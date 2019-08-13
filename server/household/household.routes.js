@@ -41,11 +41,8 @@ router.put('/:household', urlencodedParser, (req, res) => {
 // DELETE
 router.delete('/:household', (req, res) => {
     let queries = [
-        EventModel.deleteMany({ _householdId: req.params.household}),
-        TaskModel.deleteMany({ _householdId: req.params.household }),
-        NoteModel.deleteMany({ _householdId: req.params.household }),
         UserModel.updateMany({ _householdIds: { $contains: req.params.household } },
-            {  }),
+            { _householdIds: { $pull: { $elemMatch: req.params.household } } }),
         HouseholdModel.findByIdAndDelete(req.params.household)
     ];
 
