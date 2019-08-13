@@ -37,7 +37,7 @@ router.post('/', urlencodedParser, [
     if(!errors.isEmpty()) {
         res.status(422).json({
             success: false,
-            message: 'Errors in submitted data.'
+            error: 'Errors in submitted data.'
         });
     } else {
         const newUser = new UserModel({
@@ -50,7 +50,6 @@ router.post('/', urlencodedParser, [
             .then(user => {
                 res.status(200).json({
                     success: true,
-                    message: 'New user successfully created!',
                     user: user
                 })
             })
@@ -58,7 +57,7 @@ router.post('/', urlencodedParser, [
                 console.error(`Error saving new user: ${ err }`);
                 res.status(500).json({
                     success: false,
-                    message: err
+                    error: err
                 });
             });
     }
@@ -77,7 +76,6 @@ router.get('/:user', (req, res) => {
 
             res.status(200).json({
                 success: true,
-                message: 'User found!',
                 user: user
             });
         })
@@ -85,19 +83,19 @@ router.get('/:user', (req, res) => {
             console.error(`Error getting user ${ req.params.user }: ${ err }`);
             res.status(404).json({
                 success: false,
-                message: err
+                error: err
             });
         });
 });
 
 // UPDATE
-router.patch('/:user', (req, res) => {
+router.put('/:user', urlencodedParser, (req, res) => {
 
 });
 
 // DELETE
 router.delete('/:user', (req, res) => {
-    UserModel.findOneAndDelete({ _id: req.params.user})
+    UserModel.findOneAndDelete({ _id: req.params.user })
         .then(user => {
             delete user.email;
             delete user.hasVerifiedEmail;
@@ -105,7 +103,6 @@ router.delete('/:user', (req, res) => {
 
             res.status(200).json({
                 success: true,
-                message: `User ${ req.params.user } succesfully deleted.`,
                 user: user
             });
         })
@@ -113,7 +110,7 @@ router.delete('/:user', (req, res) => {
             console.error(`Error deleting user ${ req.params.user }: ${ err }`);
             res.status(404).json({ 
                 success: false,
-                message: err
+                error: err
             });
         });
 });

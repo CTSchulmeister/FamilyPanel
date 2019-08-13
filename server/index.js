@@ -7,6 +7,7 @@ const path = require('path');
 
 const config = require('./config');
 const userRoutes = require('./user/user.routes');
+const householdRoutes = require('./household/household.routes');
 
 // --- Database Setup
 mongoose.connect(config.databaseURL, { useNewUrlParser: true})
@@ -19,10 +20,10 @@ mongoose.set('useFindAndModify', false);
 const app = express();
 app.use(helmet());
 app.use(cors());
-app.use(bodyParser.json());
 
 // --- Routing
-app.use('/user', userRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/household', householdRoutes);
 app.use((err, req, res, next) => {
     console.log('Error:', err.message);
     res.status(422).json(err.message);
