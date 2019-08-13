@@ -1,31 +1,36 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import helmet from 'helmet';
-import cors from 'cors';
-import path from 'path';
+// --- Modules
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const cors = require('cors');
+const path = require('path');
 
-import config from './config';
-import db from './db';
+const config = require('./config');
+const userRoutes = require('./user/user.routes');
 
-// --- Config
+// --- Database Setup
+mongoose.connect(config.databaseURL, { useNewUrlParser: true})
+    .then(() => console.log(`FamilyPanel server connected to database: ${ config.databaseURL }`))
+    .catch(err => console.error(`Error connecting to database: ${ err }`));
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
+
+// --- App Setup
 const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
-// --- Database Config
-mongoose.connect(db.databaseURL, { useNewUrlParser: true});
-mongoose.connection.on('connected', () => {
-    console.log(`FamilyPanel server connected to database: ${ db.databaseURL }`);
+// --- Routing
+app.use('/user', userRoutes);
+app.use((err, req, res, next) => {
+    console.log('Error:', err.message);
+    res.status(422).json(err.message);
 });
-mongoose.connection.on('error', err => {
-    console.log(`Error connecting to database: ${ err }`);
-});
-mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify', false);
 
-// --- Server Startup
+// --- Server Setup
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`FamilyPanel server ready on port: ${ port }`);
