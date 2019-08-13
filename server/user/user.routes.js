@@ -4,6 +4,10 @@ const bodyParser = require('body-parser');
 const { check, validationResult } = require('express-validator');
 
 const UserModel = require('./user.model');
+const HouseholdModel = require('../household/household.model');
+const TaskModel = require('../task/task.model');
+const EventModel = require('../event/event.model');
+const NoteModel = require('../note/note.model');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -95,20 +99,26 @@ router.put('/:user', urlencodedParser, (req, res) => {
 
 // DELETE
 router.delete('/:user', (req, res) => {
-    UserModel.findOneAndDelete({ _id: req.params.user })
-        .then(user => {
-            delete user.email;
-            delete user.hasVerifiedEmail;
-            delete user.password;
+    let promises = [
+        HouseholdModel.updateMany({ _memberIds: { $contains: req.params.user } }, 
+            { _memberIds: { $pull: req.params.user } }),
+        EventModel.deleteMany({ _creatorId: req.params.user }),
+        TaskModel.deleteMany({ _creatorId: req.params.user}),
+        TaskModel.updateMany({ _assignedUserIds: { $contains: req.params.user } },
+            { _assignedUserIds: { $pull: req.params.user } }),
+        NoteModel.deleteMany({ _creatorId: req.params.user }),
+        UserModel.findByIdAndDelete(req.params.user)
+    ];
 
+    Promise.all(promises)
+        .then(() => {
             res.status(200).json({
-                success: true,
-                user: user
+                success: true
             });
         })
         .catch(err => {
-            console.error(`Error deleting user ${ req.params.user }: ${ err }`);
-            res.status(404).json({ 
+            console.error(`Error deleting user ${ req.params.user}: ${ err }`);
+            res.status(500).json({
                 success: false,
                 error: err
             });

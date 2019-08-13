@@ -44,3 +44,5 @@ const TaskSchema = new mongoose.Schema({
 TaskSchema.plugin(autoIncrement);
 
 const Task = mongoose.connection.model('Task', TaskSchema);
+
+module.exports = Task;

@@ -35,3 +35,5 @@ const EventSchema = new mongoose.Schema({
 EventSchema.plugin(autoIncrement);
 
 const Event = mongoose.connection.model('Event', EventSchema);
+
+module.exports = Event;
