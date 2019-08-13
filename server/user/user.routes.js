@@ -32,7 +32,7 @@ router.post('/', urlencodedParser, [
         .trim()
         .custom((value, { req }) => value == req.body.password)
         .withMessage('The password values did not match.')
-], (req, res) => {
+], async (req, res) => {
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
@@ -41,88 +41,79 @@ router.post('/', urlencodedParser, [
             error: 'Errors in submitted data.'
         });
     } else {
-        const newUser = new UserModel({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email
-        });
-
-        newUser.save()
-            .then(user => {
-                res.status(200).json({
-                    success: true,
-                    user: user
-                })
-            })
-            .catch(err => {
-                console.error(`Error saving new user: ${ err }`);
-                res.status(500).json({
-                    success: false,
-                    error: err
-                });
+        try {
+            const newUser = new UserModel({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                email: req.body.email
             });
-    }
-});
-
-// READ
-router.get('/:user', (req, res) => {
-    UserModel.findOneById(req.params.user)
-        .then(user => {
-            delete user.password;
-
-            if(user._id != req.session.user._id) {
-                delete user.email;
-                delete user.hasVerifiedEmail;
-            }
+    
+            const user = await newUser.save();
 
             res.status(200).json({
                 success: true,
                 user: user
             });
-        })
-        .catch(err => {
-            console.error(`Error getting user ${ req.params.user }: ${ err }`);
-            res.status(404).json({
-                success: false,
-                error: err
-            });
-        });
-});
-
-// UPDATE
-router.put('/:user', urlencodedParser, (req, res) => {
-
-});
-
-// DELETE
-router.delete('/:user', (req, res) => {
-    let queries = [
-        HouseholdModel.updateMany({ _memberIds: { $contains: req.params.user } }, 
-            { _memberIds: { $pull: req.params.user } }),
-        HouseholdModel.updateMany({ events: { _creatorId: req.params.user } },
-            { $pull: { events: { _creatorId: req.params.user } } }),
-        HouseholdModel.updateMany({ tasks: { _creatorId: req.params.user } },
-            { $pull: { tasks: { _creatorId: req.params.user } } }),
-        HouseholdModel.updateMany({ tasks: { _assignedUserIds: { $conatins: req.params.user } } },
-            { tasks: { _assignedUserIds: { $pull: { $elemMatch: req.params.user } } } }),
-        HouseholdModel.updateMany({ notes: { _creatorId: req.params.user } },
-            { $pull: { } }),
-        UserModel.findByIdAndDelete(req.params.user)
-    ];
-
-    Promise.all(queries)
-        .then(() => {
-            res.status(200).json({
-                success: true
-            });
-        })
-        .catch(err => {
-            console.error(`Error deleting user ${ req.params.user}: ${ err }`);
+        } catch (err) {
+            console.error(`Error saving new user: ${ err }`);
             res.status(500).json({
                 success: false,
                 error: err
             });
+        }
+    }
+});
+
+// READ
+router.get('/:user', async (req, res) => {
+    try {
+        let user = await UserModel.findOneById(req.params.user).exec();
+        delete user.password;
+
+        res.status(200).json({
+            success: true,
+            user: user
         });
+    } catch (err) {
+        console.error(`Error getting user ${ req.params.user }: ${ err }`);
+        res.status(404).json({
+            success: false,
+            error: err
+        });
+    }
+});
+
+// UPDATE
+router.put('/:user', urlencodedParser, async (req, res) => {
+
+});
+
+// DELETE
+router.delete('/:user', async (req, res) => {
+    try {
+        await HouseholdModel.updateMany({ _memberIds: { $contains: req.params.user } }, 
+            { _memberIds: { $pull: req.params.user } }).exec();
+        await HouseholdModel.updateMany({ events: { _creatorId: req.params.user } },
+            { $pull: { events: { _creatorId: req.params.user } } }).exec();
+        await HouseholdModel.updateMany({ tasks: { _creatorId: req.params.user } },
+            { $pull: { tasks: { _creatorId: req.params.user } } }).exec();
+        await HouseholdModel.updateMany({ tasks: { _assignedUserIds: { $conatins: req.params.user } } },
+            { tasks: { _assignedUserIds: { $pull: { $elemMatch: req.params.user } } } }).exec();
+        await HouseholdModel.updateMany({ notes: { _creatorId: req.params.user } },
+            { $pull: { notes: { _creatorId: req.params.user } } }).exec();
+        const user = await UserModel.findByIdAndDelete(req.params.user).exec();
+
+        res.status(200).json({
+            success: true,
+            user: user
+        });
+    } catch (err) {
+        console.error(`Error deleting user ${ req.params.user}: ${ err }`);
+        res.status(500).json({
+            success: false,
+            error: err
+        });
+    }
 });
 
 module.exports = router;
