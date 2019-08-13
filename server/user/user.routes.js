@@ -99,7 +99,7 @@ router.put('/:user', urlencodedParser, (req, res) => {
 
 // DELETE
 router.delete('/:user', (req, res) => {
-    let promises = [
+    let queries = [
         HouseholdModel.updateMany({ _memberIds: { $contains: req.params.user } }, 
             { _memberIds: { $pull: req.params.user } }),
         EventModel.deleteMany({ _creatorId: req.params.user }),
@@ -110,7 +110,7 @@ router.delete('/:user', (req, res) => {
         UserModel.findByIdAndDelete(req.params.user)
     ];
 
-    Promise.all(promises)
+    Promise.all(queries)
         .then(() => {
             res.status(200).json({
                 success: true

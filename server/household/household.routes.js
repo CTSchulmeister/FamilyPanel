@@ -34,22 +34,30 @@ router.get('/:household', (req, res) => {
 });
 
 // UPDATE
-router.put('/:user', urlencodedParser, (req, res) => {
+router.put('/:household', urlencodedParser, (req, res) => {
 
 });
 
 // DELETE
-router.delete('/:user', (req, res) => {
-    HouseholdModel.findOneAndDelete({ _id: req.params.household })
-        .then(household => {
+router.delete('/:household', (req, res) => {
+    let queries = [
+        EventModel.deleteMany({ _householdId: req.params.household}),
+        TaskModel.deleteMany({ _householdId: req.params.household }),
+        NoteModel.deleteMany({ _householdId: req.params.household }),
+        UserModel.updateMany({ _householdIds: { $contains: req.params.household } },
+            {  }),
+        HouseholdModel.findByIdAndDelete(req.params.household)
+    ];
+
+    Promise.all(queries)
+        .then(() => {
             res.status(200).json({
-                success: true,
-                household: household
+                success: true
             });
         })
         .catch(err => {
             console.error(`Error deleting household ${ req.params.household }: ${ err }`);
-            res.status(404).json({
+            res.status(500).json({
                 success: false,
                 error: err
             });
