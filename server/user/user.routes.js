@@ -5,9 +5,6 @@ const { check, validationResult } = require('express-validator');
 
 const UserModel = require('./user.model');
 const HouseholdModel = require('../household/household.model');
-const TaskModel = require('../task/task.model');
-const EventModel = require('../event/event.model');
-const NoteModel = require('../note/note.model');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -102,11 +99,14 @@ router.delete('/:user', (req, res) => {
     let queries = [
         HouseholdModel.updateMany({ _memberIds: { $contains: req.params.user } }, 
             { _memberIds: { $pull: req.params.user } }),
-        EventModel.deleteMany({ _creatorId: req.params.user }),
-        TaskModel.deleteMany({ _creatorId: req.params.user}),
-        TaskModel.updateMany({ _assignedUserIds: { $contains: req.params.user } },
-            { _assignedUserIds: { $pull: req.params.user } }),
-        NoteModel.deleteMany({ _creatorId: req.params.user }),
+        HouseholdModel.updateMany({ events: { _creatorId: req.params.user } },
+            { $pull: { events: { _creatorId: req.params.user } } }),
+        HouseholdModel.updateMany({ tasks: { _creatorId: req.params.user } },
+            { $pull: { tasks: { _creatorId: req.params.user } } }),
+        HouseholdModel.updateMany({ tasks: { _assignedUserIds: { $conatins: req.params.user } } },
+            { tasks: { _assignedUserIds: { $pull: { $elemMatch: req.params.user } } } }),
+        HouseholdModel.updateMany({ notes: { _creatorId: req.params.user } },
+            { $pull: { } }),
         UserModel.findByIdAndDelete(req.params.user)
     ];
 
