@@ -3,8 +3,12 @@ const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-sequence')(mongoose);
 
 // --- Schema
-const TaskSchema = new mongoose.Schema({
+const EventSchema = new mongoose.Schema({
     _id: {
+        type: Number,
+        required: true
+    },
+    _householdId: {
         type: Number,
         required: true
     },
@@ -12,35 +16,22 @@ const TaskSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    _assignedUserIds: {
-        type: Array,
-        required: true,
-        default: []
-    },
-    _householdId: {
-        type: Number,
-        required: true
-    },
     title: {
         type: String,
         required: true,
-        default: "Untitled Task"
+        default: 'Untitled Event'
     },
     description: String,
-    createdAt: {
+    time: {
         type: Date,
         required: true,
         default: Date.now
     },
-    completed: {
-        type: Boolean,
-        required: true,
-        default: false
-    }
+    location: String
 }, {
     _id: false
 });
 
-TaskSchema.plugin(autoIncrement);
+EventSchema.plugin(autoIncrement);
 
-const Task = mongoose.connection.model('Task', TaskSchema);
+const Event = mongoose.connection.model('Event', EventSchema);
