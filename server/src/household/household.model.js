@@ -4,7 +4,6 @@ const autoIncrement = require('mongoose-sequence')(mongoose);
 
 // --- Schemas
 const EventSchema = new mongoose.Schema({
-    _id: Number,
     _creatorId: {
         type: Number,
         required: true
@@ -23,10 +22,7 @@ const EventSchema = new mongoose.Schema({
     location: String
 });
 
-EventSchema.plugin(autoIncrement);
-
 const NoteSchema = new mongoose.Schema({
-    _id: Number,
     _creatorId: {
         type: Number,
         required: true
@@ -45,10 +41,7 @@ const NoteSchema = new mongoose.Schema({
     updatedAt: Date
 });
 
-NoteSchema.plugin(autoIncrement);
-
 const TaskSchema = new mongoose.Schema({
-    _id: Number,
     _creatorId: {
         type: Number,
         required: true
@@ -75,8 +68,6 @@ const TaskSchema = new mongoose.Schema({
         default: false
     }
 });
-
-TaskSchema.plugin(autoIncrement);
 
 const HouseholdSchema = new mongoose.Schema({
     _id: Number,

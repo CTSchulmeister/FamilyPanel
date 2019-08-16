@@ -91,7 +91,3 @@ describe('User Model', () => {
     });
 });
 
-describe('User Routes', () => {
-
-});
-

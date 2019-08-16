@@ -1,3 +1,5 @@
+"use strict";
+
 // --- Modules
 const mongoose = require('mongoose');
 
