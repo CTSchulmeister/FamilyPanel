@@ -5,14 +5,9 @@ const autoIncrement = require('mongoose-sequence')(mongoose);
 
 // --- Schema
 const UserSchema = new mongoose.Schema({
-    _id: {
-        type: Number,
-        required: true,
-        unique: true
-    },
+    _id: Number,
     _householdIds: {
         type: Array,
-        required: true,
         default: []
     },
     firstName: {
@@ -33,17 +28,11 @@ const UserSchema = new mongoose.Schema({
         default: false
     },
     password: {
-        hash: {
-            type: String,
-            required: true
-        },
-        salt: {
-            type: String,
-            required: true
-        }
-    }
+        type: String,
+        required: true
+    },
+    salt: String
 }, {
-    _id: false,
     toObject: {
         virtuals: true
     },
@@ -61,14 +50,14 @@ UserSchema.plugin(autoIncrement);
 UserSchema.pre('save', function(next) {
     const user = this;
 
-    const salt = crypto.randomBytes(8).toString('hex').slice(0, length);
+    const salt = crypto.randomBytes(8).toString('hex').slice(0, 8);
 
     let hash = crypto.createHmac('sha256', salt);
     hash.update(user.password);
     hash = hash.digest('hex');
 
-    user.password.hash = hash;
-    user.password.salt = salt;
+    user.password = hash;
+    user.salt = salt;
 
     next();
 });

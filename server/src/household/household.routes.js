@@ -11,7 +11,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 // CREATE
 router.post('/', urlencodedParser, [
 
-], (req, res) => {
+], async (req, res) => {
 
 });
 

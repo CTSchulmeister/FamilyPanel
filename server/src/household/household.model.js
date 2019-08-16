@@ -4,10 +4,7 @@ const autoIncrement = require('mongoose-sequence')(mongoose);
 
 // --- Schemas
 const EventSchema = new mongoose.Schema({
-    _id: {
-        type: Number,
-        required: true
-    },
+    _id: Number,
     _creatorId: {
         type: Number,
         required: true
@@ -24,17 +21,12 @@ const EventSchema = new mongoose.Schema({
         default: Date.now
     },
     location: String
-}, {
-    _id: false
 });
 
 EventSchema.plugin(autoIncrement);
 
 const NoteSchema = new mongoose.Schema({
-    _id: {
-        type: Number,
-        required: true
-    },
+    _id: Number,
     _creatorId: {
         type: Number,
         required: true
@@ -51,17 +43,12 @@ const NoteSchema = new mongoose.Schema({
         default: Date.now
     },
     updatedAt: Date
-}, {
-    _id: false
 });
 
 NoteSchema.plugin(autoIncrement);
 
 const TaskSchema = new mongoose.Schema({
-    _id: {
-        type: Number,
-        required: true
-    },
+    _id: Number,
     _creatorId: {
         type: Number,
         required: true
@@ -87,18 +74,12 @@ const TaskSchema = new mongoose.Schema({
         required: true,
         default: false
     }
-}, {
-    _id: false
 });
 
 TaskSchema.plugin(autoIncrement);
 
 const HouseholdSchema = new mongoose.Schema({
-    _id: {
-        type: Number,
-        required: true,
-        unique: true
-    },
+    _id: Number,
     _ownerId: {
         type: Number,
         required: true
@@ -112,11 +93,18 @@ const HouseholdSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    events: [EventSchema],
-    tasks: [TaskSchema],
-    notes: [NoteSchema]
-}, {
-    _id: false
+    events: {
+        type: [EventSchema],
+        default: []
+    },
+    tasks: {
+        type: [TaskSchema],
+        default: []
+    },
+    notes: {
+        type: [NoteSchema],
+        default: []
+    }
 });
 
 HouseholdSchema.plugin(autoIncrement);

@@ -1,10 +1,14 @@
 {
   "name": "familypanel-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A MERN stack application for helping household members coordinate.",
+  "main": "./src/index.js",
+  "jest": {
+    "setupTestFrameworkScriptFile": "./test/setup.js",
+    "testEnvironment": "node"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Christian Schulmeister",
   "license": "ISC",
@@ -19,5 +23,8 @@
     "mongoose": "^5.6.9",
     "mongoose-sequence": "^5.1.0",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
   }
 }

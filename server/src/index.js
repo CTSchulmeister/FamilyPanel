@@ -5,16 +5,14 @@ const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
 
-const config = require('./config');
+const config = require('../config');
 const userRoutes = require('./user/user.routes');
 const householdRoutes = require('./household/household.routes');
 
 // --- Database Setup
-mongoose.connect(config.databaseURL, { useNewUrlParser: true})
+mongoose.connect(config.databaseURL, config.mongooseOptions)
     .then(() => console.log(`FamilyPanel server connected to database: ${ config.databaseURL }`))
     .catch(err => console.error(`Error connecting to database: ${ err }`));
-mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify', false);
 
 // --- App Setup
 const app = express();
