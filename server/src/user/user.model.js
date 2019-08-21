@@ -1,13 +1,11 @@
-"use strict";
+'use strict';
 
 // --- Modules
 const mongoose = require('mongoose');
 const crypto = require('crypto');
-const autoIncrement = require('mongoose-sequence')(mongoose);
 
 // --- Schema
 const UserSchema = new mongoose.Schema({
-    _id: Number,
     _householdIds: {
         type: Array,
         default: []
@@ -46,8 +44,6 @@ const UserSchema = new mongoose.Schema({
 UserSchema.virtual('fullName').get(() => {
     return `${ this.firstName } ${ this.lastName}`;
 });
-
-UserSchema.plugin(autoIncrement);
 
 UserSchema.pre('save', function(next) {
     const user = this;

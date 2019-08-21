@@ -12,7 +12,15 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 router.post('/', urlencodedParser, [
 
 ], async (req, res) => {
-
+    try {
+        // TODO: 
+    } catch (err) {
+        console.error(`Error creating household: ${ err }`);
+        res.status(500).json({
+            success: false,
+            error: err
+        });
+    }
 });
 
 // READ
@@ -33,7 +41,9 @@ router.get('/:household', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household', urlencodedParser, async (req, res) => {
+router.put('/:household', urlencodedParser, [
+
+], async (req, res) => {
 
 });
 
@@ -58,7 +68,7 @@ router.delete('/:household', async (req, res) => {
 
 // --- Routes (Events)
 // CREATE
-router.post('/:household/event', async (req, res) => {
+router.post('/:household/event', urlencodedParser, async (req, res) => {
 
 });
 

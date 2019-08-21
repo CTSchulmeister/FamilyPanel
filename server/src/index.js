@@ -32,3 +32,5 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`FamilyPanel server ready on port: ${ port }`);
 });
+
+module.exports = app;

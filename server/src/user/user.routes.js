@@ -1,3 +1,5 @@
+'use strict';
+
 // --- Modules
 const router = require('express').Router();
 const bodyParser = require('body-parser');

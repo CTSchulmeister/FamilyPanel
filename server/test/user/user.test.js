@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // --- Modules
 const mongoose = require('mongoose');
@@ -90,4 +90,3 @@ describe('User Model', () => {
         });
     });
 });
-

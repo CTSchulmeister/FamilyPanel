@@ -1,22 +1,21 @@
+'use strict';
+
 // --- Modules
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-sequence')(mongoose);
 
 // --- Schemas
 const EventSchema = new mongoose.Schema({
     _creatorId: {
-        type: Number,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     title: {
         type: String,
-        required: true,
         default: 'Untitled Event'
     },
     description: String,
     time: {
         type: Date,
-        required: true,
         default: Date.now
     },
     location: String
@@ -24,18 +23,16 @@ const EventSchema = new mongoose.Schema({
 
 const NoteSchema = new mongoose.Schema({
     _creatorId: {
-        type: Number,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     title: {
         type: String,
-        required: true,
         default: 'Untitled Note'
     },
     body: String,
     createdAt: {
         type: Date,
-        required: true,
         default: Date.now
     },
     updatedAt: Date
@@ -43,36 +40,38 @@ const NoteSchema = new mongoose.Schema({
 
 const TaskSchema = new mongoose.Schema({
     _creatorId: {
-        type: Number,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     _assignedUserIds: {
         type: Array,
-        required: true,
         default: []
     },
     title: {
         type: String,
-        required: true,
         default: "Untitled Task"
     },
     description: String,
     createdAt: {
         type: Date,
-        required: true,
         default: Date.now
     },
     completed: {
         type: Boolean,
-        required: true,
         default: false
     }
 });
 
+TaskSchema.pre('save', function(next) {
+    if(this._assignedUserIds.length == 0) {
+        this._assignedUserIds = this.ownerDocument()._memberIds;
+    }
+    next();
+});
+
 const HouseholdSchema = new mongoose.Schema({
-    _id: Number,
     _ownerId: {
-        type: Number,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     _memberIds: {
@@ -97,8 +96,6 @@ const HouseholdSchema = new mongoose.Schema({
         default: []
     }
 });
-
-HouseholdSchema.plugin(autoIncrement);
 
 const Household = mongoose.connection.model('Household', HouseholdSchema);
 
