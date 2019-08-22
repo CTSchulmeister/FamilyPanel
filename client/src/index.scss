@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:regular,bold,italic&subset=latin,latin-ext');
+@import './scss/variables.scss';
+
+* {
+    box-sizing: border-box;
+    font-family: $standard;
+}
+
+html, body {
+    margin: 0 auto;
+}

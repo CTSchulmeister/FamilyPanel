@@ -1,0 +1,29 @@
+@import '../../scss/variables.scss';
+
+.widget__header-section {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    height: 2rem;
+    width: 100%;
+    position: relative;
+
+    &::after {
+        content: '';
+        width: 100%;
+        height: 0.25rem;
+        position: absolute;
+        background-color: red;
+        top: 100%;
+        left: 0;
+        border-radius: 0.125rem;
+    }
+}
+
+.widget__title {
+    color: $white;
+    margin: 0;
+    text-shadow: $text-shadow--medium;
+}
+

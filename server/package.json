@@ -4,11 +4,11 @@
   "description": "A MERN stack application for helping household members coordinate.",
   "main": "./src/index.js",
   "jest": {
-    "setupTestFrameworkScriptFile": "./test/setup.js",
+    "setupFilesAfterEnv": ["./test/setup.js"],
     "testEnvironment": "node"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest --verbose"
   },
   "author": "Christian Schulmeister",
   "license": "ISC",
