@@ -76,7 +76,6 @@ const HouseholdSchema = new mongoose.Schema({
     },
     _memberIds: {
         type: Array,
-        required: true,
         default: []
     },
     name: {

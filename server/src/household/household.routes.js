@@ -1,3 +1,5 @@
+'use strict';
+
 // --- Modules
 const router = require('express').Router();
 const bodyParser = require('body-parser');
@@ -7,20 +9,48 @@ const HouseholdModel = require('./household.model');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
+const exists = (value) => (value && value != '') ? true : false;
+
 // --- Routes (Household)
 // CREATE
 router.post('/', urlencodedParser, [
-
+    check(ownerId)
+        .custom(exists(value)),
+    check(memberIds)
+        .optional()
+        .isArray(),
+    check(name)
+        .custom(exists(value))
+        .isString()
+        .trim()
 ], async (req, res) => {
-    try {
-        // TODO: 
-    } catch (err) {
-        console.error(`Error creating household: ${ err }`);
-        res.status(500).json({
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        res.status(422).json({
             success: false,
-            error: err
+            errors: errors
         });
-    }
+    } else {
+        try {
+            const household = await new HouseholdModel({
+                _ownerId: req.body.ownerId,
+                _memberIds: (req.body.memberIds) ? req.body.memberIds : [],
+                name: req.body.name
+            }).save();
+
+            res.status(200).json({
+                success: true,
+                household: household
+            });
+        } catch (err) {
+            console.error(`Error creating household: ${ err }`);
+            res.status(500).json({
+                success: false,
+                error: err
+            });
+        }
+    }    
 });
 
 // READ
@@ -68,7 +98,9 @@ router.delete('/:household', async (req, res) => {
 
 // --- Routes (Events)
 // CREATE
-router.post('/:household/event', urlencodedParser, async (req, res) => {
+router.post('/:household/event', urlencodedParser, [
+
+], async (req, res) => {
 
 });
 
