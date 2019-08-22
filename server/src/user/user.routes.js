@@ -3,7 +3,7 @@
 // --- Modules
 const router = require('express').Router();
 const bodyParser = require('body-parser');
-const { checkShema } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 const crypto = require('crypto');
 
 const UserModel = require('./user.model');
@@ -135,7 +135,7 @@ router.patch('/:user', urlencodedParser, [
                 update.salt = salt;
             }
 
-            user = await UserModel.findByIdAndUpdate(req.params.user, update, { new: true });
+            user = await UserModel.findByIdAndUpdate(req.params.user, update, { new: true }).exec();
 
             res.status(200).json({
                 success: true,

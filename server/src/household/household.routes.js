@@ -14,12 +14,12 @@ const exists = (value) => (value && value != '') ? true : false;
 // --- Routes (Household)
 // CREATE
 router.post('/', urlencodedParser, [
-    check(ownerId)
+    check('ownerId')
         .custom(exists(value)),
-    check(memberIds)
+    check('memberIds')
         .optional()
         .isArray(),
-    check(name)
+    check('name')
         .custom(exists(value))
         .isString()
         .trim()
@@ -71,10 +71,48 @@ router.get('/:household', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household', urlencodedParser, [
-
+router.patch('/:household', urlencodedParser, [
+    check('ownerId')
+        .optional(),
+    check('memberIds')
+        .optional()
+        .isArray(),
+    check('name')
+        .optional()
+        .isString()
+        .trim()
 ], async (req, res) => {
+    const errors = validationResult(req);
 
+    if(!errors.isEmpty()) {
+        res.status(422).json({
+            success: false,
+            errors: errors
+        });
+    } else {
+        try {
+            let household = await HouseholdModel.findOneById(req.params.household);
+
+            let update = {
+                _ownerId: (req.body.ownerId) ? req.body.ownerId : household._ownerId,
+                _memberIds: (req.body.memberIds) ? req.body.memberIds : household._memberIds,
+                name: (req.body.name) ? req.body.name : household.name
+            };
+
+            household = await HouseholdModel.findByIdAndUpdate(req.params.household, update, { new: true }).exec();
+
+            res.status(200).json({
+                success: true,
+                household: household
+            });
+        } catch (err) {
+            console.error(`Error updating household ${ req.params.household }: ${ err }`);
+            res.status(500).json({
+                success: false,
+                error: err
+            });
+        }
+    }
 });
 
 // DELETE
