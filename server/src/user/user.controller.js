@@ -1,0 +1,157 @@
+'use strict';
+
+// --- Modules
+const UserModel = require('./user.model');
+const HouseholdModel = require('../household/household.model');
+const crypto = require('crypto');
+const mongoose = require('mongoose');
+
+// --- Controller Logic
+
+/**
+ * Generates an 8 character salt.
+ */
+const generateSalt = () => {
+    return crypto.randomBytes(8).toString('hex').slice(0, 8);
+}
+
+/**
+ * Hashes a password with the passed salt.
+ * @param {String} password 
+ * @param {String} salt 
+ */
+const generateHash = (password, salt) => {
+    let hash = crypto.createHmac('sha256', salt);
+    hash.update(password);
+    hash = hash.digest('hex');
+
+    return hash;
+};
+
+/**
+ * Creates a user.
+ * @param {String} firstName - The first name of the user.
+ * @param {String} lastName - The last name of the user.
+ * @param {String} email - The user's email.
+ * @param {String} password - The user's unhashed password.
+ */
+module.exports.createUser = async (firstName, lastName, email, password) => {
+    try {
+        const salt = generateSalt();
+        const hashedPassword = generateHash(password, salt);
+
+        const user = new UserModel({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: hashedPassword,
+            salt: salt
+        });
+
+        user.validate((err) => {
+            if(err) throw err;
+        });
+
+        return await user.save();
+    } catch (err) {
+        throw err;
+    }
+};
+
+/** 
+ * Retrieves a user document by id.
+ * @param {ObjectId} id - The user's _id value.
+ */
+module.exports.readUser = async (id) => {
+    try {
+        const user = await UserModel.findById(id).exec();
+
+        if(!user) throw new Error(`User with id ${ id } does not exist`);
+
+        return user;
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
+ * Updates a user document by id given an update object.
+ * Pass null to fields not being updated.
+ * @param {ObjectId} id - The user's id.
+ * @param {String} firstName - The user's new first name.
+ * @param {String} lastName - The user's new last name.
+ * @param {String} email - The user's new email.
+ * @param {String} password - The user's unhashed password.
+ */
+module.exports.updateUser = async (id, firstName, lastName, email, password) => {
+    try {
+        let update = {};
+
+        if(firstName) update.firstName = firstName;
+        if(lastName) update.lastName = lastName;
+        if(email) update.email = email;
+        if(password) {
+            const salt = generateSalt();
+            const hashedPassword = generateHash(password, salt);
+
+            update.password = hashedPassword;
+            update.salt = salt;
+        }
+
+        const user = await UserModel.findByIdAndUpdate(id, update, { new: true}).exec();
+
+        if(!user) throw new Error(`User with id ${ id } does not exist`);
+
+        return user;
+    } catch (err) {
+        throw err;
+    }
+};
+
+/**
+ * Deletes a user document by id.
+ * @param {ObjectId} id - The user's id.
+ */
+module.exports.deleteUser = async (id) => {
+    try {
+        await HouseholdModel.deleteMany({ _ownerId: id }).exec();
+
+        let households = await HouseholdModel.find({ _memberIds: id }).exec();
+
+        households.forEach(async household => {
+            household._memberIds.splice(household._memberIds.indexOf(id), 1);
+
+            household.events.forEach((event, index) => {
+                if(event._creatorId.equals(id)) {
+                    household.events.splice(index, 1);
+                }
+            });
+
+            household.tasks.forEach((task, index) => {
+                if(task._creatorId.equals(id)) {
+                    household.tasks.splice(index, 1);
+                } else {
+                    task._assignedUserIds.forEach((userId, index) => {
+                        if(userId.equals(id)) {
+                            task._assignedUserIds.splice(index, 1);
+                        }
+                    });
+                }
+            });
+
+            household.notes.forEach((note, index) => {
+                if(note._creatorId.equals(id)) {
+                    household.notes.splice(index, 1);
+                }
+            });
+
+            await household.save();
+        });
+
+        const user = await UserModel.findByIdAndDelete(id).exec();
+
+        return user;
+    } catch (err) {
+        throw err;
+    }
+}

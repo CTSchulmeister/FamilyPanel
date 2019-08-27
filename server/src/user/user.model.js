@@ -2,7 +2,6 @@
 
 // --- Modules
 const mongoose = require('mongoose');
-const crypto = require('crypto');
 
 // --- Schema
 const UserSchema = new mongoose.Schema({
@@ -31,7 +30,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    salt: String
+    salt: {
+        type: String,
+        required: true
+    }
 }, {
     toObject: {
         virtuals: true
@@ -43,21 +45,6 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.virtual('fullName').get(() => {
     return `${ this.firstName } ${ this.lastName}`;
-});
-
-UserSchema.pre('save', function(next) {
-    const user = this;
-
-    const salt = crypto.randomBytes(8).toString('hex').slice(0, 8);
-
-    let hash = crypto.createHmac('sha256', salt);
-    hash.update(user.password);
-    hash = hash.digest('hex');
-
-    user.password = hash;
-    user.salt = salt;
-
-    next();
 });
 
 const User = mongoose.connection.model('User', UserSchema);

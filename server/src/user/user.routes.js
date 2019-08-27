@@ -4,10 +4,8 @@
 const router = require('express').Router();
 const bodyParser = require('body-parser');
 const { check, validationResult } = require('express-validator');
-const crypto = require('crypto');
 
-const UserModel = require('./user.model');
-const HouseholdModel = require('../household/household.model');
+const UserController = require('./user.controller');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -26,6 +24,7 @@ router.post('/', urlencodedParser, [
         .trim(),
     check('email')
         .custom(exists(value))
+        .normalizeEmail()
         .isEmail().withMessage('An invalid email was submitted')
         .custom((value, { req }) => value == req.body.retypeEmail)
         .withMessage('The email values did not match')
@@ -46,11 +45,11 @@ router.post('/', urlencodedParser, [
         });
     } else {
         try {
-            const user = await new UserModel({
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                email: req.body.email
-            }).save();
+            const user = await UserController.createUser(
+                req.body.firstName, 
+                req.body.lastName,
+                req.body.email,
+                req.body.password);
 
             res.status(200).json({
                 success: true,
@@ -69,8 +68,7 @@ router.post('/', urlencodedParser, [
 // READ
 router.get('/:user', async (req, res) => {
     try {
-        let user = await UserModel.findOneById(req.params.user).exec();
-        delete user.password;
+        const user = await UserController.readUser(req.params.user);
 
         res.status(200).json({
             success: true,
@@ -97,6 +95,7 @@ router.patch('/:user', urlencodedParser, [
         .trim(),
     check('email')
         .optional()
+        .normalizeEmail()
         .isEmail().withMessage('An invalid email was submitted')
         .custom((value, { req }) => value == req.body.retypeEmail)
         .trim()
@@ -107,7 +106,7 @@ router.patch('/:user', urlencodedParser, [
         .custom((value, { req }) => value == req.body.retypePassword)
         .withMessage('The password values did not match')
 ], async (req, res) => {
-    const erros = validationResult(req);
+    const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
         res.status(422).json({
@@ -116,27 +115,19 @@ router.patch('/:user', urlencodedParser, [
         });
     } else {
         try {
-            let user = await UserModel.findOneById(req.params.user);
+            const firstName = (req.body.firstName) ? req.body.firstName : null;
+            const lastName = (req.body.lastName) ? req.body.lastName : null;
+            const email = (req.body.email) ? req.body.email : null;
+            const password = (req.body.password) ? req.body.password : null;
 
-            let update = {
-                firstName: (req.body.firstName) ? req.body.firstName: user.firstName,
-                lastName: (req.body.lastName) ? req.body.lastName: user.lastName,
-                email: (req.body.email) ? req.body.email : user.email
-            };
-
-            if(req.body.password) {
-                const salt = crypto.randomBytes(8).toString('hex').slice(0, 8);
-
-                let hash = crypto.createHmac('sha256', salt);
-                hash.update(req.body.password);
-                hash = hash.digest('hex');
-                
-                update.password = hash;
-                update.salt = salt;
-            }
-
-            user = await UserModel.findByIdAndUpdate(req.params.user, update, { new: true }).exec();
-
+            const user = await UserController.updateUser(
+                req.params.user,
+                firstName,
+                lastName,
+                email,
+                password
+            );
+            
             res.status(200).json({
                 success: true,
                 user: user
@@ -154,17 +145,7 @@ router.patch('/:user', urlencodedParser, [
 // DELETE
 router.delete('/:user', async (req, res) => {
     try {
-        await HouseholdModel.updateMany({ _memberIds: { $contains: req.params.user } }, 
-            { _memberIds: { $pull: req.params.user } }).exec();
-        await HouseholdModel.updateMany({ events: { _creatorId: req.params.user } },
-            { $pull: { events: { _creatorId: req.params.user } } }).exec();
-        await HouseholdModel.updateMany({ tasks: { _creatorId: req.params.user } },
-            { $pull: { tasks: { _creatorId: req.params.user } } }).exec();
-        await HouseholdModel.updateMany({ tasks: { _assignedUserIds: { $conatins: req.params.user } } },
-            { tasks: { _assignedUserIds: { $pull: { $elemMatch: req.params.user } } } }).exec();
-        await HouseholdModel.updateMany({ notes: { _creatorId: req.params.user } },
-            { $pull: { notes: { _creatorId: req.params.user } } }).exec();
-        const user = await UserModel.findByIdAndDelete(req.params.user).exec();
+        const user = await UserController.deleteUser(req.params.user);
 
         res.status(200).json({
             success: true,

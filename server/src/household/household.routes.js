@@ -35,7 +35,7 @@ router.post('/', urlencodedParser, [
         try {
             const household = await new HouseholdModel({
                 _ownerId: req.body.ownerId,
-                _memberIds: (req.body.memberIds) ? req.body.memberIds : [],
+                _memberIds: (req.body.memberIds) ? req.body.memberIds : [req.body.ownerId],
                 name: req.body.name
             }).save();
 
@@ -91,7 +91,7 @@ router.patch('/:household', urlencodedParser, [
         });
     } else {
         try {
-            let household = await HouseholdModel.findOneById(req.params.household);
+            let household = await HouseholdModel.findOneById(req.params.household).exec();
 
             let update = {
                 _ownerId: (req.body.ownerId) ? req.body.ownerId : household._ownerId,
@@ -123,7 +123,8 @@ router.delete('/:household', async (req, res) => {
         const household = await HouseholdModel.findByIdAndDelete(req.params.household).exec();
 
         res.status(200).json({
-            success: true
+            success: true,
+            household: household
         });
     } catch (err) {
         console.error(`Error deleting household ${ req.params.household }: ${ err }`);
@@ -137,9 +138,60 @@ router.delete('/:household', async (req, res) => {
 // --- Routes (Events)
 // CREATE
 router.post('/:household/event', urlencodedParser, [
-
+    check('creatorId')
+        .custom(exists(value)),
+    check('title')
+        .custom(exists(value))
+        .isString()
+        .trim(),
+    check('description')
+        .optional()
+        .isString()
+        .trim(),
+    check('time')
+        .optional()
+        .trim()
+        .isISO8601(),
+    check('location')
+        .optional()
+        .isString()
+        .trim(),
 ], async (req, res) => {
+    const errors = validationResult(req);
 
+    if(!errors.isEmpty()) {
+        res.status(422).json({
+            success: false,
+            errors: errors
+        });
+    } else {
+        try {
+            const event = {
+                _creatorId: req.body.creatorId,
+                title: req.body.title,
+                description: (req.body.description) ? req.body.description : null,
+                time: (req.body.time) ? req.body.time : Date.now,
+                location: (req.body.location) ? req.body.location : null
+            };
+
+            const household = await HouseholdModel.findById(req.params.household).exec();
+
+            household.events.push(event);
+
+            await household.save();
+
+            res.status(200).json({
+                success: true,
+                event: event
+            });
+        } catch (err) {
+            console.error(`Error creating event on household ${ req.params.household }: ${ err }`);
+            res.status(500).json({
+                success: false,
+                error: err
+            });
+        }
+    }
 });
 
 // READ
@@ -167,7 +219,15 @@ router.put('/:household/event/:event', urlencodedParser, async (req, res) => {
 
 // DELETE
 router.delete('/:household/event/:event', async (req, res) => {
-
+    try {
+        let household = await HouseholdModel.findOne({ _id: req.params.id }).exec();
+    } catch (err) {
+        console.error(`Error deleting event ${ req.params.event } from household ${ req.params.household }: ${ err }`);
+        res.status(500).json({
+            success: false,
+            error: err
+        });
+    }
 });
 
 // --- Routes (Tasks)

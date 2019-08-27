@@ -66,6 +66,17 @@ TaskSchema.pre('save', function(next) {
     if(this._assignedUserIds.length == 0) {
         this._assignedUserIds = this.ownerDocument()._memberIds;
     }
+
+    let creatorIdInAssignedUsers = false;
+
+    for(let i = 0; i < this._assignedUserIds.length; i++) {
+        if(mongoose.Types.ObjectId(this._assignedUserIds[i]).equals(mongoose.Types.ObjectId(this._creatorId))) {
+            creatorIdInAssignedUsers = true;
+        }
+    }
+
+    if(!creatorIdInAssignedUsers) this._assignedUserIds.push(this._creatorId);
+    
     next();
 });
 
@@ -94,6 +105,13 @@ const HouseholdSchema = new mongoose.Schema({
         type: [NoteSchema],
         default: []
     }
+});
+
+HouseholdSchema.pre('save', function(next) {
+    if(Object.values(this._memberIds).indexOf(this._ownerId) == -1) {
+        this._memberIds.push(this._ownerId);
+    }
+    next();
 });
 
 const Household = mongoose.connection.model('Household', HouseholdSchema);

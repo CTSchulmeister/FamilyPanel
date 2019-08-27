@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
+const jwt = require('express-jwt');
+const jwks = require('jwks-rsa');
 
 const config = require('../config');
 const userRoutes = require('./user/user.routes');
@@ -18,6 +20,17 @@ mongoose.connect(config.databaseURL, config.mongooseOptions)
 const app = express();
 app.use(helmet());
 app.use(cors());
+app.use(jwt({
+    secret: jwks.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: config.jwksUri
+    }),
+    audience: config.jwtAudience,
+    issuer: config.jwtIssuer,
+    algorithms: ['RS256']
+}))
 
 // --- Routing
 app.use('/api/user', userRoutes);

@@ -18,7 +18,7 @@ beforeEach((done) => {
     };
 
     if(mongoose.connection.readyState === 0) {
-        mongoose.connect(config.testDatabaseURL, config.mongooseOptions, (err) => {
+        mongoose.connect(`mongodb://localhost:27017/${process.env.TEST_SUITE}`, config.mongooseOptions, (err) => {
             if(err) throw err;
             return clearDatabase();
         });

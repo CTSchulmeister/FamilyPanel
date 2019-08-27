@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 
 const HouseholdModel = require('../../src/household/household.model');
 
+process.env.TEST_SUITE = 'familypanel-household-model-test';
+
 describe('Household Model', () => {
     const idOne = new mongoose.Types.ObjectId;
     const idTwo = new mongoose.Types.ObjectId;
@@ -12,13 +14,13 @@ describe('Household Model', () => {
 
     describe('CREATE', () => {
         test('Can create a household', async () => {
-            await new HouseholdModel({
+            let household = await new HouseholdModel({
                 _ownerId: idOne,
                 _memberIds: [idOne, idTwo, idThree],
                 name: 'Our Apartment'
             }).save();
 
-            const household = await HouseholdModel.findOne({ name: 'Our Apartment' });
+            household = await HouseholdModel.findOne(household._id).exec();
 
             expect(household.name).toEqual('Our Apartment');
         });
@@ -36,7 +38,7 @@ describe('Household Model', () => {
 
     describe('READ', () => {
         test('Doesn\'t find a household if that household doesn\'t exist', async () => {
-            const household = await HouseholdModel.findOne({ name: 'Our Apartment' }).exec();
+            const household = await HouseholdModel.findOne(new mongoose.Types.ObjectId()).exec();
 
             expect(household).toBeNull();
         });
@@ -44,14 +46,14 @@ describe('Household Model', () => {
 
     describe('UPDATE', () => {
         test('Can update a household', async () => {
-            await new HouseholdModel({
+            let household = await new HouseholdModel({
                 _ownerId: idOne,
                 _memberIds: [idOne, idTwo, idThree],
                 name: 'Our Apartment'
             }).save();
 
-            const household = await HouseholdModel.findOneAndUpdate(
-                { name: 'Our Apartment' },
+            household = await HouseholdModel.findByIdAndUpdate(
+                household._id,
                 { name: 'Our Condo' },
                 { new: true }).exec();
 
@@ -61,13 +63,13 @@ describe('Household Model', () => {
 
     describe('DELETE', () => {
         test('Can delete a household', async () => {
-            await new HouseholdModel({
+            let household = await new HouseholdModel({
                 _ownerId: idOne,
                 _memberIds: [idOne, idTwo, idThree],
                 name: 'Our Apartment'
             }).save();
 
-            const household = await HouseholdModel.findOneAndDelete({ name: 'Our Apartment' }).exec();
+            household = await HouseholdModel.findByIdAndDelete(household._id).exec();
 
             expect(household.name).toEqual('Our Apartment');
         });
@@ -76,24 +78,20 @@ describe('Household Model', () => {
     describe('Events', () => {
         describe('CREATE', () => {
             test('Can create an event', async () => {
-                await new HouseholdModel({
+                let household = await new HouseholdModel({
                     _ownerId: idOne,
                     _memberIds: [idOne, idTwo, idThree],
                     name: 'Our Apartment'
                 }).save();
-    
-                let household = await HouseholdModel.findOne({ name: 'Our Apartment' });
-    
+
                 household.events.push({
                     _creatorId: idOne,
                     title: 'Concert',
                     description: 'At the House of Blues',
                     time: '2019-10-09'
                 });
-    
-                await household.save();
-    
-                household = await HouseholdModel.findOne({ name: 'Our Apartment' });
+
+                household = await household.save();
     
                 expect(household.events[0].title).toEqual('Concert');
             });
@@ -165,13 +163,11 @@ describe('Household Model', () => {
     describe('Notes', () => {
         describe('CREATE', () => {
             test('Can create a note', async () => {
-                await new HouseholdModel({
+                let household = await new HouseholdModel({
                     _ownerId: idOne,
                     _memberIds: [idOne, idTwo, idThree],
                     name: 'Our Apartment'
                 }).save();
-    
-                let household = await HouseholdModel.findOne({ name: 'Our Apartment' });
     
                 household.notes.push({
                     _creatorId: idTwo,
@@ -179,9 +175,7 @@ describe('Household Model', () => {
                     body: 'Remember to be washing your dishes after you use them.'
                 });
     
-                await household.save();
-    
-                household = await HouseholdModel.findOne({ name: 'Our Apartment' });
+                household = await household.save();
     
                 expect(household.notes[0].title).toEqual('Hey, guys...');
             });
@@ -252,13 +246,11 @@ describe('Household Model', () => {
     describe('Tasks', () => {
         describe('CREATE', () => {
             test('Can create a task', async () => {
-                await new HouseholdModel({
+                let household = await new HouseholdModel({
                     _ownerId: idOne,
                     _memberIds: [idOne, idTwo, idThree],
                     name: 'Our Apartment'
                 }).save();
-    
-                let household = await HouseholdModel.findOne({ name: 'Our Apartment' });
     
                 household.tasks.push({
                     _creatorId: idTwo,
@@ -266,9 +258,7 @@ describe('Household Model', () => {
                     title: 'Take out the trash'
                 });
     
-                await household.save();
-    
-                household = await HouseholdModel.findOne({ name: 'Our Apartment' });
+                household = await household.save();
     
                 expect(household.tasks[0]._assignedUserIds.length).toBe(3);
             });
