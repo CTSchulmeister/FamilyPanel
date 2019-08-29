@@ -60,7 +60,7 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
 
 /** 
  * Retrieves a user document by id.
- * @param {ObjectId} id - The user's _id value.
+ * @param {mongoose.Types.ObjectId} id - The user's _id value.
  */
 module.exports.readUser = async (id) => {
     try {
@@ -75,9 +75,9 @@ module.exports.readUser = async (id) => {
 };
 
 /**
- * Updates a user document by id given an update object.
+ * Updates a user document by id given update parameters.
  * Pass null to fields not being updated.
- * @param {ObjectId} id - The user's id.
+ * @param {mongoose.Types.ObjectId} id - The user's id.
  * @param {String} firstName - The user's new first name.
  * @param {String} lastName - The user's new last name.
  * @param {String} email - The user's new email.
@@ -110,7 +110,7 @@ module.exports.updateUser = async (id, firstName, lastName, email, password) => 
 
 /**
  * Deletes a user document by id.
- * @param {ObjectId} id - The user's id.
+ * @param {mongoose.Types.ObjectId} id - The user's id.
  */
 module.exports.deleteUser = async (id) => {
     try {
@@ -149,6 +149,8 @@ module.exports.deleteUser = async (id) => {
         });
 
         const user = await UserModel.findByIdAndDelete(id).exec();
+
+        if(!user) throw new Error(`User with id ${ id } does not exist`);
 
         return user;
     } catch (err) {
