@@ -5,7 +5,7 @@ const router = require('express').Router();
 const bodyParser = require('body-parser');
 const { check, validationResult } = require('express-validator');
 
-const HouseholdModel = require('./household.model');
+const HouseholdController = require('./household.controller');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -33,11 +33,11 @@ router.post('/', urlencodedParser, [
         });
     } else {
         try {
-            const household = await new HouseholdModel({
-                _ownerId: req.body.ownerId,
-                _memberIds: (req.body.memberIds) ? req.body.memberIds : [req.body.ownerId],
-                name: req.body.name
-            }).save();
+            const household = await HouseholdController.createHousehold(
+                req.body.ownerId,
+                req.body.memberIds,
+                req.body.name
+            );
 
             res.status(200).json({
                 success: true,
@@ -56,7 +56,7 @@ router.post('/', urlencodedParser, [
 // READ
 router.get('/:household', async (req, res) => {
     try {
-        const household = await HouseholdModel.findOneById(req.params.household).exec();
+        const household = await HouseholdController.readHousehold(req.params.household);
         res.status(200).json({
             success: true,
             household: household
@@ -91,15 +91,16 @@ router.patch('/:household', urlencodedParser, [
         });
     } else {
         try {
-            let household = await HouseholdModel.findOneById(req.params.household).exec();
+            const ownerId = (req.body.ownerId) ? req.body.ownerId : null;
+            const memberIds = (req.body.memberIds) ? req.body.memberIds : null;
+            const name = (req.body.name) ? req.body.name : null;
 
-            let update = {
-                _ownerId: (req.body.ownerId) ? req.body.ownerId : household._ownerId,
-                _memberIds: (req.body.memberIds) ? req.body.memberIds : household._memberIds,
-                name: (req.body.name) ? req.body.name : household.name
-            };
-
-            household = await HouseholdModel.findByIdAndUpdate(req.params.household, update, { new: true }).exec();
+            const household = await HouseholdController.updateHousehold(
+                req.params.household,
+                ownerId, 
+                memberIds, 
+                name
+            );
 
             res.status(200).json({
                 success: true,
@@ -118,9 +119,7 @@ router.patch('/:household', urlencodedParser, [
 // DELETE
 router.delete('/:household', async (req, res) => {
     try {
-        await UserModel.updateMany({ _householdIds: { $contains: req.params.household } },
-            { _householdIds: { $pull: { $elemMatch: req.params.household } } }).exec();
-        const household = await HouseholdModel.findByIdAndDelete(req.params.household).exec();
+        const household = await HouseholdController.deleteHousehold(req.params.household);
 
         res.status(200).json({
             success: true,
