@@ -192,7 +192,7 @@ router.post('/:household/event', urlencodedParser, [
 // READ
 router.get('/:household/event/:event', async (req, res) => {
     try {
-        const event = await HouseholdController.readEvent(req.params.event);
+        const event = await HouseholdController.readEvent(req.params.household, req.params.event);
 
         res.status(200).json({
             success: true,
@@ -271,7 +271,7 @@ router.put('/:household/event/:event', urlencodedParser, [
 // DELETE
 router.delete('/:household/event/:event', async (req, res) => {
     try {
-        const event = await HouseholdController.deleteEvent(req.params.event);
+        const event = await HouseholdController.deleteEvent(req.params.household, req.params.event);
 
         res.status(200).json({
             success: true,

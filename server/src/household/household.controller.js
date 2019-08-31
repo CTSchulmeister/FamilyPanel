@@ -134,14 +134,17 @@ module.exports.createEvent = async (householdId, creatorId, title, time = Date.n
 
 /**
  * Retrieves an event document by id.
- * @param {mongoose.Types.ObjectId} id - The event's _id.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this event belongs to.
+ * @param {mongoose.Types.ObjectId} eventId - The event's _id.
  */
-module.exports.readEvent = async (id) => {
-    const household = await HouseholdModel.findOne({ 'events._id': id }).exec();
+module.exports.readEvent = async (householdId, eventId) => {
+    const household = await HouseholdModel.findOne({ _id: householdId, 'events._id': eventId }).exec();
 
-    if(!household) throw new Error(`No household had an event with the id ${ id }`);
+    if(!household) throw new Error(`No household had an event with the id ${ eventId }`);
 
-    const event = household.events.id(id);
+    const event = household.events.id(eventId);
+
+    if(!event) throw new Error(`Error retrieving event ${ eventId } from household ${ householdId }`);
 
     return event;
 }
@@ -184,15 +187,25 @@ module.exports.updateEvent = async (householdId, eventId, title = null, time = n
 
 /**
  * Deletes an event document.
- * @param {mongoose.Types.ObjectId} id - The event's _id.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this event belongs to.
+ * @param {mongoose.Types.ObjectId} eventId - The event's _id.
  */
-module.exports.deleteEvent = async (id) => {
-    const household = await HouseholdModel.findOne({ 'events._id': id }).exec();
-    const event = household.events.id(id);
+module.exports.deleteEvent = async (householdId, eventId) => {
+    const household = await HouseholdModel.findByIdAndUpdate(
+        { _id: householdId, 'events._id': eventId },
+        { $pull: { events: { _id: eventId } } },
+        { new: false }
+    ).exec();
 
-    if(!household || !event) throw new Error(`Event with id ${ id } does not exist`);
+    if(!household) {
+        throw new Error(`Household ${ householdId} does not have event ${ eventId }`);
+    }
 
-    await HouseholdModel.findByIdAndUpdate(household._id, { $pull: { events: { _id: id } } }).exec();
+    const event = household.events.id(eventId);
+
+    if(!event) {
+        throw new Error(`Error retrieving event ${ eventId } from household ${ householdId }`);
+    }
 
     return event;
 };

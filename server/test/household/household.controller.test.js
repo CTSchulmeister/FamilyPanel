@@ -108,7 +108,7 @@ describe('Household Controller', () => {
 
                 let household = await new HouseholdModel({
                     _ownerId: userId,
-                    _memberIds: [userId],
+                    _memberIds: [userId, ],
                     name: 'Our Apartment'
                 }).save();
 
@@ -148,7 +148,7 @@ describe('Household Controller', () => {
 
                 let household = await new HouseholdModel({
                     _ownerId: userId,
-                    _memberIds: [userId],
+                    _memberIds: [userId, ],
                     name: 'Our Apartment'
                 }).save();
 
@@ -180,7 +180,7 @@ describe('Household Controller', () => {
 
                 let household = await new HouseholdModel({
                     _ownerId: userId,
-                    _memberIds: [userId],
+                    _memberIds: [userId, ],
                     name: 'Our Apartment'
                 }).save();
 
@@ -227,7 +227,7 @@ describe('Household Controller', () => {
 
                 const household = await new HouseholdModel({
                     _ownerId: user._id,
-                    _memberIds: [user._id],
+                    _memberIds: [user._id, ],
                     name: 'Our Apartment'
                 }).save();
 
@@ -294,7 +294,7 @@ describe('Household Controller', () => {
 
                 const household = await new HouseholdModel({
                     _ownerId: user._id,
-                    _memberIds: [user._id,],
+                    _memberIds: [user._id, ],
                     name: 'Our Apartment'
                 }).save();
 
@@ -316,7 +316,7 @@ describe('Household Controller', () => {
                 try {
                     const household = await new HouseholdModel({
                         _ownerId: mockUserId,
-                        _memberIds: [mockUserId,],
+                        _memberIds: [mockUserId, ],
                         name: 'Our Apartment'
                     }).save();
 
@@ -374,7 +374,7 @@ describe('Household Controller', () => {
     
                 const household = await new HouseholdModel({
                     _ownerId: user._id,
-                    _memberIds: [user._id,],
+                    _memberIds: [user._id, ],
                     name: 'Our Apartment',
                     events: [{
                         _creatorId: user._id,
@@ -383,17 +383,24 @@ describe('Household Controller', () => {
                     }]
                 }).save();
     
-                const event = await HouseholdController.readEvent(household.events[0]._id);
+                const event = await HouseholdController.readEvent(household._id, household.events[0]._id);
     
                 expect(event.title).toBe('My Event');
             });
 
             test('Throws an error if the event does not exist', async () => {
                 const mockEventId = new mongoose.Types.ObjectId();
+                const mockUserId = new mongoose.Types.ObjectId();
                 let error = null;
 
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment'
+                }).save();
+
                 try {
-                    await HouseholdController.readEvent(mockEventId);
+                    await HouseholdController.readEvent(household._id, mockEventId);
                 } catch (err) {
                     error = err;
                 }
@@ -407,7 +414,7 @@ describe('Household Controller', () => {
                 const mockUserId = new mongoose.Types.ObjectId();
                 let household = await new HouseholdModel({
                     _ownerId: mockUserId,
-                    _memberIds: [mockUserId,],
+                    _memberIds: [mockUserId, ],
                     name: 'Our Apartment',
                     events: [{
                         _creatorId: mockUserId,
@@ -431,7 +438,7 @@ describe('Household Controller', () => {
                 const mockUserId = new mongoose.Types.ObjectId();
                 const household = await new HouseholdModel({
                     _ownerId: mockUserId,
-                    _memberIds: [mockUserId,],
+                    _memberIds: [mockUserId, ],
                     name: 'Our Apartment',
                     events: [{
                         _creatorId: mockUserId,
@@ -455,7 +462,7 @@ describe('Household Controller', () => {
                 const mockUserId = new mongoose.Types.ObjectId();
                 const household = await new HouseholdModel({
                     _ownerId: mockUserId,
-                    _memberIds: [mockUserId,],
+                    _memberIds: [mockUserId, ],
                     name: 'Our Apartment',
                     events: [{
                         _creatorId: mockUserId,
@@ -489,7 +496,7 @@ describe('Household Controller', () => {
 
                 let household = await new HouseholdModel({
                     _ownerId: user._id,
-                    _memberIds: [user._id,],
+                    _memberIds: [user._id, ],
                     name: 'Our Apartment',
                     events: [{
                         _creatorId: user._id,
@@ -498,7 +505,7 @@ describe('Household Controller', () => {
                     }]
                 }).save();
 
-                await HouseholdController.deleteEvent(household.events[0]._id);
+                await HouseholdController.deleteEvent(household._id, household.events[0]._id);
 
                 household = await HouseholdModel.findById(household._id);
 
@@ -519,7 +526,7 @@ describe('Household Controller', () => {
 
                 const household = await new HouseholdModel({
                     _ownerId: user._id,
-                    _memberIds: [user._id,],
+                    _memberIds: [user._id, ],
                     name: 'Our Apartment',
                     events: [{
                         _creatorId: user._id,
@@ -528,17 +535,24 @@ describe('Household Controller', () => {
                     }]
                 }).save();
 
-                const event = await HouseholdController.deleteEvent(household.events[0]._id);
+                const event = await HouseholdController.deleteEvent(household._id, household.events[0]._id);
 
                 expect(event.title).toBe('My Event');
             });
 
             test('Throws an error if the event does not exist', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
                 const mockEventId = new mongoose.Types.ObjectId();
                 let error = null;
 
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment'
+                }).save();
+
                 try {
-                    await HouseholdController.deleteEvent(mockEventId);
+                    await HouseholdController.deleteEvent(household._id, mockEventId);
                 } catch (err) {
                     error = err;
                 }
