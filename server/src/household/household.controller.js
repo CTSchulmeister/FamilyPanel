@@ -94,57 +94,61 @@ module.exports.deleteHousehold = async (id) => {
 
 /**
  * Creates a new event document.
- * @param {mongoose.Types.householdId} householdId - The _id of the household document this event belongs to.
- * @param {mongoose.Types.creatorId} creatorId - The _id of the user creating the event.
+ * @param {mongoose.Types.ObjectId} householdId - The _id of the household document this event belongs to.
+ * @param {mongoose.Types.ObjectId} creatorId - The _id of the user creating the event.
  * @param {String} title - The title of the event.
  * @param {Date} [time] - The datetime of the event.
  * @param {String} [description] - The event's description.
  * @param {Array<Number>} [location] - The event's location [longitude, latitute].
  */
 module.exports.createEvent = async (householdId, creatorId, title, time = Date.now(), description = null, location = null) => {
-    let household = await HouseholdModel.findById(householdId).exec();
+    const household = await HouseholdModel.findById(householdId).exec();
 
     if(!household) {
-        throw new Error(`Household with id ${ id } does not exist`);
+        throw new Error(`No household exists with the id ${ householdId }`);
     }
 
-    const user = await UserModel.findById(creatorId).exec()
+    const user = await UserModel.findById(creatorId).exec();
 
-    if(user == null) {
+    if(!user) {
         throw new Error(`User with id ${ creatorId } does not exist`);
     }
 
-    if(!user._householdIds.includes(householdId)) {
-        throw new Error(`User with id ${ creatorId } does not belong to household ${ householdId }`);
+    if(!household._memberIds.includes(creatorId) || !user._householdIds.includes(householdId)) {
+        throw new Error(`User ${ creatorId } does not belong to household ${ householdId }`);
     }
 
-    let newEvent = {
+    let event = {
         _creatorId: creatorId,
         title: title,
         time: time
     };
 
-    if(description) newEvent.description = description;
-    if(location) newEvent.location = location;
+    if(description) event.description = description;
+    if(location) event.location = location;
 
-    const event = await household.events.create(newEvent);
+    event = await household.events.create(event);
 
     return event;
 };
 
 /**
- * Retrieves an event document by id.
+ * Retrieves an event document.
  * @param {mongoose.Types.ObjectId} householdId - The id of the household this event belongs to.
  * @param {mongoose.Types.ObjectId} eventId - The event's _id.
  */
 module.exports.readEvent = async (householdId, eventId) => {
     const household = await HouseholdModel.findOne({ _id: householdId, 'events._id': eventId }).exec();
 
-    if(!household) throw new Error(`No household had an event with the id ${ eventId }`);
+    if(!household) {
+        throw new Error(`The household ${ householdId} does not have an event with the id ${ eventId }`);
+    };
 
     const event = household.events.id(eventId);
 
-    if(!event) throw new Error(`Error retrieving event ${ eventId } from household ${ householdId }`);
+    if(!event) {
+        throw new Error(`Error retrieving event ${ eventId } from household ${ householdId }`)
+    };
 
     return event;
 }
@@ -154,9 +158,9 @@ module.exports.readEvent = async (householdId, eventId) => {
  * @param {mongoose.Types.ObjectId} householdId - The id of the househld this event belongs to.
  * @param {mongoose.Types.ObjectId} eventId - The event's _id.
  * @param {String} [title] - The event's new title.
- * @param {Date} time - The event's new datetime.
- * @param {String} description - The event's new description.
- * @param {Array<Number>} location - The event's new location [longitude, latitude].
+ * @param {Date} [time] - The event's new datetime.
+ * @param {String} [description] - The event's new description.
+ * @param {Array<Number>} [location] - The event's new location [longitude, latitude].
  */
 module.exports.updateEvent = async (householdId, eventId, title = null, time = null, description = null, location = null) => {
     let update = {};
@@ -176,11 +180,15 @@ module.exports.updateEvent = async (householdId, eventId, title = null, time = n
         { new: true }
     ).exec();
 
-    if(!household) throw new Error(`The household ${ householdId} does not have an event with the id ${ eventId }`);
+    if(!household) {
+        throw new Error(`The household ${ householdId } does not have an event with the id ${ eventId }`);
+    }
 
     const event = household.events.id(eventId);
 
-    if(!event) throw new Error(`No event with the id ${ eventId } could be found`);
+    if(!event) { 
+        throw new Error(`Error retrieving event ${ eventId } from household ${ householdId }`);
+    }
 
     return event;
 };
@@ -191,14 +199,14 @@ module.exports.updateEvent = async (householdId, eventId, title = null, time = n
  * @param {mongoose.Types.ObjectId} eventId - The event's _id.
  */
 module.exports.deleteEvent = async (householdId, eventId) => {
-    const household = await HouseholdModel.findByIdAndUpdate(
+    const household = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'events._id': eventId },
         { $pull: { events: { _id: eventId } } },
         { new: false }
     ).exec();
 
     if(!household) {
-        throw new Error(`Household ${ householdId} does not have event ${ eventId }`);
+        throw new Error(`The household ${ householdId} does not have an event with the id ${ eventId }`);
     }
 
     const event = household.events.id(eventId);
@@ -212,4 +220,140 @@ module.exports.deleteEvent = async (householdId, eventId) => {
 
 // --- Task Controller Logic
 
+module.exports.createTask = async () => {
+
+};
+
+module.exports.readTask = async (householdId, taskId) => {
+
+};
+
+module.exports.updateTask = async () => {
+
+};
+
+module.exports.deleteTask = async (householdId, taskId) => {
+
+};
+
 // --- Note Controller Logic
+
+/**
+ * Creates a new note document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this note will belong to.
+ * @param {mongoose.Types.ObjectId} creatorId - The id of the user creating this note.
+ * @param {String} title - The note's title.
+ * @param {String} [body] - The note's body.
+ */
+module.exports.createNote = async (householdId, creatorId, title, body = null) => {
+    const household = await HouseholdModel.findById(householdId).exec();
+
+    if(!household) {
+        throw new Error(`No household exists with the id ${ householdId }`);
+    }
+
+    const user = await UserModel.findById(creatorId).exec();
+
+    if(!user) {
+        throw new Error(`User with id ${ creatorId } does not exist`);
+    }
+
+    if(!household._memberIds.includes(creatorId) || !user._householdIds.includes(householdId)) {
+        throw new Error(`User ${ creatorId } does not belong to household ${ householdId }`);
+    }
+
+    let note = {
+        _creatorId: creatorId,
+        title: title,
+        createdAt: Date.now()
+    };
+
+    if(body) note.body = body;
+
+    note = await household.notes.create(note);
+
+    return note;
+};
+
+/**
+ * Retrieves a note document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
+ * @param {mongoose.Types.ObjectId} noteId - The note's id.
+ */
+module.exports.readNote = async (householdId, noteId) => {
+    const household = await HouseholdModel.findOne({ _id: householdId, 'notes._id': noteId }).exec();
+
+    if(!household) { 
+        throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+    }
+
+    const note = household.notes.id(noteId);
+
+    if(!note) {
+        throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
+    }
+
+    return note;
+};
+
+/**
+ * Updates a note document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
+ * @param {mongoose.Types.ObjectId} noteId - The note's _id.
+ * @param {String} [title] - The note's new title.
+ * @param {String} [body] - The note's new body.
+ */
+module.exports.updateNote = async (householdId, noteId, title = null, body = null) => {
+    let update = {};
+
+    if(!title && !body) {
+        throw new Error(`No values were passed to update the note with id ${ noteId }`);
+    }
+
+    if(title) update['notes.$.title'] = title;
+    if(body) update['notes.$.body'] = body;
+    update['notes.$.updatedAt'] = Date.now();
+
+    const household = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId, 'notes._id': noteId },
+        update,
+        { new: true }
+    ).exec();
+
+    if(!household) {
+        throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+    }
+
+    const note = household.notes.id(noteId);
+
+    if(!note) {
+        throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
+    }
+
+    return note;
+};
+
+/**
+ * Deletes an event document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
+ * @param {mongoose.Types.ObjectId} noteId - The note's id.
+ */
+module.exports.deleteNote = async (householdId, noteId) => {
+    const household = await HouseholdModel.findByIdAndUpdate(
+        { _id: householdId, 'notes._id': noteId },
+        { $pull: { notes: { _id: noteId } } },
+        { new: false}
+    ).exec();
+
+    if(!household) {
+        throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+    }
+
+    const note = household.notes.id(noteId);
+
+    if(!note) {
+        throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
+    }
+
+    return note;
+};

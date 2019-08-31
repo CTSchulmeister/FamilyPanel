@@ -30,7 +30,6 @@ const generateHash = (password, salt) => {
     return hash;
 };
 
-
 describe('Household Controller', () => {
     describe('Household', () => {
         describe('createHousehold()', () => {
@@ -582,19 +581,291 @@ describe('Household Controller', () => {
 
     describe('Notes', () => {
         describe('createNote()', () => {
+            test('Can create a note', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
 
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+
+                const household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment'
+                }).save();
+
+                await UserModel.findByIdAndUpdate(user._id, { $push: { _householdIds: household._id } }).exec();
+
+                const note = await HouseholdController.createNote(
+                    household._id,
+                    user._id,
+                    'My Note',
+                );
+
+                expect(note.title).toBe('My Note');
+            });
+
+            test('Throws an error if the user does not exist', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                try {
+                    const household = await new HouseholdModel({
+                        _ownerId: mockUserId,
+                        _memberIds: [mockUserId, ],
+                        name: 'Our Apartment'
+                    }).save();
+
+                    await HouseholdController.createNote(
+                        household._id,
+                        mockUserId,
+                        'My Note'
+                    );
+                } catch (err) {
+                    if(err) error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the household does not exist', async () => {
+                const mockHouseholdId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                try {
+                    const user = await new UserModel({
+                        firstName: 'Adam',
+                        lastName: 'Smith',
+                        email: 'asmith@test.com',
+                        password: hashedPassword,
+                        salt: salt,
+                        _householdIds: [mockHouseholdId, ]
+                    }).save();
+
+                    await HouseholdController.createNote(
+                        mockHouseholdId,
+                        user._id,
+                        'My Note'
+                    );
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
         });
 
         describe('readNote()', () => {
+            test('Can retrieve a note document', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
+    
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+    
+                const household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment',
+                    notes: [{
+                        _creatorId: user._id,
+                        title: 'My Note',
+                        body: 'This is my note!',
+                        createdAt: Date.now()
+                    }]
+                }).save();
+    
+                const note = await HouseholdController.readNote(household._id, household.notes[0]._id);
+    
+                expect(note.title).toBe('My Note');
+            });
 
+            test('Throws an error if the note does not exist', async () => {
+                const mockNoteId = new mongoose.Types.ObjectId();
+                const mockUserId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment'
+                }).save();
+
+                try {
+                    await HouseholdController.readNote(household._id, mockNoteId);
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
         });
 
         describe('updateNote()', () => {
+            test('Can update a note', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
+                let household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment',
+                    notes: [{
+                        _creatorId: mockUserId,
+                        title: 'My Note',
+                        body: 'This is my note!',
+                        createdAt: Date.now()
+                    }]
+                }).save();
 
+                await HouseholdController.updateNote(
+                    household._id,
+                    household.notes[0]._id,
+                    'I Wrote a Note!'
+                );
+
+                household = await HouseholdModel.findById(household._id).exec();
+
+                expect(household.notes[0].title).toBe('I Wrote a Note!');
+            });
+
+            test('Returns the updated event', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment',
+                    notes: [{
+                        _creatorId: mockUserId,
+                        title: 'My Note',
+                        body: 'This is my note!',
+                        createdAt: Date.now()
+                    }]
+                }).save();
+
+                const note = await HouseholdController.updateNote(
+                    household._id,
+                    household.notes[0]._id,
+                    'I Wrote a Note!'
+                );
+
+                expect(note.title).toBe('I Wrote a Note!');
+            });
+
+            test('Throws an error if no update data is passed', async () => {
+                let error = null;
+
+                const mockUserId = new mongoose.Types.ObjectId();
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment',
+                    notes: [{
+                        _creatorId: mockUserId,
+                        title: 'My Note',
+                        body: 'This is my note!',
+                        createdAt: Date.now()
+                    }]
+                }).save();
+
+                try {
+                    await HouseholdController.updateNote(household._id, household.notes[0]._id);
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
         });
 
         describe('deleteNote()', () => {
+            test('Can delete a note', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
 
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+
+                let household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment',
+                    notes: [{
+                        _creatorId: user._id,
+                        title: 'My Note',
+                        body: 'This is my note!',
+                        createdAt: Date.now()
+                    }]
+                }).save();
+
+                await HouseholdController.deleteNote(household._id, household.notes[0]._id);
+
+                household = await HouseholdModel.findById(household._id);
+
+                expect(household.notes.length).toBe(0);
+            });
+
+            test('Returns the correct note', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
+
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+
+                const household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment',
+                    notes: [{
+                        _creatorId: user._id,
+                        title: 'My Note',
+                        body: 'This is my note!',
+                        createdAt: Date.now()
+                    }]
+                }).save();
+
+                const note = await HouseholdController.deleteNote(household._id, household.notes[0]._id);
+
+                expect(note.title).toBe('My Note');
+            });
+
+            test('Throws an error if the note does not exist', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
+                const mockNoteId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment'
+                }).save();
+
+                try {
+                    await HouseholdController.deleteNote(household._id, mockNoteId);
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            }); 
         });
     });
 });

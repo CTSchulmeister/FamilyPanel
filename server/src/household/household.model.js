@@ -30,12 +30,13 @@ const NoteSchema = new mongoose.Schema({
     },
     title: {
         type: String,
+        required: true,
         default: 'Untitled Note'
     },
     body: String,
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
     updatedAt: Date
 });
@@ -55,7 +56,7 @@ const TaskSchema = new mongoose.Schema({
     description: String,
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now()
     },
     completed: {
         type: Boolean,
