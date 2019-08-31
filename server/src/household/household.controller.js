@@ -148,17 +148,18 @@ module.exports.readEvent = async (id) => {
 
 /**
  * Updates an event document.
- * @param {mongoose.Types.ObjectId} id - The event's _id.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the househld this event belongs to.
+ * @param {mongoose.Types.ObjectId} eventId - The event's _id.
  * @param {String} [title] - The event's new title.
  * @param {Date} time - The event's new datetime.
  * @param {String} description - The event's new description.
  * @param {Array<Number>} location - The event's new location [longitude, latitude].
  */
-module.exports.updateEvent = async (id, title = null, time = null, description = null, location = null) => {
+module.exports.updateEvent = async (householdId, eventId, title = null, time = null, description = null, location = null) => {
     let update = {};
 
     if(!title && !time && !description && !location) {
-        throw new Error(`No values were passed to update the event with id ${ id }`);
+        throw new Error(`No values were passed to update the event with id ${ eventId }`);
     }
 
     if(title) update['events.$.title'] = title;
@@ -167,16 +168,16 @@ module.exports.updateEvent = async (id, title = null, time = null, description =
     if(location) update['events.$.location'] = location;
     
     const household = await HouseholdModel.findOneAndUpdate(
-        { 'events._id': id },
+        { _id: householdId, 'events._id': eventId },
         update,
         { new: true }
     ).exec();
 
-    if(!household) throw new Error(`No household had an event with the id ${ id }`);
+    if(!household) throw new Error(`The household ${ householdId} does not have an event with the id ${ eventId }`);
 
-    const event = household.events.id(id);
+    const event = household.events.id(eventId);
 
-    if(!event) throw new Error(`No event with the id ${ id } could be found`);
+    if(!event) throw new Error(`No event with the id ${ eventId } could be found`);
 
     return event;
 };

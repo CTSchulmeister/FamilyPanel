@@ -153,8 +153,8 @@ router.post('/:household/event', urlencodedParser, [
         .isISO8601(),
     check('location')
         .optional()
-        .isString()
-        .trim(),
+        .isArray()
+        .custom(value => value.length == 2)
 ], async (req, res) => {
     const errors = validationResult(req);
 
@@ -165,19 +165,15 @@ router.post('/:household/event', urlencodedParser, [
         });
     } else {
         try {
-            const event = {
-                _creatorId: req.body.creatorId,
-                title: req.body.title,
-                description: (req.body.description) ? req.body.description : null,
-                time: (req.body.time) ? req.body.time : Date.now,
-                location: (req.body.location) ? req.body.location : null
-            };
+            const description = (req.body.description) ? req.body.description : null;
+            const time = (req.body.time) ? req.body.time : null;
+            const location = (req.body.location) ? req.body.location : null;
 
-            const household = await HouseholdModel.findById(req.params.household).exec();
-
-            household.events.push(event);
-
-            await household.save();
+            const event = await HouseholdController.createEvent(
+                req.params.household,
+                req.body.creatorId,
+                req.body.title
+            )
 
             res.status(200).json({
                 success: true,
@@ -196,8 +192,8 @@ router.post('/:household/event', urlencodedParser, [
 // READ
 router.get('/:household/event/:event', async (req, res) => {
     try {
-        const household = await HouseholdModel.findOne({ _id: req.params.household, events: { $contains: { _id: req.params.event } } }).exec();
-        const event = household.events.filter(event => event._id == req.params.event).pop();
+        const event = await HouseholdController.readEvent(req.params.event);
+
         res.status(200).json({
             success: true,
             event: event
@@ -212,14 +208,75 @@ router.get('/:household/event/:event', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household/event/:event', urlencodedParser, async (req, res) => {
+router.put('/:household/event/:event', urlencodedParser, [
+    check('title')
+        .optional()
+        .isString()
+        .trim(),
+    check('time')
+        .optional()
+        .trim()
+        .isISO8601(),
+    check('description')
+        .optional()
+        .isString()
+        .trim(),
+    check('location')
+        .optional()
+        .isArray()
+        .custom(value => value.length == 2)
+], async (req, res) => {
+    const errors = validationResult(req);
 
+    if(!errors.isEmpty()) {
+        res.status(422).json({
+            success: false,
+            errors: errors
+        });
+    } else if(!req.body.title && !req.body.time && !req.body.description && !req.body.location) {
+        res.status(400).json({
+            success: false,
+            error: `No update values were passed to update event ${ req.params.event }`
+        });
+    } else {
+        try {
+            const title = (req.body.title) ? req.body.title : null;
+            const time = (req.body.time) ? req.body.time : null;
+            const description = (req.body.description) ? req.body.description : null;
+            const location = (req.body.location) ? req.body.location : null;
+
+            const event = await HouseholdController.updateEvent(
+                req.params.household,
+                req.params.event,
+                title,
+                time,
+                description,
+                location
+            );
+
+            res.status(200).json({
+                success: true,
+                event: event
+            });
+        } catch (err) {
+            console.error(`Error updating event ${ req.params.event } from household ${ req.params.household }: ${ err }`);
+            res.status(500).json({
+                success: false,
+                error: err
+            });
+        }
+    }
 });
 
 // DELETE
 router.delete('/:household/event/:event', async (req, res) => {
     try {
-        let household = await HouseholdModel.findOne({ _id: req.params.id }).exec();
+        const event = await HouseholdController.deleteEvent(req.params.event);
+
+        res.status(200).json({
+            success: true,
+            event: event
+        });
     } catch (err) {
         console.error(`Error deleting event ${ req.params.event } from household ${ req.params.household }: ${ err }`);
         res.status(500).json({

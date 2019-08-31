@@ -416,7 +416,8 @@ describe('Household Controller', () => {
                     }]
                 }).save();
 
-                const event = await HouseholdController.updateEvent(
+                await HouseholdController.updateEvent(
+                    household._id,
                     household.events[0]._id,
                     'Bar Crawl',
                 );
@@ -440,6 +441,7 @@ describe('Household Controller', () => {
                 }).save();
 
                 const event = await HouseholdController.updateEvent(
+                    household._id,
                     household.events[0]._id,
                     'Bar Crawl',
                 );
@@ -463,7 +465,7 @@ describe('Household Controller', () => {
                 }).save();
 
                 try {
-                    await HouseholdController.updateEvent();
+                    await HouseholdController.updateEvent(household._id, household.events[0]._id);
                 } catch (err) {
                     error = err;
                 }
