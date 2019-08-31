@@ -5,10 +5,7 @@ const mongoose = require('mongoose');
 
 // --- Schema
 const UserSchema = new mongoose.Schema({
-    _householdIds: {
-        type: Array,
-        default: []
-    },
+    _householdIds: Array,
     firstName: {
         type: String,
         required: true

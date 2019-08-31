@@ -11,14 +11,16 @@ const EventSchema = new mongoose.Schema({
     },
     title: {
         type: String,
+        required: true,
         default: 'Untitled Event'
     },
-    description: String,
     time: {
         type: Date,
-        default: Date.now
+        required: true,
+        default: Date.now()
     },
-    location: String
+    description: String,
+    location: [Number]
 });
 
 const NoteSchema = new mongoose.Schema({
@@ -44,8 +46,7 @@ const TaskSchema = new mongoose.Schema({
         required: true
     },
     _assignedUserIds: {
-        type: Array,
-        default: []
+        type: Array
     },
     title: {
         type: String,
@@ -87,25 +88,15 @@ const HouseholdSchema = new mongoose.Schema({
     },
     _memberIds: {
         type: Array,
-        required: true,
-        default: []
+        required: true
     },
     name: {
         type: String,
         required: true
     },
-    events: {
-        type: [EventSchema],
-        default: []
-    },
-    tasks: {
-        type: [TaskSchema],
-        default: []
-    },
-    notes: {
-        type: [NoteSchema],
-        default: []
-    }
+    events: [EventSchema],
+    tasks: [TaskSchema],
+    notes: [NoteSchema]
 });
 
 HouseholdSchema.pre('save', function(next) {
