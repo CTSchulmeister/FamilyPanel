@@ -39,7 +39,7 @@ router.post('/', urlencodedParser, [
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
-        res.status(422).json({
+        res.status(400).json({
             success: false,
             errors: errors
         });
@@ -109,7 +109,7 @@ router.patch('/:user', urlencodedParser, [
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
-        res.status(422).json({
+        res.status(400).json({
             success: false,
             errors: errors
         });

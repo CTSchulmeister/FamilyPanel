@@ -27,7 +27,7 @@ router.post('/', urlencodedParser, [
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
-        res.status(422).json({
+        res.status(400).json({
             success: false,
             errors: errors
         });
@@ -85,7 +85,7 @@ router.patch('/:household', urlencodedParser, [
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
-        res.status(422).json({
+        res.status(400).json({
             success: false,
             errors: errors
         });
@@ -138,9 +138,9 @@ router.delete('/:household', async (req, res) => {
 // CREATE
 router.post('/:household/event', urlencodedParser, [
     check('creatorId')
-        .custom(exists(value)),
+        .custom(value => exists(value)),
     check('title')
-        .custom(exists(value))
+        .custom(value => exists(value))
         .isString()
         .trim(),
     check('description')
@@ -159,7 +159,7 @@ router.post('/:household/event', urlencodedParser, [
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
-        res.status(422).json({
+        res.status(400).json({
             success: false,
             errors: errors
         });
@@ -172,7 +172,10 @@ router.post('/:household/event', urlencodedParser, [
             const event = await HouseholdController.createEvent(
                 req.params.household,
                 req.body.creatorId,
-                req.body.title
+                req.body.title,
+                description,
+                time,
+                location
             )
 
             res.status(200).json({
@@ -229,7 +232,7 @@ router.put('/:household/event/:event', urlencodedParser, [
     const errors = validationResult(req);
 
     if(!errors.isEmpty()) {
-        res.status(422).json({
+        res.status(400).json({
             success: false,
             errors: errors
         });
@@ -322,15 +325,55 @@ router.put('/:household/task/:task', async (req, res) => {
 
 // --- Routes (Notes)
 // CREATE
-router.post('/:household/note', async (req, res) => {
+router.post('/:household/note', [
+    check('creatorId')
+        .custom(value => exists(value)),
+    check('title')
+        .custom(value => exists(value))
+        .isString()
+        .trim(),
+    check('body')
+        .optional()
+        .isString()
+        .trim()
+], async (req, res) => {
+    const errors = validationResult(req);
 
+    if(!errors.isEmpty()) {
+        res.status(400).json({
+            success: false,
+            errors: errors
+        });
+    } else {
+        try {
+            const body = (req.body.body) ? req.body.body : null;
+
+            const note = await HouseholdController.createNote(
+                req.params.household,
+                req.body.creatorId,
+                req.body.title,
+                body
+            );
+
+            res.status(200).json({
+                success: true,
+                note: note
+            });
+        } catch (err) {
+            console.error(`Error creating note on household ${ req.params.household }: ${ err }`);
+            res.status(500).json({
+                success: false,
+                error: err
+            });
+        }
+    }
 });
 
 // READ
 router.get('/:household/note/:note', async (req, res) => {
     try {
-        const household = await HouseholdModel.findOne({ _id: req.params.household, notes: { $contains: { _id: req.params.note } } }).exec();
-        const note = household.notes.filter(note => note._id == req.params.note).pop();
+        const note = await HouseholdController.readNote(req.params.household, req.params.note);
+
         res.status(200).json({
             success: true,
             note: note
@@ -345,13 +388,70 @@ router.get('/:household/note/:note', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household/note/:note', async (req, res) => {
+router.put('/:household/note/:note', [
+    check('title')
+        .optional()
+        .isString()
+        .trim(),
+    check('body')
+        .optional()
+        .isString()
+        .trim()
+], async (req, res) => {
+    const errors = validationResult(req);
 
+    if(!errors.isEmpty()) {
+        res.status(400).json({
+            success: false,
+            errors: errors
+        });
+    } else if(!req.body.title && !req.body.body) {
+        res.status(400).json({
+            success: false,
+            error: `No update values were passed to update note ${ req.params.note }`
+        });
+    } else {
+        try {
+            const title = (req.body.title) ? req.body.title : null;
+            const body = (req.body.body) ? req.body.body : null;
+
+            const note = await HouseholdController.updateNote(
+                req.params.household,
+                req.params.note,
+                title,
+                body
+            );
+
+            res.status(200).json({
+                success: true,
+                note: note
+            });
+        } catch (err) {
+            console.error(`Error updating note ${ req.params.note } from household ${ req.params.household }: ${ err }`);
+            res.status(500).json({
+                success: false,
+                error: err
+            });
+        }
+    }
 });
 
 // DELETE
 router.delete('/:household/note/:note', async (req, res) => {
+    try {
+        const note = await HouseholdController.deleteNote(req.params.household, req.params.note);
 
+        res.status(200).json({
+            success: true,
+            note: note
+        });
+    } catch (err) {
+        console.error(`Error updating note ${ req.params.note } from household ${ req.params.hosehold }: ${ err }`);
+        res.status(500).json({
+            success: false,
+            error: err
+        });
+    }
 });
 
 module.exports = router;
