@@ -51,12 +51,16 @@ const TaskSchema = new mongoose.Schema({
     },
     title: {
         type: String,
+        required: true,
         default: "Untitled Task"
     },
     description: String,
     createdAt: {
         type: Date,
         default: Date.now()
+    },
+    completeBy: {
+        type: Date
     },
     completed: {
         type: Boolean,

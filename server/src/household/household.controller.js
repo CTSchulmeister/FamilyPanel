@@ -220,20 +220,150 @@ module.exports.deleteEvent = async (householdId, eventId) => {
 
 // --- Task Controller Logic
 
-module.exports.createTask = async () => {
+/**
+ * Creates a new task document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this task will belong to.
+ * @param {mongoose.Types.ObjectId} creatorId - The id of the user creating this task.
+ * @param {String} title - The title of this task.
+ * @param {Array<mongoose.Types.ObjectId} [assignedUserIds] - The users assigned to this task. Null will default to all users in the household.
+ * @param {String} [description] - The description of this task.
+ * @param {Date} [completeBy] - The datetime by which this task should be completed by.
+ */
+module.exports.createTask = async (householdId, creatorId, title, assignedUserIds = null, description = null, completeBy = null) => {
+    const household = await HouseholdModel.findById(householdId).exec();
 
+    if(!household) { 
+        throw new Error(`No household exists with the id ${ householdId }`);
+    }
+
+    const creator = await UserModel.findById(creatorId).exec();
+
+    if(!creator) {
+        throw new Error(`User with id ${ creatorId } does not exist`);
+    }
+
+    if(!household._memberIds.includes(creatorId) || !creator._householdIds.includes(householdId)) {
+        throw new Error(`User ${ creatorId } does not belong to household ${ householdId }`);
+    }
+
+    if(!assignedUserIds) {
+        assignedUserIds = household._memberIds;
+    } else {
+        if(household._memberIds.some(member => assignedUserIds.indexOf(member) == -1)) {
+            throw new Error(`At least one assigned user does not belong to household ${ householdId }`);
+        }
+    }
+
+    let task = {
+        _creatorId: creatorId,
+        _assignedUserIds: assignedUserIds,
+        title: title,
+        createdAt: Date.now(),
+    }
+
+    if(description) task.description = description;
+    if(completeBy) task.completeBy = completeBy;
+
+    task = await household.tasks.create(task);
+
+    return task;
 };
 
+/**
+ * Retrieves a task document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this task belongs to.
+ * @param {mongoose.Types.ObjectId} taskId - The note's id.
+ */
 module.exports.readTask = async (householdId, taskId) => {
+    const household = await HouseholdModel.findOne({ _id: householdId, 'tasks._id': taskId }).exec();
 
+    if(!household) {
+        throw new Error(`The household ${ householdId } does not have a task with the id ${ taskId }`);
+    }
+
+    const task = household.tasks.id(taskId);
+
+    if(!task) {
+        throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
+    }
+
+    return task;
 };
 
-module.exports.updateTask = async () => {
+/**
+ * Updates a task document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this task belongs to.
+ * @param {mongoose.Types.ObjectId} taskId - The task's id.
+ * @param {Array<mongoose.Types.ObjectId>} [assignedUserIds] - The task's new assigned users.
+ * @param {String} [title] - The task's new title.
+ * @param {String} [description] - The task's new description.
+ * @param {Date} [completeBy] - The task's new completion deadline.
+ * @param {Boolean} [completed] - The task's new completion status.
+ */
+module.exports.updateTask = async (householdId, taskId, assignedUserIds = null, title = null, description = null, completeBy = null, completed = null) => {
+    if(!assignedUserIds && !title && !description && !completeBy && !completed) {
+        throw new Error(`No values were passed to update the note with id ${ noteId }`);
+    }
 
+    let update = {};
+    let household;
+
+    if(assignedUserIds) {
+        household = await HouseholdModel.findOne({ _id: householdId, 'tasks._id': taskId }).exec();
+
+        if(household._memberIds.some(member => assignedUserIds.indexOf(member) == -1)) {
+            throw new Error(`At least one assigned user does not belong to household ${ householdId }`);
+        } else {
+            update['tasks.$._assignedUserIds'] = assignedUserIds;
+        }
+    }
+    if(title) update['tasks.$.title'] = title;
+    if(description) update['tasks.$.description'] = description;
+    if(completeBy) update['tasks.$.completeBy'] = completeBy;
+    if(completed) update['tasks.$.completed'] = completed;
+
+    household = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId, 'tasks._id': taskId },
+        update,
+        { new: true }
+    ).exec();
+
+    if(!household) {
+        throw new Error(`The household ${ householdId } does not have a task with the id ${ taskId }`);
+    }
+
+    const task = household.tasks.id(taskId);
+
+    if(!task) {
+        throw new Error(`Error retrieving task ${ taskId } from household ${ householdId }`);
+    }
+
+    return task;
 };
 
+/**
+ * Deletes a task document.
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household this task belongs to.
+ * @param {mongoose.Types.ObjectId} taskId - The task's id.
+ */
 module.exports.deleteTask = async (householdId, taskId) => {
+    const household = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId, 'tasks._id': taskId },
+        { $pull: { tasks: { _id: taskId } } },
+        { new: false }
+    ).exec();
 
+    if(!household) {
+        throw new Error(`The household ${ householdId } does not have a task with the id ${ taskId }`);
+    }
+
+    const task = household.tasks.id(taskId);
+
+    if(!task) {
+        throw new Error(`Error retrieving task ${ taskId } from household ${ householdId }`);
+    }
+
+    return task;
 };
 
 // --- Note Controller Logic
@@ -304,11 +434,11 @@ module.exports.readNote = async (householdId, noteId) => {
  * @param {String} [body] - The note's new body.
  */
 module.exports.updateNote = async (householdId, noteId, title = null, body = null) => {
-    let update = {};
-
     if(!title && !body) {
         throw new Error(`No values were passed to update the note with id ${ noteId }`);
     }
+    
+    let update = {};    
 
     if(title) update['notes.$.title'] = title;
     if(body) update['notes.$.body'] = body;
@@ -339,7 +469,7 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
  * @param {mongoose.Types.ObjectId} noteId - The note's id.
  */
 module.exports.deleteNote = async (householdId, noteId) => {
-    const household = await HouseholdModel.findByIdAndUpdate(
+    const household = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'notes._id': noteId },
         { $pull: { notes: { _id: noteId } } },
         { new: false}

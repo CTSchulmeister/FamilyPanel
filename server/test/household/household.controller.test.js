@@ -563,19 +563,346 @@ describe('Household Controller', () => {
 
     describe('Tasks', () => {
         describe('createTask()', () => {
+            test('Can create a task', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
 
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+
+                const household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment'
+                }).save();
+
+                await UserModel.findByIdAndUpdate(user._id, { $push: { _householdIds: household._id } }).exec();
+
+                const task = await HouseholdController.createTask(
+                    household._id,
+                    user._id,
+                    'My Task'
+                );
+
+                expect(task.title).toBe('My Task');
+            });
+
+            test('Assigns all household members to a task if no specific assigned users are passed', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
+    
+                const creator = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+
+                const mockMemberId = new mongoose.Types.ObjectId();
+
+                const household = await new HouseholdModel({
+                    _ownerId: creator._id,
+                    _memberIds: [creator._id, mockMemberId, ],
+                    name: 'Our Apartment'
+                }).save();
+
+                await UserModel.findByIdAndUpdate(creator._id, { $push: { _householdIds: household._id } }).exec();
+
+                const task = await HouseholdController.createTask(
+                    household._id, 
+                    creator._id, 
+                    'My Task'
+                );
+
+                expect(task._assignedUserIds.length).toBe(2);
+            });
+
+            test('Throws an error if the creator does not exist', async () => {
+                const mockCreatorId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                try {
+                    const household = await new HouseholdModel({
+                        _ownerId: mockCreatorId,
+                        _memberIds: [mockCreatorId, ],
+                        name: 'Our Apartment'
+                    }).save();
+
+                    await HouseholdController.createTask(
+                        household._id,
+                        mockCreatorId,
+                        'My Task'
+                    );
+                } catch (err) {
+                    if(err) error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the household does not exist', async () => {
+                const mockHouseholdId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                try {
+                    const user = await new UserModel({
+                        firstName: 'Adam',
+                        lastName: 'Smith',
+                        email: 'asmith@test.com',
+                        password: hashedPassword,
+                        salt: salt,
+                        _householdIds: [mockHouseholdId, ]
+                    }).save();
+
+                    await HouseholdController.createTask(
+                        mockHouseholdId,
+                        user._id,
+                        'My Task'
+                    );
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
         });
 
         describe('readTask()', () => {
+            test('Can retrieve a task document', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
+    
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+    
+                const household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment',
+                    tasks: [{
+                        _creatorId: user._id,
+                        _assignedUserIds: [user._id, ],
+                        title: 'My Task'
+                    }]
+                }).save();
+    
+                const task = await HouseholdController.readTask(household._id, household.tasks[0]._id);
+    
+                expect(task.title).toBe('My Task'); 
+            });
 
+            test('Throws an error if the task does not exist', async () => {
+                const mockTaskId = new mongoose.Types.ObjectId();
+                const mockUserId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment'
+                }).save();
+
+                try {
+                    await HouseholdController.readTask(household._id, mockTaskId);
+                } catch (err) {
+                    error = err;
+                } 
+
+                expect(error).not.toBeNull();
+            });
         });
 
         describe('updateTask()', () => {
+            test('Can update a task', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
+                let household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment',
+                    tasks: [{
+                        _creatorId: mockUserId,
+                        _assignedUserIds: [mockUserId, ],
+                        title: 'My Task'
+                    }]
+                }).save();
 
+                await HouseholdController.updateTask(
+                    household._id,
+                    household.tasks[0]._id,
+                    null,
+                    'Do the Dishes!',
+                );
+
+                household = await HouseholdModel.findById(household._id).exec();
+
+                expect(household.tasks[0].title).toBe('Do the Dishes!');
+            });
+
+            test('Returns the updated task', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment',
+                    tasks: [{
+                        _creatorId: mockUserId,
+                        _assignedUserIds: [mockUserId, ],
+                        title: 'My Task'
+                    }]
+                }).save();
+
+                const task = await HouseholdController.updateTask(
+                    household._id,
+                    household.tasks[0]._id,
+                    null,
+                    'Do the Dishes!',
+                );
+
+                expect(task.title).toBe('Do the Dishes!');
+            });
+
+            test('Throws an error if no update data is passed', async () => {
+                let error = null;
+
+                const mockUserId = new mongoose.Types.ObjectId();
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment',
+                    tasks: [{
+                        _creatorId: mockUserId,
+                        _assignedUserIds: [mockUserId, ],
+                        title: 'My Task'
+                    }]
+                }).save();
+
+                try {
+                    await HouseholdController.updateTask(household._id, household.tasks[0]._id);
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if an assignedUser does not belong to the household', async () => {
+                const mockCreatorId = new mongoose.Types.ObjectId();
+                const mockMemberId = new mongoose.Types.ObjectId();
+                const household = await new HouseholdModel({
+                    _ownerId: mockCreatorId,
+                    _memberIds: [mockCreatorId, ],
+                    name: 'Our Apartment',
+                    tasks: [{
+                        _creatorId: mockCreatorId,
+                        _assignedUserIds: [mockCreatorId, ],
+                        title: 'My Task'
+                    }]
+                });
+                let error = null;
+
+                try {
+                    await HouseholdController.updateTask(
+                        household._id,
+                        household.tasks[0]._id,
+                        [mockCreatorId, mockMemberId]
+                    );
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
         });
 
         describe('deleteTask()', () => {
+            test('Can delete a task', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
+    
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+    
+                let household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment',
+                    tasks: [{
+                        _creatorId: user._id,
+                        _assignedUserIds: [user._id, ],
+                        title: 'My Task'
+                    }]
+                }).save();
 
+                await HouseholdController.deleteTask(household._id, household.tasks[0]._id);
+
+                household = await HouseholdModel.findById(household._id);
+
+                expect(household.tasks.length).toBe(0);
+            });
+
+            test('Returns the correct task', async () => {
+                const salt = generateSalt();
+                const hashedPassword = generateHash('testpassword', salt);
+    
+                const user = await new UserModel({
+                    firstName: 'Adam',
+                    lastName: 'Smith',
+                    email: 'asmith@test.com',
+                    password: hashedPassword,
+                    salt: salt
+                }).save();
+    
+                const household = await new HouseholdModel({
+                    _ownerId: user._id,
+                    _memberIds: [user._id, ],
+                    name: 'Our Apartment',
+                    tasks: [{
+                        _creatorId: user._id,
+                        _assignedUserIds: [user._id, ],
+                        title: 'My Task'
+                    }]
+                }).save();
+
+                const task = await HouseholdController.deleteTask(household._id, household.tasks[0]._id);
+
+                expect(task.title).toBe('My Task');
+            });
+
+            test('Throws an error if the task does not exist', async () => {
+                const mockUserId = new mongoose.Types.ObjectId();
+                const mockTaskId = new mongoose.Types.ObjectId();
+                let error = null;
+
+                const household = await new HouseholdModel({
+                    _ownerId: mockUserId,
+                    _memberIds: [mockUserId, ],
+                    name: 'Our Apartment'
+                }).save();
+
+                try {
+                    await HouseholdController.deleteTask(household._id, mockTaskId);
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
         });
     });
 
