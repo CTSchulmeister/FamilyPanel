@@ -47,7 +47,7 @@ router.post('/', urlencodedParser, [
             console.error(`Error creating household: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }    
@@ -65,7 +65,7 @@ router.get('/:household', async (req, res) => {
         console.error(`Error getting household ${ req.params.household }: ${ err }`);
         res.status(404).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -110,7 +110,7 @@ router.patch('/:household', urlencodedParser, [
             console.error(`Error updating household ${ req.params.household }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -129,7 +129,7 @@ router.delete('/:household', async (req, res) => {
         console.error(`Error deleting household ${ req.params.household }: ${ err }`);
         res.status(500).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -186,7 +186,7 @@ router.post('/:household/event', urlencodedParser, [
             console.error(`Error creating event on household ${ req.params.household }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -205,7 +205,7 @@ router.get('/:household/event/:event', async (req, res) => {
         console.error(`Error retrieving event ${ req.params.event } from household ${ req.params.household}: ${ err }`);
         res.status(404).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -239,7 +239,7 @@ router.put('/:household/event/:event', urlencodedParser, [
     } else if(!req.body.title && !req.body.time && !req.body.description && !req.body.location) {
         res.status(400).json({
             success: false,
-            error: `No update values were passed to update event ${ req.params.event }`
+            errors: [`No update values were passed to update event ${ req.params.event }`]
         });
     } else {
         try {
@@ -265,7 +265,7 @@ router.put('/:household/event/:event', urlencodedParser, [
             console.error(`Error updating event ${ req.params.event } from household ${ req.params.household }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -284,7 +284,7 @@ router.delete('/:household/event/:event', async (req, res) => {
         console.error(`Error deleting event ${ req.params.event } from household ${ req.params.household }: ${ err }`);
         res.status(500).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -339,7 +339,7 @@ router.post('/:household/task', [
             console.error(`Error creating task on household ${ req.params.household }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -358,7 +358,7 @@ router.get('/:household/task/:task', async (req, res) => {
         console.error(`Error retrieving task ${ req.params.task } from household ${ req.params.household}: ${ err }`);
         res.status(404).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -393,7 +393,7 @@ router.put('/:household/task/:task', [
     } else if(!req.body.assignedUserIds && !req.body.title && !req.body.description && !req.body.completeBy && !req.body.completed) {
         res.status(400).json({
             success: false,
-            error: `No update values were passed to update task ${ req.params.task }`
+            errors: [`No update values were passed to update task ${ req.params.task }`]
         });
     } else {
         try {
@@ -421,7 +421,7 @@ router.put('/:household/task/:task', [
             console.error(`Error updating task ${ req.params.task } from household ${ req.params.household }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -440,7 +440,7 @@ router.delete('/:household/task/:task', async (req, res) => {
         console.error(`Error updating task ${ req.params.task } from household ${ req.params.household }: ${ err }`);
         res.status(500).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -485,7 +485,7 @@ router.post('/:household/note', [
             console.error(`Error creating note on household ${ req.params.household }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -504,7 +504,7 @@ router.get('/:household/note/:note', async (req, res) => {
         console.error(`Error retrieving note ${ req.params.note } from household ${ req.params.household}: ${ err }`);
         res.status(404).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -530,7 +530,7 @@ router.put('/:household/note/:note', [
     } else if(!req.body.title && !req.body.body) {
         res.status(400).json({
             success: false,
-            error: `No update values were passed to update note ${ req.params.note }`
+            errors: [`No update values were passed to update note ${ req.params.note }`]
         });
     } else {
         try {
@@ -552,7 +552,7 @@ router.put('/:household/note/:note', [
             console.error(`Error updating note ${ req.params.note } from household ${ req.params.household }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -571,7 +571,7 @@ router.delete('/:household/note/:note', async (req, res) => {
         console.error(`Error updating note ${ req.params.note } from household ${ req.params.hosehold }: ${ err }`);
         res.status(500).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });

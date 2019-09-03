@@ -61,7 +61,7 @@ router.post('/', urlencodedParser, [
             console.error(`Error saving new user: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -80,7 +80,7 @@ router.get('/:user', async (req, res) => {
         console.error(`Error getting user ${ req.params.user }: ${ err }`);
         res.status(404).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
@@ -138,7 +138,7 @@ router.patch('/:user', urlencodedParser, [
             console.error(`Error updating user ${ req.params.user }: ${ err }`);
             res.status(500).json({
                 success: false,
-                error: err
+                errors: [err]
             });
         }
     }
@@ -157,7 +157,7 @@ router.delete('/:user', async (req, res) => {
         console.error(`Error deleting user ${ req.params.user}: ${ err }`);
         res.status(500).json({
             success: false,
-            error: err
+            errors: [err]
         });
     }
 });
