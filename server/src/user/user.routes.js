@@ -70,6 +70,12 @@ router.get('/:user', async (req, res) => {
     try {
         const user = await UserController.readUser(req.params.user);
 
+        if(!req.session.user || req.session.user != req.params.user) {
+            delete user.email;
+            delete user.hasVerifiedEmail;
+            delete user._householdIds;
+        }
+
         res.status(200).json({
             success: true,
             user: user
@@ -113,6 +119,11 @@ router.patch('/:user', urlencodedParser, [
             success: false,
             errors: errors
         });
+    } else if(!req.session.user || req.session.user != req.params.user) {
+        res.status(401).json({
+            success: false,
+            errors: [`You are unauthorized to modify user ${ req.params.user }`]
+        });
     } else {
         try {
             const firstName = (req.body.firstName) ? req.body.firstName : null;
@@ -144,20 +155,27 @@ router.patch('/:user', urlencodedParser, [
 
 // DELETE
 router.delete('/:user', async (req, res) => {
-    try {
-        const user = await UserController.deleteUser(req.params.user);
-
-        res.status(200).json({
-            success: true,
-            user: user
-        });
-    } catch (err) {
-        console.error(`Error deleting user ${ req.params.user}: ${ err }`);
-        res.status(500).json({
+    if(!req.session.user || req.session.user != req.params.user) {
+        res.status(401).json({
             success: false,
-            errors: [err]
+            errors: [`You are unauthorized to delete user ${ req.session.user }`]
         });
-    }
+    } else {
+        try {
+            const user = await UserController.deleteUser(req.params.user);
+    
+            res.status(200).json({
+                success: true,
+                user: user
+            });
+        } catch (err) {
+            console.error(`Error deleting user ${ req.params.user}: ${ err }`);
+            res.status(500).json({
+                success: false,
+                errors: [err]
+            });
+        }
+    }  
 });
 
 module.exports = router;
