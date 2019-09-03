@@ -21,6 +21,7 @@ router.post('/', urlencodedParser, [
         .isArray(),
     check('name')
         .custom(value => exists(value))
+            .withMessage('The name field cannot be left empty')
         .isString()
         .trim()
 ], async (req, res) => {

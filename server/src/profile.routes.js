@@ -4,61 +4,54 @@
 const router = require('express').Router();
 const bodyParser = require('body-parser');
 const { check, validationResult } = require('express-validator');
-const crypto = require('crypto');
+const { generateSalt, generateHash, checkPasswordFormat } = require('./util');
 
 const UserModel = require('./user/user.model');
 
-const urlencodedParser = bodyParser.urlencodedParser({ extended: false });
-
-const exists = (value) => (value && value != '') ? true : false;
-
-// --- Utility Functions
-/**
- * Generates an 8 character salt.
- */
-const generateSalt = () => {
-    return crypto.randomBytes(8).toString('hex').slice(0, 8);
-}
-
-/**
- * Hashes a password with the passed salt.
- * @param {String} password 
- * @param {String} salt 
- */
-const generateHash = (password, salt) => {
-    let hash = crypto.createHmac('sha256', salt);
-    hash.update(password);
-    hash = hash.digest('hex');
-
-    return hash;
-};
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 // --- Routes
 router.post('/register', urlencodedParser, [
     check('firstName')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The first name field cannot be left empty')
         .isString()
         .trim()
         .escape(),
     check('lastName')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The last name field cannot be left empty')
         .isString()
         .trim()
         .escape(),
     check('email')
-        .custom(value => exists(value))
-        .custom(value => value == req.body.retypeEmail)
-        .withMessage('The input for email and retype email did not match')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The email field cannot be left empty')
+        .custom((value, { req }) => value == req.body.retypeEmail)
+            .withMessage('The input for email and retype email did not match')
         .isEmail()
+            .withMessage('The input was not a valid email')
+        .normalizeEmail()
         .trim()
         .escape(),
+    check('retypeEmail')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The retype email field cannot be left empty'),
     check('password')
-        .custom(value => exists(value))
-        .custom(value => value == req.body.retypePassword)
-        .withMessage('The input for password and retype password did not match')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The password field cannot be left empty')
+        .custom((value, { req }) => value == req.body.retypePassword)
+            .withMessage('The input for password and retype password did not match')
+        .isLength({ min: 8 })
+            .withMessage('Password must be at least 8 characters long')
+        .custom(value => checkPasswordFormat(value))
+            .withMessage('Password must contain at least one letter, one number, and one special charater')
         .isString()
         .trim()
-        .escape()
+        .escape(),
+    check('retypePassword')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The retype password field cannot be left empty')
 ], async (req, res) => {
     const errors = validationResult(req);
 
@@ -108,14 +101,16 @@ router.post('/register', urlencodedParser, [
     }
 });
 
-router.post('/signin', urlencodedParser, [
+router.post('/sign-in', urlencodedParser, [
     check('email')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('No email was entered')
         .trim()
         .isEmail()
         .escape(),
     check('password')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('No password was entered')
         .isString()
         .trim()
         .escape()
@@ -161,9 +156,11 @@ router.post('/signin', urlencodedParser, [
     }
 });
 
-router.get('/signout', (req, res) => {
+router.get('/sign-out', (req, res) => {
     if(req.session.user) {
-        req.session.user = null;
+        req.session.destroy((err) => {
+            if(err) throw err;
+        });
 
         res.status(200).json({
             success: true
@@ -178,11 +175,19 @@ router.get('/signout', (req, res) => {
 
 router.post('/change-password', urlencodedParser, [
     check('password')
-        .custom(value => exists(value))
-        .custom(value => value == req.body.retypePassword)
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The password field cannot be left empty')
+        .custom((value, { req }) => value == req.body.retypePassword)
+        .isLength({ min: 8 })
+            .withMessage('Password must be at least 8 characters long')
+        .custom(value => checkPasswordFormat(value))
+            .withMessage('Password must contain at least one letter, one number, one special charater')
         .isString()
         .trim()
-        .escape()
+        .escape(),
+    check('retypePassword')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The retype password field cannot be left empty')
 ], async (req, res) => {
     if(!req.session.user) {
         res.status(400).json({

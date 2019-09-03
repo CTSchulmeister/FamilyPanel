@@ -23,4 +23,19 @@ module.exports.generateHash = (password, salt) => {
     hash = hash.digest('hex');
 
     return hash;
-}
+};
+
+/**
+ * @description Checks if a password meets the password requirements:
+ *  - At least one letter
+ *  - At least one number
+ *  - At least one special character
+ *  - At least 8 characters long
+ * @param {String} password
+ * @returns {Boolean}
+ */
+module.exports.checkPasswordFormat = (password) => {
+    const passwordFormat = new RegExp('^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})');
+
+    return passwordFormat.test(password);
+};

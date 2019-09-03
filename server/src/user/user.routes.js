@@ -4,37 +4,55 @@
 const router = require('express').Router();
 const bodyParser = require('body-parser');
 const { check, validationResult } = require('express-validator');
+const { checkPasswordFormat } = require('../util');
 
 const UserController = require('./user.controller');
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
-const exists = (value) => (value && value != '') ? true : false;
-
 // --- Routes
 // CREATE
 router.post('/', urlencodedParser, [
     check('firstName')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The first name field cannot be left empty')
         .isString()
-        .trim(),
+        .trim()
+        .escape(),
     check('lastName')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The last name field cannot be left empty')
         .isString()
-        .trim(),
+        .trim()
+        .escape(),
     check('email')
-        .custom(value => exists(value))
-        .normalizeEmail()
-        .isEmail().withMessage('An invalid email was submitted')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The email field cannot be left empty')
         .custom((value, { req }) => value == req.body.retypeEmail)
-        .withMessage('The email values did not match')
+            .withMessage('The input for email and retype email did not match')
+        .isEmail()
+            .withMessage('An invalid email was submitted')
+        .normalizeEmail()
         .trim()
-        .normalizeEmail(),
+        .escape(),
+    check('retypeEmail')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The retype email field cannot be left empty'),
     check('password')
-        .custom(value => exists(value))
-        .trim()
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The password field cannot be left empty')
         .custom((value, { req }) => value == req.body.retypePassword)
-        .withMessage('The password values did not match')
+            .withMessage('The input for password and retype password did not match')
+        .isLength({ min: 8 })
+            .withMessage('Password must be at least 8 characters long')
+        .custom(value => checkPasswordFormat(value))
+            .withMessage('Password must contain at least one letter, one number, and one special character')
+        .isString()
+        .trim()
+        .escape(),
+    check('retypePassword')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The retype password field cannot be left empty')
 ], async (req, res) => {
     const errors = validationResult(req);
 
@@ -93,24 +111,42 @@ router.get('/:user', async (req, res) => {
 router.patch('/:user', urlencodedParser, [
     check('firstName')
         .optional()
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('If first name is being updated, the field cannot be left empty')
         .isString()
-        .trim(),
+        .trim()
+        .escape(),
     check('lastName')
         .optional()
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('If last name is being updated, the field cannot be left empty')
         .isString()
-        .trim(),
+        .trim()
+        .escape(),
     check('email')
         .optional()
-        .normalizeEmail()
-        .isEmail().withMessage('An invalid email was submitted')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('If email is being updated, the field cannot be left empty')
         .custom((value, { req }) => value == req.body.retypeEmail)
+            .withMessage('The input for email and retype email did not match')
+        .isEmail()
+            .withMessage('The input was not a valid email')
+        .normalizeEmail()
         .trim()
-        .normalizeEmail(),
+        .escape(),
     check('password')
         .optional()
-        .trim()
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('If password is being updated, the field cannot be left empty')
         .custom((value, { req }) => value == req.body.retypePassword)
-        .withMessage('The password values did not match')
+            .withMessage('The password values did not match')
+        .isLength({ min: 8 })
+            .withMessage('Password must be at least 8 charactes long')
+        .custom(value => checkPasswordFormat(value))
+            .withMessage('Password must contain at least one letter, one number, and one special character')
+        .isString()
+        .trim()
+        .escape()
 ], async (req, res) => {
     const errors = validationResult(req);
 
