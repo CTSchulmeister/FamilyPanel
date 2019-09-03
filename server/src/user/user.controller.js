@@ -43,7 +43,7 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
         throw new Error(`A user with the email ${ email } already exists`);
     }
 
-    const user = new UserModel({
+    let user = new UserModel({
         firstName: firstName,
         lastName: lastName,
         email: email,
@@ -55,7 +55,12 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
         if(err) throw err;
     });
 
-    return await user.save();
+    user = await user.save();
+
+    delete user.password;
+    delete user.salt;
+
+    return user;
 };
 
 /** 
@@ -63,9 +68,12 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
  * @param {mongoose.Types.ObjectId} id - The user's _id value.
  */
 module.exports.readUser = async (id) => {
-    const user = await UserModel.findById(id).exec();
+    let user = await UserModel.findById(id).exec();
 
     if(!user) throw new Error(`User with id ${ id } does not exist`);
+
+    delete user.password;
+    delete user.salt;
 
     return user;
 };
@@ -96,9 +104,12 @@ module.exports.updateUser = async (id, firstName = null, lastName = null, email 
         throw new Error(`No values were passed to update the user with id ${ id }`);
     }
 
-    const user = await UserModel.findByIdAndUpdate(id, update, { new: true}).exec();
+    let user = await UserModel.findByIdAndUpdate(id, update, { new: true}).exec();
 
     if(!user) throw new Error(`User with id ${ id } does not exist`);
+
+    delete user.password;
+    delete user.salt;
 
     return user;
 };
@@ -142,9 +153,12 @@ module.exports.deleteUser = async (id) => {
         await household.save();
     });
 
-    const user = await UserModel.findByIdAndDelete(id).exec();
+    let user = await UserModel.findByIdAndDelete(id).exec();
 
     if(!user) throw new Error(`User with id ${ id } does not exist`);
+
+    delete user.password;
+    delete user.salt;
 
     return user;
 }
