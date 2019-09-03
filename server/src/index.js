@@ -30,7 +30,7 @@ app.use(jwt({
     audience: config.jwtAudience,
     issuer: config.jwtIssuer,
     algorithms: ['RS256']
-}))
+}));
 
 // --- Routing
 app.use('/api/user', userRoutes);

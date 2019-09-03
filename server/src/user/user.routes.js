@@ -7,6 +7,8 @@ const { check, validationResult } = require('express-validator');
 
 const UserController = require('./user.controller');
 
+const UserModel = require('./user.model');
+
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const exists = (value) => (value && value != '') ? true : false;
@@ -15,15 +17,15 @@ const exists = (value) => (value && value != '') ? true : false;
 // CREATE
 router.post('/', urlencodedParser, [
     check('firstName')
-        .custom(exists(value))
+        .custom(value => exists(value))
         .isString()
         .trim(),
     check('lastName')
-        .custom(exists(value))
+        .custom(value => exists(value))
         .isString()
         .trim(),
     check('email')
-        .custom(exists(value))
+        .custom(value => exists(value))
         .normalizeEmail()
         .isEmail().withMessage('An invalid email was submitted')
         .custom((value, { req }) => value == req.body.retypeEmail)
@@ -31,7 +33,7 @@ router.post('/', urlencodedParser, [
         .trim()
         .normalizeEmail(),
     check('password')
-        .custom(exists(value))
+        .custom(value => exists(value))
         .trim()
         .custom((value, { req }) => value == req.body.retypePassword)
         .withMessage('The password values did not match')
