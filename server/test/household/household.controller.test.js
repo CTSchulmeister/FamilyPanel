@@ -2,33 +2,13 @@
 
 // --- Modules
 const mongoose = require('mongoose');
-const crypto = require('crypto');
+const { generateSalt, generateHash } = require('../../src/util');
 
 const HouseholdController = require('../../src/household/household.controller');
 const HouseholdModel = require('../../src/household/household.model');
 const UserModel = require('../../src/user/user.model');
 
 process.env.TEST_SUITE = 'familypanel-household-controller-test';
-
-/**
- * Generates an 8 character salt.
- */
-const generateSalt = () => {
-    return crypto.randomBytes(8).toString('hex').slice(0, 8);
-}
-
-/**
- * Hashes a password with the passed salt.
- * @param {String} password 
- * @param {String} salt 
- */
-const generateHash = (password, salt) => {
-    let hash = crypto.createHmac('sha256', salt);
-    hash.update(password);
-    hash = hash.digest('hex');
-
-    return hash;
-};
 
 describe('Household Controller', () => {
     describe('Household', () => {

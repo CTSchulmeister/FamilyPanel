@@ -2,7 +2,7 @@
 
 // --- Modules
 const mongoose = require('mongoose');
-const crypto = require('crypto');
+const { generateSalt, generateHash } = require('../../src/util');
 
 const UserModel = require('../../src/user/user.model');
 

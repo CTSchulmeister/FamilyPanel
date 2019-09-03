@@ -3,30 +3,10 @@
 // --- Modules
 const UserModel = require('./user.model');
 const HouseholdModel = require('../household/household.model');
-const crypto = require('crypto');
+const { generateSalt, generateHash }= require('../util');
 const mongoose = require('mongoose');
 
 // --- Controller Logic
-
-/**
- * Generates an 8 character salt.
- */
-const generateSalt = () => {
-    return crypto.randomBytes(8).toString('hex').slice(0, 8);
-}
-
-/**
- * Hashes a password with the passed salt.
- * @param {String} password 
- * @param {String} salt 
- */
-const generateHash = (password, salt) => {
-    let hash = crypto.createHmac('sha256', salt);
-    hash.update(password);
-    hash = hash.digest('hex');
-
-    return hash;
-};
 
 /**
  * Creates a user.
