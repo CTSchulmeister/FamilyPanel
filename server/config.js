@@ -6,7 +6,5 @@ module.exports = {
         useCreateIndex: true,
         autoIndex: false
     },
-    jwksUri: 'https://familypanel.auth0.com/.well-known/jwks.json',
-    jwtAudience: 'https://familypanel/',
-    jwtIssuer: 'https://familypanel.auth0.com/'
+    secret: 'myInsecureSecret'
 }

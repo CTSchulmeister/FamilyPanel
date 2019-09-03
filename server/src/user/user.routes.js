@@ -7,8 +7,6 @@ const { check, validationResult } = require('express-validator');
 
 const UserController = require('./user.controller');
 
-const UserModel = require('./user.model');
-
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const exists = (value) => (value && value != '') ? true : false;

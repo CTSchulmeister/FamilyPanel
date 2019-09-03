@@ -1,15 +1,15 @@
 // --- Modules
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
-const jwt = require('express-jwt');
-const jwks = require('jwks-rsa');
 
 const config = require('../config');
 const userRoutes = require('./user/user.routes');
 const householdRoutes = require('./household/household.routes');
+const profileRoutes = require('./profile.routes');
 
 // --- Database Setup
 mongoose.connect(config.databaseURL, config.mongooseOptions)
@@ -20,21 +20,16 @@ mongoose.connect(config.databaseURL, config.mongooseOptions)
 const app = express();
 app.use(helmet());
 app.use(cors());
-app.use(jwt({
-    secret: jwks.expressJwtSecret({
-        cache: true,
-        rateLimit: true,
-        jwksRequestsPerMinute: 5,
-        jwksUri: config.jwksUri
-    }),
-    audience: config.jwtAudience,
-    issuer: config.jwtIssuer,
-    algorithms: ['RS256']
+app.use(session({
+    secret: config.secret,
+    saveUninitialized: false,
+    resave: true
 }));
 
 // --- Routing
 app.use('/api/user', userRoutes);
 app.use('/api/household', householdRoutes);
+app.use('/profile', profileRoutes);
 app.use((err, req, res, next) => {
     console.log('Error:', err.message);
     res.status(422).json(err.message);
