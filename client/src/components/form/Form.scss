@@ -1,0 +1,54 @@
+@import '../../scss/variables.scss';
+
+.form {
+    &__wrapper {
+        padding: 2rem;
+        border-radius: 1rem;
+        background: white;
+        box-shadow: $shadow--large;
+    }
+
+    &__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+
+        width: 100%;
+        margin: 0rem 0rem 0.5rem;
+
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    &__divider {
+        height: 0.25rem;
+        width: 100%;
+        margin: 0.25rem 0rem;
+
+        border: none;
+        background: $primary-color;
+    }
+
+    &__submit {
+        display: inline-block;
+
+        margin-top: 0.75rem;
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+
+        background: $primary-color;
+        border: none;
+        border-radius: 0.25rem;
+
+        color: $white;
+        font-weight: 700;
+        text-decoration: none;
+
+        transition: all 0.3s ease-in-out;
+
+        &:hover, &:focus {
+            background: $primary-color--light;
+            cursor: pointer;
+        }
+    }
+}

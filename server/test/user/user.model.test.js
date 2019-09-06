@@ -8,26 +8,6 @@ const UserModel = require('../../src/user/user.model');
 
 process.env.TEST_SUITE = 'familypanel-user-model-test';
 
-/**
- * Generates an 8 character salt.
- */
-const generateSalt = () => {
-    return crypto.randomBytes(8).toString('hex').slice(0, 8);
-}
-
-/**
- * Hashes a password with the passed salt.
- * @param {String} password 
- * @param {String} salt 
- */
-const generateHash = (password, salt) => {
-    let hash = crypto.createHmac('sha256', salt);
-    hash.update(password);
-    hash = hash.digest('hex');
-
-    return hash;
-};
-
 describe('User Model', () => {
     describe('CREATE', () => {
         test('Can create a user', async () => {

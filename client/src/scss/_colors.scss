@@ -1,8 +1,11 @@
-$primary-color: blue;
+
+$primary-color--light: rgb(85, 212, 191);
+$primary-color: rgb(48, 170, 150);
+$primary-color--dark: rgb(17, 104, 89);
 
 // --- Gray Scale
 $white: rgb(247, 247, 247);
-$gray-scale--light: rgb(219, 219, 219);
-$gray-scale--medium: rgb(138, 135, 135);
-$gray-scale--dark: rgb(82, 82, 82);
+$gray--light: rgb(219, 219, 219);
+$gray: rgb(138, 135, 135);
+$gray--dark: rgb(82, 82, 82);
 $black: rgb(34, 34, 34);

@@ -8,4 +8,14 @@
 
 html, body {
     margin: 0 auto;
+    min-height: 100vh;
+    min-width: 100vw;
+    position: relative;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
 }

@@ -350,8 +350,6 @@ describe('Household Controller', () => {
                     password: hashedPassword,
                     salt: salt
                 }).save();
-
-                console.log(user);
     
                 const household = await new HouseholdModel({
                     _ownerId: user._id,

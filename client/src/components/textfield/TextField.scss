@@ -1,0 +1,33 @@
+@import '../../scss/variables.scss';
+
+.text-field {
+    width: 100%;
+    position: relative;
+
+    &__input {
+        height: 3rem;
+        width: 100%;
+        position: relative;
+
+        border: none;
+
+        font-size: 1rem;
+
+        &::focus {
+            border: none;
+            outline: none;
+        }
+    }
+    
+    &::after {
+        content: '';
+
+        height: 0.125rem;
+        width: 100%;
+        position: absolute;
+        bottom: 0rem;
+        left: 0rem;
+        
+        background: $gray;
+    }
+}

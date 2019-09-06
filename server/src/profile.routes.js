@@ -8,10 +8,16 @@ const { generateSalt, generateHash, checkPasswordFormat } = require('./util');
 
 const UserModel = require('./user/user.model');
 
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
+const jsonParser = bodyParser.json();
 
 // --- Routes
-router.post('/register', urlencodedParser, [
+router.get('/register', (req, res) => {
+    res.json({
+        Message: 'Hello!'
+    });
+})
+
+router.post('/register', jsonParser, [
     check('firstName')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The first name field cannot be left empty')
@@ -101,7 +107,7 @@ router.post('/register', urlencodedParser, [
     }
 });
 
-router.post('/sign-in', urlencodedParser, [
+router.post('/sign-in', jsonParser, [
     check('email')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('No email was entered')
@@ -173,7 +179,7 @@ router.get('/sign-out', (req, res) => {
     }
 });
 
-router.post('/change-password', urlencodedParser, [
+router.post('/change-password', jsonParser, [
     check('password')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The password field cannot be left empty')

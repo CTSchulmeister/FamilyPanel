@@ -1,10 +1,14 @@
 import React from 'react';
 
-import Widget from './components/widget/Widget';
+import RegistrationForm from './components/registrationform/RegistrationForm';
+import Background from './components/background/Background';
 
 const App = (props) => {
     return (
-        <Widget />
+        <div className="wrapper">
+            <Background></Background>
+            <RegistrationForm />
+        </div>
     );
 };
 

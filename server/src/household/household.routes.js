@@ -7,20 +7,22 @@ const { check, validationResult } = require('express-validator');
 
 const HouseholdController = require('./household.controller');
 
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
-
-const exists = (value) => (value && value != '') ? true : false;
+const jsonParser = bodyParser.json();
 
 // --- Routes (Household)
 // CREATE
-router.post('/', urlencodedParser, [
+router.post('/', jsonParser, [
     check('ownerId')
-        .custom(value => exists(value)),
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The ownerId field cannot be left empty'),
     check('memberIds')
-        .optional()
-        .isArray(),
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The memberIds field cannot be left empty')
+        .isArray()
+        .custom(value => value.length >= 1)
+            .withMessage('The memberIds field must have at least one member'),
     check('name')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The name field cannot be left empty')
         .isString()
         .trim()
@@ -72,7 +74,7 @@ router.get('/:household', async (req, res) => {
 });
 
 // UPDATE
-router.patch('/:household', urlencodedParser, [
+router.patch('/:household', jsonParser, [
     check('ownerId')
         .optional(),
     check('memberIds')
@@ -137,20 +139,25 @@ router.delete('/:household', async (req, res) => {
 
 // --- Routes (Events)
 // CREATE
-router.post('/:household/event', urlencodedParser, [
+router.post('/:household/event', jsonParser, [
     check('creatorId')
-        .custom(value => exists(value)),
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The creatorId field cannot be left empty'),
     check('title')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The title field cannot be left empty')
         .isString()
-        .trim(),
+        .trim()
+        .escape(),
     check('description')
         .optional()
         .isString()
-        .trim(),
+        .trim()
+        .escape(),
     check('time')
         .optional()
         .trim()
+        .escape()
         .isISO8601(),
     check('location')
         .optional()
@@ -212,7 +219,7 @@ router.get('/:household/event/:event', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household/event/:event', urlencodedParser, [
+router.put('/:household/event/:event', jsonParser, [
     check('title')
         .optional()
         .isString()
@@ -292,11 +299,13 @@ router.delete('/:household/event/:event', async (req, res) => {
 
 // --- Routes (Tasks)
 // CREATE
-router.post('/:household/task', [
+router.post('/:household/task', jsonParser, [
     check('creatorId')
-        .custom(value => exists(value)),
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The creatorId field cannot be left empty'),
     check('title')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The title field cannot be left empty')
         .isString()
         .trim(),
     check('assignedUserIds')
@@ -365,7 +374,7 @@ router.get('/:household/task/:task', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household/task/:task', [
+router.put('/:household/task/:task', jsonParser, [
     check('assignedUserIds')
         .optional()
         .isArray(),
@@ -448,11 +457,13 @@ router.delete('/:household/task/:task', async (req, res) => {
 
 // --- Routes (Notes)
 // CREATE
-router.post('/:household/note', [
+router.post('/:household/note', jsonParser, [
     check('creatorId')
-        .custom(value => exists(value)),
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The creatorId field cannot be left emtpy'),
     check('title')
-        .custom(value => exists(value))
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The title field cannot be left empty')
         .isString()
         .trim(),
     check('body')
@@ -511,7 +522,7 @@ router.get('/:household/note/:note', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household/note/:note', [
+router.put('/:household/note/:note', jsonParser, [
     check('title')
         .optional()
         .isString()

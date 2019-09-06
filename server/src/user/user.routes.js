@@ -8,11 +8,11 @@ const { checkPasswordFormat } = require('../util');
 
 const UserController = require('./user.controller');
 
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
+const jsonParser = bodyParser.json();
 
 // --- Routes
 // CREATE
-router.post('/', urlencodedParser, [
+router.post('/', jsonParser, [
     check('firstName')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The first name field cannot be left empty')
@@ -108,7 +108,7 @@ router.get('/:user', async (req, res) => {
 });
 
 // UPDATE
-router.patch('/:user', urlencodedParser, [
+router.patch('/:user', jsonParser, [
     check('firstName')
         .optional()
         .exists({ checkFalsy: true, checkNull: true })
