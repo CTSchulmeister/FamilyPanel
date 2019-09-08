@@ -49,8 +49,7 @@ router.post('/', jsonParser, [
         .custom(value => checkPasswordFormat(value))
             .withMessage('Password must contain at least one letter, one number, and one special character')
         .isString()
-        .trim()
-        .escape(),
+        .trim(),
     check('retypePassword')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The retype password field cannot be left empty')
@@ -91,15 +90,14 @@ router.post('/login', jsonParser, [
     check('email')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The email field cannot be left empty')
-            .isEmail()
-            .trim()
-            .escape(),
+        .isEmail()
+        .trim()
+        .escape(),
     check('password')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The password field cannot be left empty')
         .isString()
         .trim()
-        .escape()
 ], async (req, res) => {
     try {
         const { user, token } = await UserController.loginUser(req.body.email, req.body.password);
@@ -153,6 +151,31 @@ router.post('/me/logout-all', auth, async (req, res) => {
         res.status(500).json({
             success: false,
             errors: [err.message]
+        });
+    }
+});
+
+router.post('/me/change-password', auth, [
+    check('password')
+        .exists({ checkFalsy: true, checkNull: true })
+        .custom((value, { req }) => value == req.body.retypePassword)
+        .isString()
+        .trim(),
+    check('retypePassword')
+        .exists({ checkFalsy: true, checkNull: true })
+], async (req, res) => {
+    try {
+        const user = UserController.updateUser(req.user, null, null, null, req.body.password);
+        req.user = user;
+
+        res.status(200).json({
+            success: true,
+            user: user
+        });
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            errors: [`You are not authorized to change this password`]
         });
     }
 });
@@ -225,7 +248,6 @@ router.patch('/:user', auth, jsonParser, [
             .withMessage('Password must contain at least one letter, one number, and one special character')
         .isString()
         .trim()
-        .escape()
 ], async (req, res) => {
     const errors = validationResult(req);
 
