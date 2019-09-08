@@ -23,7 +23,6 @@ app.use(cors());
 // --- Routing
 app.use('/api/user', userRoutes);
 app.use('/api/household', householdRoutes);
-app.use('/profile', profileRoutes);
 app.use((err, req, res, next) => {
     console.log('Error:', err.message);
     res.status(422).json(err.message);

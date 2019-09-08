@@ -86,6 +86,7 @@ router.post('/', jsonParser, [
     }
 });
 
+// Login
 router.post('/login', jsonParser, [
     check('email')
         .exists({ checkFalsy: true, checkNull: true })
@@ -116,6 +117,7 @@ router.post('/login', jsonParser, [
     }
 });
 
+// Get current user associated with token
 router.get('/me', auth, async (req, res) => {
     res.status(200).json({
         success: true,
@@ -123,6 +125,7 @@ router.get('/me', auth, async (req, res) => {
     });
 });
 
+// Logout of this device
 router.post('/me/logout', auth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter((token) => token.token != req.token);
@@ -138,6 +141,7 @@ router.post('/me/logout', auth, async (req, res) => {
     }
 });
 
+// Logout on all devices
 router.post('/me/logout-all', auth, async (req, res) => {
     try {
         req.user.tokens.splice(0, req.user.tokens.length);
