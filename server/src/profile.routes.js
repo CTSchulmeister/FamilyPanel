@@ -136,12 +136,11 @@ router.post('/sign-in', jsonParser, [
                 throw new Error(`No user was found with the email ${ req.body.email }`);
             }
 
-            let hash = crypto.createHmac('sha256', user.salt);
-            hash.update(req.body.password);
-            const hashedPassword = hash.digest('hex');
+            const hashedPassword = generateHash(req.body.password, user.salt);
 
             if(hashedPassword != user.password) {
                 throw new Error(`Incorrect password`);
+                console.log('Error 1');
             }
 
             req.session.user = user._id;

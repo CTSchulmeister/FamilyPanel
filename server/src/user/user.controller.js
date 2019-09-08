@@ -37,10 +37,39 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
 
     user = await user.save();
 
-    delete user.password;
-    delete user.salt;
+    const token = await user.generateAuthToken();
 
-    return user;
+    user.password = undefined;
+    user.salt = undefined;
+
+    return { user, token };
+};
+
+/**
+ * Logs in as a user with the passed credentials.
+ * @param {String} email - The user's email.
+ * @param {String} password - The user's unhashed password.
+ */
+module.exports.loginUser = async (email, password) => {
+    try {
+        const user = await UserModel.findOne({ email: email }).exec();
+
+        if(!user) {
+            throw new Error(`Invalid login credentials`);
+        }
+
+        const hashedPassword = generateHash(password, user.salt);
+
+        if(hashedPassword != user.password) {
+            throw new Error(`Invalid login credentials`);
+        }
+
+        const token = await user.generateAuthToken();
+
+        return { user, token };
+    } catch (err) {
+        throw err;
+    }
 };
 
 /** 
@@ -52,8 +81,8 @@ module.exports.readUser = async (id) => {
 
     if(!user) throw new Error(`User with id ${ id } does not exist`);
 
-    delete user.password;
-    delete user.salt;
+    user.password = undefined;
+    user.salt = undefined;
 
     return user;
 };
@@ -88,8 +117,8 @@ module.exports.updateUser = async (id, firstName = null, lastName = null, email 
 
     if(!user) throw new Error(`User with id ${ id } does not exist`);
 
-    delete user.password;
-    delete user.salt;
+    user.password = undefined;
+    user.salt = undefined;
 
     return user;
 };
@@ -137,8 +166,8 @@ module.exports.deleteUser = async (id) => {
 
     if(!user) throw new Error(`User with id ${ id } does not exist`);
 
-    delete user.password;
-    delete user.salt;
+    user.password = undefined;
+    user.salt = undefined;
 
     return user;
 }

@@ -9,6 +9,7 @@ const HouseholdModel = require('../../src/household/household.model');
 const UserModel = require('../../src/user/user.model');
 
 process.env.TEST_SUITE = 'familypanel-household-controller-test';
+process.env.JWT_KEY = 'testkey';
 
 describe('Household Controller', () => {
     describe('Household', () => {

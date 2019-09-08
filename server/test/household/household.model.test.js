@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const HouseholdModel = require('../../src/household/household.model');
 
 process.env.TEST_SUITE = 'familypanel-household-model-test';
+process.env.JWT_KEY = 'testkey';
 
 describe('Household Model', () => {
     const idOne = new mongoose.Types.ObjectId;

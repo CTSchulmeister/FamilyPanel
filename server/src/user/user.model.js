@@ -2,6 +2,8 @@
 
 // --- Modules
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const { generateHash } = require('../util');
 
 // --- Schema
 const UserSchema = new mongoose.Schema({
@@ -17,7 +19,8 @@ const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true
     },
     hasVerifiedEmail: {
         type: Boolean,
@@ -30,7 +33,13 @@ const UserSchema = new mongoose.Schema({
     salt: {
         type: String,
         required: true
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 }, {
     toObject: {
         virtuals: true
@@ -40,9 +49,20 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-UserSchema.virtual('fullName').get(() => {
+UserSchema.virtual('fullName').get(function() {
     return `${ this.firstName } ${ this.lastName}`;
 });
+
+/**
+ * Generates an authentication token for this user.
+ */
+UserSchema.methods.generateAuthToken = async function() {
+    const user = this;
+    const token = jwt.sign({_id: user._id}, process.env.JWT_KEY);
+    user.tokens = user.tokens.concat({token});
+    await user.save();
+    return token;
+}
 
 const User = mongoose.connection.model('User', UserSchema);
 

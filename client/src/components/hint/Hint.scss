@@ -1,0 +1,10 @@
+@import '../../scss/variables.scss';
+
+.hint {
+    display: block;
+    color: $gray;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    margin-top: 1rem;
+    word-wrap: normal;
+}

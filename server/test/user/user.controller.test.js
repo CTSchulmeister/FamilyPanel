@@ -7,11 +7,12 @@ const UserController = require('../../src/user/user.controller');
 const HouseholdModel = require('../../src/household/household.model');
 
 process.env.TEST_SUITE = 'familypanel-user-controller-test';
+process.env.JWT_KEY = 'testkey';
 
 describe('User Controller', () => {
     describe('createUser()', () => {
         test('Can create a user', async () => {
-            const user = await UserController.createUser('A', 'Test', 'atest@email.com', 'mypassword');
+            const { user } = await UserController.createUser('A', 'Test', 'atest@email.com', 'mypassword');
 
             expect(user.firstName).toBe('A');
         });
@@ -27,11 +28,17 @@ describe('User Controller', () => {
 
             expect(error).not.toBeNull();
         });
+
+        test('Creates a token', async () => {
+            const { user } = await UserController.createUser('John', 'Smith', 'jsmith@gmail.com', 'test123!');
+
+            expect(user.tokens.length).toBe(1);
+        });
     });
 
     describe('readUser()', () => {
         test('Can retrieve a user', async () => {
-            let user = await UserController.createUser('B', 'Test', 'btest@email.com', 'mypassword');
+            let { user } = await UserController.createUser('B', 'Test', 'btest@email.com', 'mypassword');
 
             user = await UserController.readUser(user._id);
 
@@ -53,7 +60,7 @@ describe('User Controller', () => {
 
     describe('updateUser()', () => {
         test('Can update a user', async () => {
-            let user = await UserController.createUser('C', 'Test', 'ctest@email.com', 'mypassword');
+            let { user } = await UserController.createUser('C', 'Test', 'ctest@email.com', 'mypassword');
 
             user = await UserController.updateUser(user._id, 'Bob', null, null, null);
 
@@ -79,7 +86,7 @@ describe('User Controller', () => {
 
     describe('deleteUser()', () => {
         test('Can delete a user', async () => {
-            let user = await UserController.createUser('D', 'Test', 'dtest@email.com', 'mypassword');
+            let { user } = await UserController.createUser('D', 'Test', 'dtest@email.com', 'mypassword');
 
             user = await UserController.deleteUser(user._id);
 
@@ -88,7 +95,7 @@ describe('User Controller', () => {
     })
 
     test('Can delete a user and their owned household', async () => {
-        let user = await UserController.createUser('E', 'Test', 'etest@email.com', 'mypassword');
+        let { user } = await UserController.createUser('E', 'Test', 'etest@email.com', 'mypassword');
 
         let household = await new HouseholdModel({
             _ownerId: user._id,
@@ -104,7 +111,7 @@ describe('User Controller', () => {
     });
 
     test('Can delete a user and their relevant documents from a not owner household', async () => {
-        let user = await UserController.createUser('F', 'Test', 'ftest@email.com', 'mypassword');
+        let { user } = await UserController.createUser('F', 'Test', 'ftest@email.com', 'mypassword');
         const mockUserId = new mongoose.Types.ObjectId();
 
         let household = await new HouseholdModel({

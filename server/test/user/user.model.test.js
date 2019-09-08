@@ -7,6 +7,7 @@ const { generateSalt, generateHash } = require('../../src/util');
 const UserModel = require('../../src/user/user.model');
 
 process.env.TEST_SUITE = 'familypanel-user-model-test';
+process.env.JWT_KEY = 'testkey';
 
 describe('User Model', () => {
     describe('CREATE', () => {
@@ -21,9 +22,9 @@ describe('User Model', () => {
                 password: hashedPassword,
                 salt: salt
             }).save();
-    
+
             user = await UserModel.findById(user._id).exec();
-    
+
             expect(user.firstName).toEqual('G');
         });
     

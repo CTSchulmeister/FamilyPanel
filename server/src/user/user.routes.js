@@ -7,6 +7,7 @@ const { check, validationResult } = require('express-validator');
 const { checkPasswordFormat } = require('../util');
 
 const UserController = require('./user.controller');
+const auth = require('../middleware/auth');
 
 const jsonParser = bodyParser.json();
 
@@ -63,35 +64,109 @@ router.post('/', jsonParser, [
         });
     } else {
         try {
-            const user = await UserController.createUser(
+            const { user, token } = await UserController.createUser(
                 req.body.firstName, 
                 req.body.lastName,
                 req.body.email,
-                req.body.password);
+                req.body.password
+            );
 
             res.status(200).json({
                 success: true,
-                user: user
+                user: user,
+                token: token
             });
         } catch (err) {
             console.error(`Error saving new user: ${ err }`);
             res.status(500).json({
                 success: false,
-                errors: [err]
+                errors: [err.message]
             });
         }
     }
 });
 
+router.post('/login', jsonParser, [
+    check('email')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The email field cannot be left empty')
+            .isEmail()
+            .trim()
+            .escape(),
+    check('password')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The password field cannot be left empty')
+        .isString()
+        .trim()
+        .escape()
+], async (req, res) => {
+    try {
+        const { user, token } = await UserController.loginUser(req.body.email, req.body.password);
+
+        res.status(200).json({
+            success: true,
+            user: user,
+            token: token
+        });
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            errors: [err.message]
+        });
+    }
+});
+
+router.get('/me', auth, async (req, res) => {
+    res.status(200).json({
+        success: true,
+        user: req.user
+    });
+});
+
+router.post('/me/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => token.token != req.token);
+        await req.user.save();
+        res.status(200).json({
+            success: true
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            errors: [err.message]
+        });
+    }
+});
+
+router.post('/me/logout-all', auth, async (req, res) => {
+    try {
+        req.user.tokens.splice(0, req.user.tokens.length);
+        await req.user.save();
+        res.status(200).json({
+            success: true
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            errors: [err.message]
+        });
+    }
+});
+
 // READ
-router.get('/:user', async (req, res) => {
+router.get('/:user', auth, async (req, res) => {
     try {
         const user = await UserController.readUser(req.params.user);
 
-        if(!req.session.user || req.session.user != req.params.user) {
-            delete user.email;
-            delete user.hasVerifiedEmail;
-            delete user._householdIds;
+        if(req.user._id != user._id ) {
+            user.hasVerifiedEmail = undefined;
+            user.password = undefined;
+            user.salt = undefined;
+            user.tokens = undefined;
+        }
+
+        if(!req.user._householdIds.some(household => user._householdIds.includes(household))) {
+            user.email = undefined;
         }
 
         res.status(200).json({
@@ -102,13 +177,13 @@ router.get('/:user', async (req, res) => {
         console.error(`Error getting user ${ req.params.user }: ${ err }`);
         res.status(404).json({
             success: false,
-            errors: [err]
+            errors: [err.message]
         });
     }
 });
 
 // UPDATE
-router.patch('/:user', jsonParser, [
+router.patch('/:user', auth, jsonParser, [
     check('firstName')
         .optional()
         .exists({ checkFalsy: true, checkNull: true })
@@ -155,10 +230,10 @@ router.patch('/:user', jsonParser, [
             success: false,
             errors: errors
         });
-    } else if(!req.session.user || req.session.user != req.params.user) {
+    } else if(req.user._id != req.params.user) {
         res.status(401).json({
             success: false,
-            errors: [`You are unauthorized to modify user ${ req.params.user }`]
+            errors: [`You are not authorized to update this user`]
         });
     } else {
         try {
@@ -183,18 +258,18 @@ router.patch('/:user', jsonParser, [
             console.error(`Error updating user ${ req.params.user }: ${ err }`);
             res.status(500).json({
                 success: false,
-                errors: [err]
+                errors: [err.message]
             });
         }
     }
 });
 
 // DELETE
-router.delete('/:user', async (req, res) => {
-    if(!req.session.user || req.session.user != req.params.user) {
+router.delete('/:user', auth, async (req, res) => {
+    if(req.user._id != req.params.user) {
         res.status(401).json({
             success: false,
-            errors: [`You are unauthorized to delete user ${ req.session.user }`]
+            errors: [`You are not authorized to delete this user`]
         });
     } else {
         try {
@@ -208,10 +283,10 @@ router.delete('/:user', async (req, res) => {
             console.error(`Error deleting user ${ req.params.user}: ${ err }`);
             res.status(500).json({
                 success: false,
-                errors: [err]
+                errors: [err.message]
             });
         }
-    }  
+    }
 });
 
 module.exports = router;

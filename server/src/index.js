@@ -1,10 +1,8 @@
 // --- Modules
 const express = require('express');
-const session = require('express-session');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
-const path = require('path');
 
 const config = require('../config');
 const userRoutes = require('./user/user.routes');
@@ -18,13 +16,9 @@ mongoose.connect(config.databaseURL, config.mongooseOptions)
 
 // --- App Setup
 const app = express();
+app.use(express.json());
 app.use(helmet());
 app.use(cors());
-app.use(session({
-    secret: config.secret,
-    saveUninitialized: false,
-    resave: true
-}));
 
 // --- Routing
 app.use('/api/user', userRoutes);

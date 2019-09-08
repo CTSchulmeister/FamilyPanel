@@ -1,13 +1,13 @@
 import React from 'react';
 
-import RegistrationForm from './components/registrationform/RegistrationForm';
+import LoginForm from './components/loginform/LoginForm';
 import Background from './components/background/Background';
 
 const App = (props) => {
     return (
         <div className="wrapper">
             <Background></Background>
-            <RegistrationForm />
+            <LoginForm />
         </div>
     );
 };
