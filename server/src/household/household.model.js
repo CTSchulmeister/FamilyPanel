@@ -101,7 +101,13 @@ const HouseholdSchema = new mongoose.Schema({
     },
     events: [EventSchema],
     tasks: [TaskSchema],
-    notes: [NoteSchema]
+    notes: [NoteSchema],
+    settings: {
+        allMembersCanInvite: {
+            type: Boolean,
+            default: false
+        }
+    }
 });
 
 HouseholdSchema.pre('save', function(next) {
