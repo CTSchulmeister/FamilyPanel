@@ -1,0 +1,13 @@
+@import '../../scss/variables.scss';
+
+.main {
+    grid-area: main;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: $color-gradient;
+
+
+}

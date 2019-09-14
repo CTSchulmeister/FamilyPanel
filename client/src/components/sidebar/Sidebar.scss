@@ -1,0 +1,70 @@
+@import '../../scss/variables.scss';
+
+.sidebar {
+    grid-area: sidebar;
+
+    display: grid;
+    grid-template-rows: 4rem 1fr;
+
+    position: relative;
+    z-index: 2;
+    padding: 0rem 2rem;
+
+    background: $dark-gray-scale-gradient;
+    box-shadow: $side-shadow;
+
+    &__logo {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        height: 4rem;
+        width: 100%;
+
+        text-transform: uppercase;
+        text-decoration: none;
+        color: white;
+        font-weight: $bold;
+        font-size: 1.5rem;
+        letter-spacing: 0.25rem;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    &__main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+
+    }
+
+    &__header {
+        height: fit-content;
+        width: 100%;
+        margin-bottom: 6rem;
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0rem;
+            bottom: 0.5rem;
+            height: 0.25rem;
+            width: 50%;
+            background-color: white;
+        }
+    }
+
+    &__household-name {
+        font-size: 1.5rem;
+        font-weight: $normal-weight;
+        text-transform: uppercase;
+        color: white;
+        letter-spacing: 0.25rem;
+    }
+
+
+}

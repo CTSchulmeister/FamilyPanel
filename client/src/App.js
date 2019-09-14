@@ -1,14 +1,11 @@
 import React from 'react';
+import './App.scss';
 
-import LoginForm from './components/loginform/LoginForm';
-import Background from './components/background/Background';
+import Dashboard from './components/dashboard/Dashboard';
 
 const App = (props) => {
     return (
-        <div className="wrapper">
-            <Background></Background>
-            <LoginForm />
-        </div>
+        <Dashboard />
     );
 };
 

@@ -1,0 +1,13 @@
+@import '../../scss/variables.scss';
+
+.dashboard {
+    display: grid;
+    grid-template-rows: 4rem 1fr;
+    grid-template-columns: 20rem 1fr;
+    grid-template-areas:
+        "sidebar topbar"
+        "sidebar  main ";
+
+    height: 100vh;
+    width: 100vw;
+}

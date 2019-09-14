@@ -1,11 +1,51 @@
+// Primary Color
+$extra-light-primary: #D2EBB1;
+$light-primary: #BCEF79;
+$primary: #98EA2A;
+$dark-primary: #75B71D;
+$extra-dark-primary: #3F640E;
 
-$primary-color--light: rgb(85, 212, 191);
-$primary-color: rgb(48, 170, 150);
-$primary-color--dark: rgb(17, 104, 89);
+// Secondary Color
+$extra-light-secondary: #AFF3FF;
+$light-secondary: #6EE1F5;
+$secondary: #11C3E3;
+$dark-secondary: #0E95AD;
+$extra-dark-secondary: #0B5E6E;
 
-// --- Gray Scale
-$white: rgb(247, 247, 247);
-$gray--light: rgb(219, 219, 219);
-$gray: rgb(138, 135, 135);
-$gray--dark: rgb(82, 82, 82);
-$black: rgb(34, 34, 34);
+// Color Gradient
+$extra-light-color-gradient: linear-gradient(to bottom right, 
+    $extra-light-primary,
+    $extra-light-secondary);
+$light-color-gradient: linear-gradient(to bottom right, 
+    $light-primary,
+    $light-secondary);
+$color-gradient: linear-gradient(to bottom right, 
+    $primary,
+    $secondary);
+$dark-color-gradient: linear-gradient(to bottom right, 
+    $dark-primary,
+    $dark-secondary);
+$extra-dark-color-gradient: linear-gradient(to bottom right, 
+    $extra-dark-primary,
+    $extra-dark-secondary);
+
+// Gray Scale
+$extra-light-gray: #EAEAEA;
+$light-gray: #BABABA;
+$gray: #818181;
+$dark-gray: #484848;
+$extra-dark-gray: #2F2F2F;
+
+// Gray Scale Gradient
+$light-gray-scale-gradient: linear-gradient(to bottom right,
+    $extra-light-gray,
+    $light-gray);
+$medium-light-gray-scale-gradient: linear-gradient(to bottom right,
+    $light-gray,
+    $gray);
+$medium-dark-gray-scale-gradient: linear-gradient(to bottom right,
+    $gray,
+    $dark-gray);
+$dark-gray-scale-gradient: linear-gradient(to bottom right,
+    $dark-gray,
+    $extra-dark-gray);

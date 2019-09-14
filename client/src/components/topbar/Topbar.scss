@@ -1,0 +1,26 @@
+@import '../../scss/variables.scss';
+
+.topbar {
+    grid-area: topbar;
+
+    display: flex;
+    justify-content: flex-end;
+
+    position: relative;
+    z-index: 1;
+    padding: 0rem 1rem;
+    box-shadow: $top-shadow;
+
+    &__buttons {
+        display: flex;
+    }
+
+    &__divider {
+        height: 3rem;
+        margin: 0.5rem 1rem;
+        width: 0.125rem;
+
+        border: none;
+        background: $extra-light-gray;
+    }
+}

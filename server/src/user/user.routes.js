@@ -155,7 +155,8 @@ router.post('/me/logout-all', auth, async (req, res) => {
     }
 });
 
-router.post('/me/change-password', auth, [
+// Change password
+router.post('/me/change-password', auth, jsonParser, [
     check('password')
         .exists({ checkFalsy: true, checkNull: true })
         .custom((value, { req }) => value == req.body.retypePassword)
@@ -165,7 +166,7 @@ router.post('/me/change-password', auth, [
         .exists({ checkFalsy: true, checkNull: true })
 ], async (req, res) => {
     try {
-        const user = UserController.updateUser(req.user, null, null, null, req.body.password);
+        const user = UserController.updateUser(req.user._id, null, null, null, req.body.password);
         req.user = user;
 
         res.status(200).json({
@@ -175,7 +176,7 @@ router.post('/me/change-password', auth, [
     } catch (err) {
         res.status(400).json({
             success: false,
-            errors: [`You are not authorized to change this password`]
+            errors: [err.message]
         });
     }
 });

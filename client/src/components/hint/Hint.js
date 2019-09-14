@@ -4,7 +4,7 @@ import './Hint.scss';
 const Hint = (props) => {
     return (
         <span className="hint">
-            <i class="fas fa-info-circle"></i>
+            <i className="fas fa-info-circle"></i>
             &nbsp;
             { props.hint }
         </span>

@@ -1,0 +1,77 @@
+@import '../../scss/variables.scss';
+
+.sidebar-group, .sidebar-group--active {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    position: relative;
+    height: 3rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
+
+    background: transparent;
+
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    letter-spacing: 0.25rem;
+    text-transform: uppercase;
+
+    &:hover {
+        cursor: pointer;
+        text-shadow: 0rem 0rem 0.5rem rgba(255, 255, 255, 0.5);
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-right: 1.5rem;
+
+        height: 100%;
+        width: 2rem;
+
+        color: white;
+        font-size: 1.5rem;
+    }
+}
+
+.sidebar-group {
+    &::before {
+        content: '';
+
+        position: absolute;
+        top: 0rem;
+        left: -2rem;
+        height: 100%;
+        width: 0.5rem;
+
+        background: $color-gradient;
+
+        transform: scaleX(0);
+        transform-origin: left;
+
+        transition: all ease-out 0.3s;
+    }
+
+    &:hover::before {
+        transform: scaleX(1);
+        
+        transition: all ease-out 0.3s;
+    }
+}
+
+.sidebar-group--active {
+    &::before {
+        content: '';
+
+        position: absolute;
+        top: 0rem;
+        left: -2rem;
+        height: 100%;
+        width: 1rem;
+
+        background: $color-gradient;
+    }
+}

@@ -6,12 +6,13 @@ const bodyParser = require('body-parser');
 const { check, validationResult } = require('express-validator');
 
 const HouseholdController = require('./household.controller');
+const auth = require('../middleware/auth');
 
 const jsonParser = bodyParser.json();
 
 // --- Routes (Household)
 // CREATE
-router.post('/', jsonParser, [
+router.post('/', auth, jsonParser, [
     check('ownerId')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The ownerId field cannot be left empty'),
@@ -33,6 +34,11 @@ router.post('/', jsonParser, [
         res.status(400).json({
             success: false,
             errors: errors
+        });
+    } else if(req.user._id != ownerId) {
+        res.status(400).json({
+            success: false,
+            errors: [`You are not authorized to create a household with this ownerId`]
         });
     } else {
         try {
@@ -57,9 +63,16 @@ router.post('/', jsonParser, [
 });
 
 // READ
-router.get('/:household', async (req, res) => {
+router.get('/:household', auth, async (req, res) => {
     try {
         const household = await HouseholdController.readHousehold(req.params.household);
+
+        if(!household._memberIds.includes(req.user._id)) {
+            household.events = undefined;
+            household.tasks = undefined;
+            household.notes = undefined;
+        }
+
         res.status(200).json({
             success: true,
             household: household
@@ -74,7 +87,7 @@ router.get('/:household', async (req, res) => {
 });
 
 // UPDATE
-router.patch('/:household', jsonParser, [
+router.patch('/:household', auth, jsonParser, [
     check('ownerId')
         .optional(),
     check('memberIds')
@@ -94,11 +107,20 @@ router.patch('/:household', jsonParser, [
         });
     } else {
         try {
+            let household = await HouseholdController.readHousehold(req.params.household);
+
+            if(household._ownerId != req.user._id) {
+                res.status(400).json({
+                    success: false,
+                    errors: []
+                });
+            }
+
             const ownerId = (req.body.ownerId) ? req.body.ownerId : null;
             const memberIds = (req.body.memberIds) ? req.body.memberIds : null;
             const name = (req.body.name) ? req.body.name : null;
 
-            const household = await HouseholdController.updateHousehold(
+            household = await HouseholdController.updateHousehold(
                 req.params.household,
                 ownerId, 
                 memberIds, 
