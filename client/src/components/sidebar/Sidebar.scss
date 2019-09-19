@@ -37,14 +37,12 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-
-
     }
 
     &__header {
         height: fit-content;
         width: 100%;
-        margin-bottom: 6rem;
+        margin-bottom: 3rem;
         position: relative;
 
         &::after {
@@ -58,7 +56,14 @@
         }
     }
 
+    &__subheading {
+        font-size: 1rem;
+        text-transform: uppercase;
+        color: $light-gray;
+    }
+
     &__household-name {
+        margin: 0.5rem 0rem 1.5rem;
         font-size: 1.5rem;
         font-weight: $normal-weight;
         text-transform: uppercase;

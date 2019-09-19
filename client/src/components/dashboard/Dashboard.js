@@ -15,7 +15,7 @@ class Dashboard extends Component {
             <div className="dashboard">
                 <Topbar />
                 <Sidebar
-                    householdName="Household Name"
+                    householdName="Super Long Household Name"
                 />
                 <Main />
             </div>

@@ -12,12 +12,12 @@ const Sidebar = (props) => {
 
             <div className="sidebar__main">
                 <div className="sidebar__header">
+                    <span className="sidebar__subheading">Household</span>
                     <h2 className="sidebar__household-name">{ props.householdName }</h2>
                 </div>
                 <div className="sidebar__buttons">
                     <SidebarGroup
                         type="home"
-                        active="true"
                     />
                     <SidebarGroup 
                         type="members"
@@ -30,6 +30,7 @@ const Sidebar = (props) => {
                     />
                     <SidebarGroup 
                         type="notes"
+                        active="true"
                     />
                 </div>
             </div>

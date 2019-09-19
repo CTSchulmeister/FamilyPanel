@@ -1,0 +1,134 @@
+@import './variables.scss';
+
+.form {
+    height: 100%;
+    width: 100%;
+    padding: 2rem;
+
+    background: white;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        height: 3rem;
+        width: 100%;
+        position: relative;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+            left: 0rem;
+            bottom: 0rem;
+
+            height: 0.25rem;
+            width: 100%;
+            
+            background: $color-gradient;
+        }
+    }
+
+    &__title {
+        margin: 0rem;
+
+        font-size: 1.5rem;
+        font-weight: $bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+    }
+
+    &__input-group {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        height: 3rem;
+        width: 100%;
+
+        position: relative;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+            bottom: 0.25rem;
+            left: 0rem;
+            
+            height: 0.125rem;
+            width: 100%;
+
+            background-color: $gray;
+        }
+    }
+
+    &__label {
+        display: inline-block;
+
+        position: absolute;
+        top: 0.9rem;
+        left: 0rem;
+
+        color: black;
+        font-size: 1rem;
+
+        transform: translateY(0rem) translateX(0rem) scale(1);
+        transform-origin: top left;
+
+        transition: all ease-out 0.3s;
+    }
+
+    &__text-input {
+        height: 1.5rem;
+        width: 100%;
+
+        background: transparent;
+        border: none;
+
+        font-size: 1rem;
+
+        &:focus + .form__label,
+        &:not([value='']) + .form__label {
+            transform: translateY(-0.75rem) translateX(0.05rem) scale(0.6);
+            transform-origin: top left;
+
+            transition: all ease-out 0.3s;
+        }
+    }
+
+    &__submit-group {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        height: 3rem;
+        width: 100%;
+    }
+
+    &__submit-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0.5rem 1.5rem;
+
+        border: none;
+        background: $color-gradient;
+        background-size: 200% auto;
+
+        color: white;
+        text-transform: uppercase;
+        font-size: 1rem;
+        font-weight: $bold;
+
+        transition: all ease-out 0.3s;
+
+        &:hover {
+            cursor: pointer;
+            background-position: right center;
+
+            transition: all ease-out 0.3s;
+        }
+    }
+}

@@ -3,8 +3,9 @@
 .topbar {
     grid-area: topbar;
 
-    display: flex;
-    justify-content: flex-end;
+    display: grid;
+    grid-template-columns: 1fr 3.125rem 9rem 3.125rem auto;
+    grid-template-rows: 4rem;
 
     position: relative;
     z-index: 1;
@@ -17,7 +18,7 @@
 
     &__divider {
         height: 3rem;
-        margin: 0.5rem 1rem;
+        margin: 0.5rem 1.5rem;
         width: 0.125rem;
 
         border: none;
