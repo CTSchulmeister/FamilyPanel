@@ -1,12 +1,13 @@
 import React from 'react';
+
 import './App.scss';
 
-import Dashboard from './components/dashboard/Dashboard';
+import Landing from './components/landing/Landing';
 
 const App = (props) => {
     return (
-        <Dashboard />
+        <Landing />
     );
 };
 
-export default App;
+export default connect()(App);

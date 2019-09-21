@@ -1,0 +1,90 @@
+@import '../../scss/variables.scss';
+
+.landing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 100vh;
+    width: 100vw;
+
+    background: $color-gradient;
+
+    &__main-container {
+        display: grid;
+        grid-template-rows: 4rem auto 4rem;
+        grid-template-columns: 4fr 5fr 4rem;
+        grid-template-areas:
+            "  .  form   .  "
+            "main form panel"
+            "  .  form   .  ";
+
+        height: 60%;
+        width: 60%;
+    }
+
+    &__main {
+        grid-area: main;
+
+        position: relative;
+        z-index: 1;
+        padding: 2rem;
+
+        background: $dark-gray-scale-gradient;
+        border-top-left-radius: 2rem;
+        border-bottom-left-radius: 2rem;
+        box-shadow: $large-shadow;
+
+        color: white;
+    }
+
+    &__title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        height: 3rem;
+        width: 100%;
+        margin: 0rem;
+        position: relative;
+
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        font-weight: $bold;
+        letter-spacing: 0.2rem;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+            height: 0.25rem;
+            width: 50%;
+            left: 25%;
+            bottom: 0.25rem;
+            background: $color-gradient;
+        }
+    }
+
+    &__form-wrapper {
+        grid-area: form;
+
+        position: relative;
+        z-index: 2;
+
+        box-shadow: $extra-large-shadow;
+    }
+
+    &__decorative-panel {
+        grid-area: panel;
+
+        position: relative;
+        z-index: 1;
+        padding: 2rem;
+        
+        background: $extra-dark-gray;
+        border-top-right-radius: 2rem;
+        border-bottom-right-radius: 2rem;
+        box-shadow: $large-shadow;
+    }
+
+}

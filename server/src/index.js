@@ -7,7 +7,6 @@ const cors = require('cors');
 const config = require('../config');
 const userRoutes = require('./user/user.routes');
 const householdRoutes = require('./household/household.routes');
-const profileRoutes = require('./profile.routes');
 
 // --- Database Setup
 mongoose.connect(config.databaseURL, config.mongooseOptions)

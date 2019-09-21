@@ -14,6 +14,7 @@
 
         height: 3rem;
         width: 100%;
+        margin-bottom: 0.25rem;
         position: relative;
 
         &::after {
@@ -41,13 +42,22 @@
 
     &__input-group {
         display: flex;
-        align-items: center;
-        justify-content: flex-start;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
 
-        height: 3rem;
         width: 100%;
+        padding-bottom: 0.75rem;
 
         position: relative;
+
+        &--error {
+            background: $error-background;
+        }
+
+        &:hover {
+            cursor: text;
+        }
 
         &::after {
             content: '';
@@ -67,21 +77,27 @@
         display: inline-block;
 
         position: absolute;
-        top: 0.9rem;
+        bottom: 0.75rem;
         left: 0rem;
 
-        color: black;
+        color: $dark-gray;
         font-size: 1rem;
+        text-transform: uppercase;
 
         transform: translateY(0rem) translateX(0rem) scale(1);
         transform-origin: top left;
 
         transition: all ease-out 0.3s;
+
+        &:hover {
+            cursor: text;
+        }
     }
 
     &__text-input {
         height: 1.5rem;
         width: 100%;
+        margin-top: 0.75rem;
 
         background: transparent;
         border: none;
@@ -90,11 +106,18 @@
 
         &:focus + .form__label,
         &:not([value='']) + .form__label {
-            transform: translateY(-0.75rem) translateX(0.05rem) scale(0.6);
+            transform: translateY(-1.1rem) translateX(0.05rem) scale(0.75);
+            color: $gray;
             transform-origin: top left;
 
             transition: all ease-out 0.3s;
         }
+    }
+
+    &__hint {
+        color: $gray;
+        text-transform: uppercase;
+        font-size: 0.75rem;
     }
 
     &__submit-group {

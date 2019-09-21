@@ -15,7 +15,7 @@ const Sidebar = (props) => {
                     <span className="sidebar__subheading">Household</span>
                     <h2 className="sidebar__household-name">{ props.householdName }</h2>
                 </div>
-                <div className="sidebar__buttons">
+                <nav className="sidebar__buttons">
                     <SidebarGroup
                         type="home"
                     />
@@ -32,7 +32,7 @@ const Sidebar = (props) => {
                         type="notes"
                         active="true"
                     />
-                </div>
+                </nav>
             </div>
         </aside>
     );

@@ -14,55 +14,49 @@ class RegistrationForm extends Component {
             retypePassword: ''
         };
 
-        this.handleFirstNameChange.bind(this);
-        this.handleLastNameChange.bind(this);
-        this.handleEmailChange.bind(this);
-        this.handleRetypeEmailChange.bind(this);
-        this.handlePasswordChange.bind(this);
-        this.handleRetypePasswordChange.bind(this);
+        this.focusInput.bind(this);
+        this.handleChange.bind(this);
         this.handleSubmit.bind(this);
     }
 
-    handleFirstNameChange = (event) => {
+    focusInput = (event) => {
+        if(event.target.classList.contains('form__input-group')) {
+            event.target.querySelector('.form__text-input').focus();
+        } else if(event.target.parentElement.classList.contains('form__hint')) {
+            event.target.parentElement.parentElement.querySelector('.form__text-input').focus();
+        } else {
+            event.target.parentElement.querySelector('.form__text-input').focus();
+        }
+    }
+
+    handleChange = (event) => {
+        let key = event.target.name;
+        let value = event.target.value;
+
         this.setState({
-            firstName: event.target.value
+            [key]: value
         });
     };
 
-    handleLastNameChange = (event) => {
-        this.setState({
-            lastName: event.target.value
-        });
-    };
-
-    handleEmailChange = (event) => {
-        this.setState({
-            email: event.target.value
-        });
-    };
-
-    handleRetypeEmailChange = (event) => {
-        this.setState({
-            retypeEmail: event.target.value
-        });
-    };
-
-    handlePasswordChange = (event) => {
-        this.setState({
-            password: event.target.value
-        });
-    };
-
-    handleRetypePasswordChange = (event) => {
-        this.setState({
-            retypePassword: event.target.value
-        });
-    };
-
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         event.preventDefault();
 
-        alert(`${ this.state.firstName } ${ this.state.lastName } ${ this.state.email } ${ this.state.password }`);
+        try {
+            let response = await fetch(`${ process.env.REACT_APP_API_URL }/api/user`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this.state)
+            });
+
+            response = await response.json();
+
+            console.log(response.user.firstName);
+        } catch (err) {
+            alert(`Error encountered: ${ err }`);
+        }
     };
 
     render() {
@@ -71,59 +65,73 @@ class RegistrationForm extends Component {
                 <div className="form__header">
                     <h2 className="form__title">Register</h2>
                 </div>
-                <div className="form__input-group">
+                <div className="form__input-group" onClick={ this.focusInput }>
                     <input 
                         className="form__text-input"
                         type="text"
+                        name="firstName"
                         value={ this.state.firstName }
-                        onChange={ this.handleFirstNameChange }
+                        onChange={ this.handleChange }
+                        maxLength="30"
                     />
-                    <label className="form__label">First Name</label>
+                    <label className="form__label" htmlFor="firstName">First Name</label>
                 </div>
-                <div className="form__input-group">
+                <div className="form__input-group" onClick={ this.focusInput }>
                     <input 
                         className="form__text-input"
                         type="text" 
+                        name="lastName"
                         value={ this.state.lastName }
-                        onChange={ this.handleLastNameChange }
+                        onChange={ this.handleChange }
+                        maxLength="30"
                     />
-                    <label className="form__label">Last Name</label>
+                    <label className="form__label" htmlFor="lastName">Last Name</label>
                 </div>
-                <div className="form__input-group">
+                <div className="form__input-group" onClick={ this.focusInput }>
                     <input
                         className="form__text-input"
                         type="email"
+                        name="email"
                         value={ this.state.email }
-                        onChange={ this.handleEmailChange }
+                        onChange={ this.handleChange }
                     />
-                    <label className="form__label">Email</label>
+                    <label className="form__label" htmlFor="email">Email</label>
                 </div>
-                <div className="form__input-group">
+                <div className="form__input-group" onClick={ this.focusInput }>
                     <input
                         className="form__text-input"
                         type="email"
+                        name="retypeEmail"
                         value={ this.state.retypeEmail }
-                        onChange={ this.handleRetypeEmailChange }
+                        onChange={ this.handleChange }
                     />
-                    <label className="form__label">Retype Email</label>
+                    <label className="form__label" htmlFor="retypeEmail">Retype Email</label>
                 </div>
-                <div className="form__input-group">
+                <div className="form__input-group" onClick={ this.focusInput }>
+                    <div className="form__hint">
+                        <i className="fas fa-info-circle"></i>
+                        &nbsp;
+                        A valid password must contain at least 8 characters, including
+                        letters, numbers, and special characters
+                    </div>
                     <input
                         className="form__text-input"
                         type="password"
+                        name="password"
                         value={ this.state.password }
-                        onChange={ this.handlePasswordChange }
+                        onChange={ this.handleChange }
                     />
-                    <label className="form__label">Password</label>
+                    <label className="form__label" htmlFor="password">Password</label>
                 </div>
-                <div className="form__input-group">
+                <div className="form__input-group" onClick={ this.focusInput }>
                     <input
                         className="form__text-input"
                         type="password"
+                        name="retypePassword"
                         value={ this.state.retypePassword }
-                        onChange={ this.handleRetypePasswordChange }
+                        onChange={ this.handleChange }
                     />
-                    <label className="form__label">Retype Password</label>
+                    <label className="form__label" htmlFor="retypePassword">Retype Password</label>
                 </div>
                 <div className="form__submit-group">
                     <input
