@@ -1,17 +1,31 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { changeView } from '../../actions/viewActions';
 import './UserHandle.scss';
 
 const UserHandle = (props) => {
+    let name = `${ props.firstName } ${ props.lastName }`;
+
+    if(name.length > 30) {
+        name = name.substring(0, 26) + '...';
+    }
+
+    const viewProfile = () => {
+        props.changeView('profile');
+    }
+
     return (
-        <a href='/profile' className="user-handle">
-            <span className="user-handle__name">{ props.firstName }&nbsp;{ props.lastName }</span>
+        <button className="user-handle" onClick={ viewProfile }>
+            <span className="user-handle__name">{ name }</span>
             <img 
                 className="user-handle__picture" 
                 src={ process.env.PUBLIC_URL + '/anonymousProfilePicture.png ' } 
-                alt={ `${ props.firstName } ${ props.lastName }`}
+                alt={ name }
             />
-        </a>
+        </button>
     );
 };
 
-export default UserHandle;
+
+
+export default connect(null, { changeView })(UserHandle);

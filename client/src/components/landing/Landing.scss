@@ -91,16 +91,24 @@
         background: $color-gradient;
     }
 
-    &__form-button {
-        margin: 0rem 2rem;
+    &__form-switcher {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
+        height: 4.25rem;
+        padding: 0rem 2rem 2rem;
+
+        text-transform: uppercase;
+        color: $dark-gray;
+        font-size: 1rem;
+    }
+
+    &__form-switcher-button {
         display: flex;
         align-items: center;
         justify-content: center;
-
-        height: 4rem;
-        width: calc(100% - 4rem);
-        padding: 0rem;
+        padding: 0.5rem 1.5rem;
 
         border: none;
         background: $color-gradient;
@@ -122,7 +130,7 @@
     }
 
     &__form-wrapper {
-        height: calc(100% - 8.25rem);
+        height: calc(100% - 6.25rem);
     }
 
     &__decorative-panel {

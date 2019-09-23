@@ -1,18 +1,29 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import './Dashboard.scss';
 
 import TopBar from '../TopBar/TopBar';
 import SideBar from '../SideBar/SideBar';
 import Main from '../Main/Main';
 
-const Dashboard = (props) => {
-    return (
-        <div className="dashboard">
-            <TopBar user={ props.user } hello="Hey!"/>
-            <SideBar view={ props.view } household="PH Household Name"/>
-            <Main view={ props.view }/>
-        </div>
-    );
-};
+class Dashboard extends Component {
+    render() {
+        return (
+            <div className="dashboard">
+                <TopBar user={ this.props.user } hello="Hey!"/>
+                <SideBar householdName="PH Household Name"/>
+                <Main view={ this.props.view }/>
+            </div>
+        );
+    }
+}
 
-export default Dashboard;
+const mapStateToProps = (state) => {
+    return {
+        isAuthenticated: state.auth.authenticated,
+        user: state.auth.user,
+        view: state.view.currentView
+    };
+}
+
+export default connect(mapStateToProps)(Dashboard);

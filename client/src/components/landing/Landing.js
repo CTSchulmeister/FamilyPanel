@@ -11,7 +11,8 @@ class Landing extends Component {
         this.state = {
             formToShow: 'Registration',
             formComponent: <RegistrationForm />,
-            buttonText: 'Already have an account? Log in!'
+            buttonIntro: 'Already have an account?',
+            buttonText: 'Log in!'
         };
 
         this.toggleForm.bind(this);
@@ -22,13 +23,15 @@ class Landing extends Component {
             this.setState({
                 formToShow: 'Log In',
                 formComponent: <LogInForm />,
-                buttonText: 'Don\'t have an account yet? Click here to register!'
+                buttonIntro: 'Don\'t have an account yet?',
+                buttonText: 'Register!'
             });
         } else {
             this.setState({
                 formToShow: 'Registration',
                 formComponent: <RegistrationForm />,
-                buttonText: 'Already have an account? Log in!'
+                buttonIntro: 'Already have an account?',
+                buttonText: 'Log in!'
             });
         }
     };
@@ -52,9 +55,12 @@ class Landing extends Component {
                             { this.state.formComponent }
                         </div>
                         <hr className="landing__divider" />
-                        <button className="landing__form-button" onClick={ this.toggleForm }>
-                            { this.state.buttonText }
-                        </button>
+                        <div className="landing__form-switcher">
+                            { this.state.buttonIntro }
+                            <button className="landing__form-switcher-button" onClick={ this.toggleForm }>
+                                { this.state.buttonText }
+                            </button>
+                        </div>
                     </aside>
                     <div className="landing__decorative-panel">.</div>
                 </div>

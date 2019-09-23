@@ -3,12 +3,17 @@
 .user-handle {
     display: flex;
     align-items: center;
-    padding: 1rem 0.5rem;
+
+    border: none;
+    background: transparent;
+    margin: 0rem;
+    padding: 0.5rem 0rem;
 
     text-decoration: none;
     color: $gray;
     text-transform: uppercase;
     letter-spacing: 0.25rem;
+    font-size: 1rem;
 
     transition: all ease-out 0.3s;
 

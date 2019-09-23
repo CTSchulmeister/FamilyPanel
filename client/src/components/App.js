@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Landing from './Landing/Landing';
-import DashboardContainer from './Dashboard/DashboardContainer';
+import Dashboard from './Dashboard/Dashboard';
 
 const App = (props) => {
     let viewToRender = props.view ? props.view : null;
@@ -10,9 +10,9 @@ const App = (props) => {
     
     if(props.isAuthenticated) {
         if(!viewToRender) {
-            componentToRender = <DashboardContainer view="home" />
+            componentToRender = <Dashboard view="profile" />
         } else {
-            componentToRender = <DashboardContainer view={ viewToRender } />
+            componentToRender = <Dashboard view={ viewToRender } />
         }
     } else {
         componentToRender = <Landing />;
@@ -27,7 +27,7 @@ const App = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        view: state.view,
+        view: state.view.view,
         isAuthenticated: state.auth.authenticated,
         user: state.auth.user
     };
