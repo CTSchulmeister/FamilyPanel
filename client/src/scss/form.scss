@@ -7,6 +7,11 @@
 
     background: white;
 
+    & ::before {
+        content: '';
+        display: none;
+    }
+
     &__header {
         display: flex;
         align-items: center;
