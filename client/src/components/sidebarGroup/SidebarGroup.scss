@@ -1,6 +1,6 @@
 @import '../../scss/variables.scss';
 
-.sidebar-group, .sidebar-group--active {
+.side-bar-group, .side-bar-group--active {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -37,7 +37,7 @@
     }
 }
 
-.sidebar-group {
+.side-bar-group {
     &::before {
         content: '';
 
@@ -62,7 +62,7 @@
     }
 }
 
-.sidebar-group--active {
+.side-bar-group--active {
     &::before {
         content: '';
 

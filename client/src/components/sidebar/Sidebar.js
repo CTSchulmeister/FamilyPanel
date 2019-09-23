@@ -1,41 +1,63 @@
 import React from 'react';
-import './Sidebar.scss';
+import './SideBar.scss';
+import PropTypes from 'prop-types';
 
-import SidebarGroup from '../sidebarGroup/SidebarGroup';
+import SideBarGroup from '../SideBarGroup/SideBarGroup';
 
-const Sidebar = (props) => {
+const SideBar = (props) => {
+    const SideBarGroups = [
+        'home',
+        'members',
+        'events',
+        'tasks',
+        'notes'
+    ].map(value => {
+        if(value === props.view) {
+            return (
+                <SideBarGroup
+                    type={ value }
+                    active={ true }
+                    key={ value }
+                />
+            );
+        } else {
+            return (
+                <SideBarGroup
+                    type={ value }
+                    key={ value }
+                />
+            );
+        }
+    });
+
     return (
-        <aside className="sidebar">
-            <a href="/" className="sidebar__logo">
-                Family Panel
+        <aside className="side-bar">
+            <a href="/" className="side-bar__logo">
+                <h1>Family Panel</h1>
             </a>
 
-            <div className="sidebar__main">
-                <div className="sidebar__header">
-                    <span className="sidebar__subheading">Household</span>
-                    <h2 className="sidebar__household-name">{ props.householdName }</h2>
+            <div className="side-bar__main">
+                <div className="side-bar__header">
+                    <span className="side-bar__sub-heading">Household</span>
+                    <h2 className="side-bar__household-name">{ props.householdName }</h2>
                 </div>
-                <nav className="sidebar__buttons">
-                    <SidebarGroup
-                        type="home"
-                    />
-                    <SidebarGroup 
-                        type="members"
-                    />
-                    <SidebarGroup 
-                        type="events"
-                    />
-                    <SidebarGroup 
-                        type="tasks"
-                    />
-                    <SidebarGroup 
-                        type="notes"
-                        active="true"
-                    />
+
+                <nav className="side-bar__buttons">
+                    { SideBarGroups }
                 </nav>
             </div>
         </aside>
-    );
+    )
 }
 
-export default Sidebar;
+SideBar.propTypes = {
+    view: PropTypes.oneOf([
+        'home',
+        'members',
+        'events',
+        'tasks',
+        'notes'
+    ])
+}
+
+export default SideBar;

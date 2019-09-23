@@ -1,26 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './Dashboard.scss';
 
-import Topbar from '../topbar/Topbar';
-import Sidebar from '../sidebar/Sidebar';
-import Main from '../main/Main';
+import TopBar from '../TopBar/TopBar';
+import SideBar from '../SideBar/SideBar';
+import Main from '../Main/Main';
 
-class Dashboard extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <div className="dashboard">
-                <Topbar />
-                <Sidebar
-                    householdName="Super Long Household Name"
-                />
-                <Main />
-            </div>
-        );
-    }
-}
+const Dashboard = (props) => {
+    return (
+        <div className="dashboard">
+            <TopBar user={ props.user } hello="Hey!"/>
+            <SideBar view={ props.view } household="PH Household Name"/>
+            <Main view={ props.view }/>
+        </div>
+    );
+};
 
 export default Dashboard;

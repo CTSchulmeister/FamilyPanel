@@ -1,6 +1,6 @@
 @import '../../scss/variables.scss';
 
-.sidebar {
+.side-bar {
     grid-area: sidebar;
 
     display: grid;
@@ -21,12 +21,17 @@
         height: 4rem;
         width: 100%;
 
-        text-transform: uppercase;
         text-decoration: none;
-        color: white;
-        font-weight: $bold;
-        font-size: 1.5rem;
-        letter-spacing: 0.25rem;
+
+        & h1 {
+            margin: 0rem;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            color: white;
+            font-weight: $bold;
+            font-size: 1.5rem;
+            letter-spacing: 0.25rem;
+        }
 
         &:hover {
             cursor: pointer;
@@ -56,7 +61,7 @@
         }
     }
 
-    &__subheading {
+    &__sub-heading {
         font-size: 1rem;
         text-transform: uppercase;
         color: $light-gray;

@@ -1,37 +1,43 @@
-import React, { Component } from 'react';
-import './TopbarButton.scss';
+import React from 'react';
+import './TopBarButton.scss';
+import PropTypes from 'prop-types';
 
-class TopbarButton extends Component {
-    constructor(props) {
-        super(props);
+const TopBarButton = (props) => {
+    let title, icon, route;
 
-        switch(props.type) {
-            case 'messages':
-                this.title = 'Messages';
-                this.icon = <i className="far fa-envelope"></i>;
-                break;
-            case 'notifications':
-                this.title = 'Notifications';
-                this.icon = <i className="far fa-bell"></i>;
-                break;
-            case 'settings':
-                this.title = 'Settings';
-                this.icon = <i className="fas fa-sliders-h"></i>
-                break;
-            default:
-                throw new Error(`Invalid type value given.  Must be 'messages', 'notifications', or 'settings'`);
-        }
-
-        this.route = (props.route) ? props.route : '#';
+    switch(props.type) {
+        case 'messages':
+            title = 'Messages';
+            icon = <i className="far fa-envelope"></i>;
+            route = '/messages';
+            break;
+        case 'notifications':
+            title = 'Notifications';
+            icon = <i className="far fa-bell"></i>;
+            route = '/notifications';
+            break;
+        case 'settings':
+            title = 'Settings';
+            icon = <i className="fas fa-sliders-h"></i>
+            route = '/settings'
+            break;
+        default:
+            throw new Error(`Invalid type value given.  Must be 'messages', 'notifications', or 'settings'`);
     }
 
-    render() {
-        return (
-            <a href={ this.route } className="topbar-button">
-                { this.icon }
-            </a>
-        )
-    }
-}
+    return (
+        <a href={ route } className="top-bar-button" title={ title }>
+            { icon }
+        </a>
+    );
+};
 
-export default TopbarButton;
+TopBarButton.propTypes = {
+    type: PropTypes.oneOf([
+        'messages',
+        'notifications',
+        'settings'
+    ])
+};
+
+export default TopBarButton;

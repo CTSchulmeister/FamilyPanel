@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { registerUser } from '../../actions/authActions';
 import './RegistrationForm.scss';
 
 class RegistrationForm extends Component {
@@ -38,22 +40,11 @@ class RegistrationForm extends Component {
         });
     };
 
-    handleSubmit = async (event) => {
+    handleSubmit = (event) => {
         event.preventDefault();
 
         try {
-            let response = await fetch(`${ process.env.REACT_APP_API_URL }/api/user`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.state)
-            });
-
-            response = await response.json();
-
-            console.log(response.user.firstName);
+            this.props.registerUser(this.state);
         } catch (err) {
             alert(`Error encountered: ${ err }`);
         }
@@ -145,4 +136,4 @@ class RegistrationForm extends Component {
     }
 }
 
-export default RegistrationForm;
+export default connect(null, { registerUser })(RegistrationForm);

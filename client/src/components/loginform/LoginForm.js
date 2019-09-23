@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import './LoginForm.scss';
+import { connect } from 'react-redux';
+import { logUserIn } from '../../actions/authActions';
+import './LogInForm.scss';
 
-class LoginForm extends Component {
+class LogInForm extends Component {
     constructor(props) {
         super(props);
 
@@ -38,16 +40,7 @@ class LoginForm extends Component {
         event.preventDefault();
 
         try {
-            let response = await fetch(`${ process.env.REACT_APP_API_URL }/api/user/login`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(this.state)
-            });
-
-            response = await response.json();
+            this.props.logUserIn(this.state);
         } catch (err) {
             alert(`Error encountered: ${ err }`);
         }
@@ -91,4 +84,4 @@ class LoginForm extends Component {
     }
 }
 
-export default LoginForm;
+export default connect(null, { logUserIn })(LogInForm);
