@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { createHousehold } from '../../actions/householdActions';
 import './CreateHouseholdForm.scss';
 
 class CreateHouseholdForm extends Component {
@@ -38,7 +39,7 @@ class CreateHouseholdForm extends Component {
         event.preventDefault();
 
         try {
-            alert('mock submit');
+            this.props.createHousehold(this.state);
         } catch (err) {
             alert(`Error encountered: ${ err }`);
         }
@@ -72,4 +73,4 @@ class CreateHouseholdForm extends Component {
     }
 }
 
-export default connect(null, {  })(CreateHouseholdForm);
+export default connect(null, { createHousehold })(CreateHouseholdForm);

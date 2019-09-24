@@ -59,7 +59,7 @@ router.post('/', jsonParser, [
     if(!errors.isEmpty()) {
         res.status(400).json({
             success: false,
-            errors: errors
+            errors: errors.errors
         });
     } else {
         try {
@@ -79,7 +79,9 @@ router.post('/', jsonParser, [
             console.error(`Error saving new user: ${ err }`);
             res.status(500).json({
                 success: false,
-                errors: [err.message]
+                errors: [{
+                    msg: err.toString()
+                }]
             });
         }
     }
@@ -110,7 +112,9 @@ router.post('/login', jsonParser, [
     } catch (err) {
         res.status(400).json({
             success: false,
-            errors: [err.message]
+            errors: [{
+                msg: err.toString()
+            }]
         });
     }
 });

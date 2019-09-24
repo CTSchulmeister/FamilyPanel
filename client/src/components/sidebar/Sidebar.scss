@@ -101,9 +101,11 @@
         left: calc(100% + 1rem);
         z-index: 5;
 
-        animation: appearFromLeft 0.6s;
-        transform-origin: left;
+        box-shadow: $shadow;
 
+        animation: appear 0.6s;
+        transform-origin: left;
+        
         ::before {
             content: '';
 
@@ -115,9 +117,17 @@
             background: white;
             position: absolute;
         }
+
+        & .form {
+            padding: 1rem;
+            
+            &__title {
+                font-size: 1.2rem;
+            }
+        }
     }
 
-    @keyframes appearFromLeft {
+    @keyframes appear {
         from {
             transform: scaleX(0);
         }

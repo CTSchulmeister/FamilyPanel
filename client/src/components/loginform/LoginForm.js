@@ -47,8 +47,43 @@ class LogInForm extends Component {
     };
 
     render() {
+        let errors = null;
+        if(this.props.loginErrors) {
+            let errorsArray = this.props.loginErrors;
+
+            errors = errorsArray.map(error => {
+                let param;
+
+                switch(error.param) {
+                    case 'email':
+                        param = 'Email:';
+                        break;
+                    case 'password':
+                        param = 'Password:';
+                        break;
+                    default:
+                        param = '';
+                }
+
+                return (
+                    <li className="form__error">
+                        <span className="form__error-param">{ param }</span> { error.msg }
+                    </li>
+                );
+            });
+
+            errors = 
+                <div className="form__errors">
+                    <span className="form__errors-header">Registration Errors:</span>
+                    <ul className="form__errors-list">
+                        { errors }
+                    </ul>
+                </div>;
+        }
+
         return (
             <form className="form" onSubmit={ this.handleSubmit }>
+                { errors }
                 <div className="form__header">
                     <h2 className="form__title">Log In</h2>
                 </div>
@@ -84,4 +119,10 @@ class LogInForm extends Component {
     }
 }
 
-export default connect(null, { logUserIn })(LogInForm);
+const mapStateToProps = (state) => {
+    return {
+        loginErrors: state.auth.loginErrors
+    }
+}
+
+export default connect(mapStateToProps, { logUserIn })(LogInForm);

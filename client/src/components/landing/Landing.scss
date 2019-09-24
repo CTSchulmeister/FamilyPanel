@@ -2,9 +2,8 @@
 
 .landing {
     display: flex;
-    align-items: center;
     justify-content: center;
-
+    align-items: center;
     height: 100vh;
     width: 100vw;
 
@@ -19,7 +18,7 @@
             "main form panel"
             "  .  form   .  ";
 
-        height: 60%;
+        min-height: 60%;
         width: 60%;
     }
 

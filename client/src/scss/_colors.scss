@@ -1,33 +1,14 @@
 // Primary Color
-$extra-light-primary: #D2EBB1;
-$light-primary: #BCEF79;
-$primary: #98EA2A;
-$dark-primary: #75B71D;
-$extra-dark-primary: #3F640E;
+$primary: rgb(42, 234, 128);
+// $primary: #98EA2A;
 
 // Secondary Color
-$extra-light-secondary: #AFF3FF;
-$light-secondary: #6EE1F5;
 $secondary: #11C3E3;
-$dark-secondary: #0E95AD;
-$extra-dark-secondary: #0B5E6E;
 
 // Color Gradient
-$extra-light-color-gradient: linear-gradient(to bottom right, 
-    $extra-light-primary,
-    $extra-light-secondary);
-$light-color-gradient: linear-gradient(to bottom right, 
-    $light-primary,
-    $light-secondary);
 $color-gradient: linear-gradient(to bottom right, 
-    $primary,
-    $secondary);
-$dark-color-gradient: linear-gradient(to bottom right, 
-    $dark-primary,
-    $dark-secondary);
-$extra-dark-color-gradient: linear-gradient(to bottom right, 
-    $extra-dark-primary,
-    $extra-dark-secondary);
+    $secondary,
+    $primary);
 
 // Error Colors
 $error-background: rgb(255, 228, 228);

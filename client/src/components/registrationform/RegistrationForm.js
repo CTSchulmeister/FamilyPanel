@@ -51,8 +51,54 @@ class RegistrationForm extends Component {
     };
 
     render() {
+        let errors = null;
+        if(this.props.registrationErrors) {
+            let errorsArray = this.props.registrationErrors;
+            errors = errorsArray.map(error => {
+                let param;
+
+                switch(error.param) {
+                    case 'firstName':
+                        param = 'First Name:';
+                        break;
+                    case 'lastName':
+                        param = 'Last Name:';
+                        break;
+                    case 'email':
+                        param = 'Email:';
+                        break;
+                    case 'retypeEmail':
+                        param = 'Retype Email:';
+                        break;
+                    case 'password':
+                        param = 'Password:';
+                        break;
+                    case 'retypePassword':
+                        param = 'Retype Password:';
+                        break;
+                    default:
+                        param = '';
+                }
+
+                return (
+                    <li className="form__error">
+                        <span className="form__error-param">{ param }</span> { error.msg }
+                    </li>
+                );
+            });
+
+            errors = 
+                <div className="form__errors">
+                    <span className="form__errors-header">Registration Errors:</span>
+                    <ul className="form__errors-list">
+                        { errors }
+                    </ul>
+                </div>;
+        }
+
         return (
             <form className="form" onSubmit={ this.handleSubmit }>
+                { errors }
                 <div className="form__header">
                     <h2 className="form__title">Register</h2>
                 </div>
@@ -136,4 +182,10 @@ class RegistrationForm extends Component {
     }
 }
 
-export default connect(null, { registerUser })(RegistrationForm);
+const mapStateToProps = (state) => {
+    return {
+        registrationErrors: state.auth.registrationErrors
+    }
+}
+
+export default connect(mapStateToProps, { registerUser })(RegistrationForm);

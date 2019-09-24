@@ -20,7 +20,7 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
     const hashedPassword = generateHash(password, salt);
 
     if(await UserModel.findOne({ email: email }).exec() != null) {
-        throw new Error(`A user with the email ${ email } already exists`);
+        throw `A user with the email ${ email } already exists`;
     }
 
     let user = new UserModel({
@@ -55,13 +55,13 @@ module.exports.loginUser = async (email, password) => {
         const user = await UserModel.findOne({ email: email }).exec();
 
         if(!user) {
-            throw new Error(`Invalid login credentials`);
+            throw `Invalid login credentials`;
         }
 
         const hashedPassword = generateHash(password, user.salt);
 
         if(hashedPassword != user.password) {
-            throw new Error(`Invalid login credentials`);
+            throw `Invalid login credentials`;
         }
 
         const token = await user.generateAuthToken();
@@ -79,7 +79,7 @@ module.exports.loginUser = async (email, password) => {
 module.exports.readUser = async (id) => {
     let user = await UserModel.findById(id).exec();
 
-    if(!user) throw new Error(`User with id ${ id } does not exist`);
+    if(!user) throw `User with id ${ id } does not exist`;
 
     user.password = undefined;
     user.salt = undefined;
@@ -110,12 +110,12 @@ module.exports.updateUser = async (id, firstName = null, lastName = null, email 
     }
 
     if(Object.entries(update).length === 0 && update.constructor === Object) {
-        throw new Error(`No values were passed to update the user with id ${ id }`);
+        throw `No values were passed to update the user with id ${ id }`;
     }
 
     let user = await UserModel.findByIdAndUpdate(id, update, { new: true}).exec();
 
-    if(!user) throw new Error(`User with id ${ id } does not exist`);
+    if(!user) throw `User with id ${ id } does not exist`;
 
     user.password = undefined;
     user.salt = undefined;

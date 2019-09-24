@@ -13,8 +13,6 @@ class SideBar extends Component {
             showCreateHouseholdButton: false
         };
 
-        this.sideBarHeaderRef = React.createRef();
-
         this.showHouseholdCreationForm.bind(this);
     }
 
@@ -27,14 +25,14 @@ class SideBar extends Component {
             this.setState({
                 showCreateHouseholdButton: false
             });
-        }        
+        }
     };
 
     render() {
         let householdSection;
         let sideBarGroups;
 
-        if(this.props.user._householdIds.length === 0) {
+        if(this.props.user.currentHousehold && this.props.user.currentHousehold !== '') {
             sideBarGroups = [
                 'profile',
             ].map(value => {
@@ -60,7 +58,7 @@ class SideBar extends Component {
             let householdForm = (this.state.showCreateHouseholdButton)
                 ? (
                     <div className="side-bar__household-create-form-wrapper">
-                        <CreateHouseholdForm />
+                        <CreateHouseholdForm/>
                     </div>
                 )
                 : null;
@@ -106,15 +104,28 @@ class SideBar extends Component {
                 }
             });
 
+            let householdForm = (this.state.showCreateHouseholdButton)
+                ? (
+                    <div className="side-bar__household-create-form-wrapper">
+                        <CreateHouseholdForm/>
+                    </div>
+                )
+                : null;
+
+
             householdSection = (
                 <div className="side-bar__households">
                     <div className="side-bar__header">
-                        <span classNAme="side-bar__sub-heading">
+                        <span className="side-bar__sub-heading">
                             Household
                         </span>
                         <h2 className="side-bar__household-name">
-                            { this.props.householdName }
+                            { this.props.currentHousehold.name }
                         </h2>
+                        <button className="side-bar__create-household-button" onClick={ this.showHouseholdCreationForm }>
+                            Create Household
+                        </button>
+                        { householdForm }
                     </div>
                 </div>
             );
@@ -141,7 +152,9 @@ class SideBar extends Component {
 const mapStateToProps = (state) => {
     return {
         view: state.view.currentView,
-        user: state.auth.user
+        user: state.auth.user,
+        households: state.households.households,
+        currentHousehold: state.households.currentHousehold
     };
 }
 

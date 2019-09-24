@@ -35,7 +35,7 @@ router.post('/', auth, jsonParser, [
             success: false,
             errors: errors
         });
-    } else if(req.user._id != ownerId) {
+    } else if(req.user._id != req.body.ownerId) {
         res.status(400).json({
             success: false,
             errors: [`You are not authorized to create a household with this ownerId`]

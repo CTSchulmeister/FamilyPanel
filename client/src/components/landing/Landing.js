@@ -43,11 +43,11 @@ class Landing extends Component {
                     <main className="landing__main">
                         <h1 className="landing__title">FamilyPanel</h1>
                         <p className="landing__description">
-                            FamilyPanel allows your household to easily coordinate with eachother.
+                            FamilyPanel allows your household to easily coordinate with one another.
                         </p>
                         <p className="landing__description">
-                            Create events, assign tasks, and leaves notes for each other.
-                            It's easy to keep your household organized with FamilyPanel there to help you.
+                            Create events, assign tasks, and leave notes for each other.
+                            Keeping your household organized is easy with FamilyPanel there to help you.
                         </p>
                     </main>
                     <aside className="landing__form-container">

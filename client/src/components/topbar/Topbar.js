@@ -4,12 +4,13 @@ import './TopBar.scss';
 
 import TopBarButton from '../TopBarButton/TopBarButton';
 import UserHandle from '../UserHandle/UserHandle';
+import LogOutButton from '../LogOutButton/LogOutButton';
 
 const TopBar = (props) => {
     return (
         <header className="top-bar">
             <div className="top-bar__search-bar">
-                PH
+                &nbsp;
             </div>
 
             <hr className="top-bar__divider" />
@@ -18,6 +19,7 @@ const TopBar = (props) => {
                 <TopBarButton type="notifications" />
                 <TopBarButton type="messages" />
                 <TopBarButton type="settings" />
+                <LogOutButton />
             </div>
 
             <hr className="top-bar__divider" />

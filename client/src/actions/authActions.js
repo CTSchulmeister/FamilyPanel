@@ -2,7 +2,11 @@ import {
     AUTH_USER,
     UNAUTH_USER,
     AUTH_ERROR,
-    PENDING_AUTH
+    PENDING_AUTH,
+    REGISTRATION_ERROR,
+    LOGIN_ERROR,
+    PENDING_GET_HOUSEHOLDS,
+    GET_HOUSEHOLDS
 } from './types';
 
 const ROOT_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
@@ -16,24 +20,27 @@ export const registerUser = (userData) => async dispatch => {
         let response = await fetch(`${ROOT_URL}/api/user`, {
             method: 'POST',
             headers: {
-                'content-type': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(userData)
         });
-    
         response = await response.json();
 
         if(response.success === false) {
-            throw new Error(response.errors.toString());
-        }
-
-        localStorage.setItem('auth_jwt_token', response.token);
+            dispatch({
+                type: REGISTRATION_ERROR,
+                registrationErrors: response.errors
+            });
+        } else {
+            localStorage.setItem('auth_jwt_token', response.token);
     
-        dispatch({
-            type: AUTH_USER,
-            user: response.user,
-            token: response.token
-        });
+            dispatch({
+                type: AUTH_USER,
+                user: response.user,
+                token: response.token
+            });
+        }        
     } catch (error) {
         dispatch({
             type: AUTH_ERROR,
@@ -59,14 +66,47 @@ export const logUserIn = (userData) => async (dispatch) => {
         response = await response.json();
 
         if(response.success === false) {
-            throw new Error(response.errors.toString());
-        }
+            dispatch({
+                type: LOGIN_ERROR,
+                loginErrors: response.errors
+            });
+        } else {
+            localStorage.setItem('auth_jwt_token', response.token);
 
-        dispatch({
-            type: AUTH_USER,
-            user: response.user,
-            token: response.token
-        });
+            dispatch({
+                type: AUTH_USER,
+                user: response.user,
+                token: response.token
+            });
+
+            if(response.user._householdIds.length > 0) {
+                dispatch({
+                    type: PENDING_GET_HOUSEHOLDS
+                })
+    
+                const householdId = response.user._householdIds[0];
+        
+                response = await fetch(`${ROOT_URL}/api/household/${ householdId }`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+                    }
+                });
+    
+                response = await response.json();
+    
+                if(response.success === false) {
+                    throw new Error(response.errors.toString());
+                }
+        
+                dispatch({
+                    type: GET_HOUSEHOLDS,
+                    currentHousehold: response.household
+                });
+            }
+        }
     } catch (error) {
         dispatch({
             type: AUTH_ERROR,

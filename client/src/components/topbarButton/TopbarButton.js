@@ -19,7 +19,7 @@ const TopBarButton = (props) => {
         case 'settings':
             title = 'Settings';
             icon = <i className="fas fa-sliders-h"></i>
-            route = '/settings'
+            route = '/settings';
             break;
         default:
             throw new Error(`Invalid type value given.  Must be 'messages', 'notifications', or 'settings'`);

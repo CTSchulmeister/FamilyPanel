@@ -11,7 +11,7 @@ class Dashboard extends Component {
         return (
             <div className="dashboard">
                 <TopBar user={ this.props.user } hello="Hey!"/>
-                <SideBar householdName="PH Household Name"/>
+                <SideBar />
                 <Main view={ this.props.view }/>
             </div>
         );

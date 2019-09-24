@@ -56,10 +56,6 @@
 
         position: relative;
 
-        &--error {
-            background: $error-background;
-        }
-
         &:hover {
             cursor: text;
         }
@@ -157,6 +153,33 @@
             background-position: right center;
 
             transition: all ease-out 0.3s;
+        }
+    }
+
+    &__errors {
+        background: $error-background;
+        padding: 1rem;
+
+        &-header {
+            display: block;
+            font-weight: $bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            margin-bottom: 1rem;
+        }
+
+        &-list {
+            list-style: none;
+            padding-left: 0rem;
+            margin: 0rem;
+        }
+    }
+
+    &__error {
+        margin-left: 1rem;
+
+        &-param {
+            font-weight: $bold;
         }
     }
 }
