@@ -33,7 +33,7 @@ class Landing extends Component {
                 buttonIntro: 'Already have an account?',
                 buttonText: 'Log in!'
             });
-        }
+        }      
     };
 
     render() {
@@ -51,7 +51,7 @@ class Landing extends Component {
                         </p>
                     </main>
                     <aside className="landing__form-container">
-                        <div className="landing__form-wrapper">
+                        <div className="landing__form-wrapper" ref={ this.formWrapper }>
                             { this.state.formComponent }
                         </div>
                         <hr className="landing__divider" />

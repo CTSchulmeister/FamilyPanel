@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createHousehold } from '../../actions/householdActions';
+import { hideHouseholdCreationForm } from '../../actions/viewActions';
 import './CreateHouseholdForm.scss';
 
 class CreateHouseholdForm extends Component {
@@ -14,6 +15,8 @@ class CreateHouseholdForm extends Component {
         this.focusInput.bind(this);
         this.handleChange.bind(this);
         this.handleSubmit.bind(this);
+
+        this.nameRef = React.createRef();
     }
 
     focusInput = (event) => {
@@ -40,9 +43,14 @@ class CreateHouseholdForm extends Component {
 
         try {
             this.props.createHousehold(this.state);
+            this.props.hideHouseholdCreationForm();
         } catch (err) {
             alert(`Error encountered: ${ err }`);
         }
+    }
+
+    componentDidMount() {
+        this.nameRef.current.focus();
     }
 
     render() {
@@ -58,6 +66,7 @@ class CreateHouseholdForm extends Component {
                         name="name"
                         value={ this.state.name }
                         onChange={ this.handleChange }
+                        ref={ this.nameRef }
                     />
                     <label className="form__label" htmlFor="name">Household Name</label>
                 </div>
@@ -73,4 +82,4 @@ class CreateHouseholdForm extends Component {
     }
 }
 
-export default connect(null, { createHousehold })(CreateHouseholdForm);
+export default connect(null, { createHousehold, hideHouseholdCreationForm })(CreateHouseholdForm);

@@ -1,9 +1,12 @@
 import {
-    CHANGE_VIEW
+    CHANGE_VIEW, 
+    SHOW_HOUSEHOLD_CREATION_FORM,
+    HIDE_HOUSEHOLD_CREATION_FORM
 } from '../actions/types';
 
 const initialState = {
-    currentView: 'profile'
+    currentView: 'profile',
+    showHouseholdCreationForm: false
 };
 
 export default function(state = initialState, action) {
@@ -11,7 +14,18 @@ export default function(state = initialState, action) {
         case CHANGE_VIEW:
             return {
                 ...state,
-                currentView: action.currentView
+                currentView: action.currentView,
+                householdCreationFormIsActive: false
+            };
+        case SHOW_HOUSEHOLD_CREATION_FORM:
+            return {
+                ...state,
+                householdCreationFormIsActive: true
+            };
+        case HIDE_HOUSEHOLD_CREATION_FORM:
+            return {
+                ...state,
+                householdCreationFormIsActive: false
             };
         default:
             return state;

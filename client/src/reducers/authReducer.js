@@ -30,7 +30,9 @@ export default function(state = initialState, action) {
                 loading: false,
                 user: action.user,
                 token: action.token,
-                authenticated: true
+                authenticated: true,
+                registrationErrors: null,
+                loginErrors: null
             };
         case UNAUTH_USER:
             return {

@@ -59,22 +59,22 @@ class RegistrationForm extends Component {
 
                 switch(error.param) {
                     case 'firstName':
-                        param = 'First Name:';
+                        param = 'First Name';
                         break;
                     case 'lastName':
-                        param = 'Last Name:';
+                        param = 'Last Name';
                         break;
                     case 'email':
-                        param = 'Email:';
+                        param = 'Email';
                         break;
                     case 'retypeEmail':
-                        param = 'Retype Email:';
+                        param = 'Retype Email';
                         break;
                     case 'password':
-                        param = 'Password:';
+                        param = 'Password';
                         break;
                     case 'retypePassword':
-                        param = 'Retype Password:';
+                        param = 'Retype Password';
                         break;
                     default:
                         param = '';
@@ -82,7 +82,7 @@ class RegistrationForm extends Component {
 
                 return (
                     <li className="form__error">
-                        <span className="form__error-param">{ param }</span> { error.msg }
+                        <span className="form__error-param">{ param }</span> - { error.msg }
                     </li>
                 );
             });

@@ -3,7 +3,8 @@ import {
     PENDING_CREATE_HOUSEHOLD,
     CREATE_HOUSEHOLD_ERROR,
     PENDING_GET_HOUSEHOLDS,
-    GET_HOUSEHOLDS
+    GET_HOUSEHOLDS,
+    UNAUTH_USER
 } from '../actions/types';
 
 const initialState = {
@@ -41,6 +42,13 @@ export default function(state = initialState, action) {
                 ...state,
                 loading: false,
                 currentHousehold: action.currentHousehold
+            };
+        case UNAUTH_USER:
+            return {
+                ...state,
+                loading: false,
+                households: [],
+                currentHousehold: ''
             };
         default:
             return state;

@@ -11,7 +11,7 @@
 
     &__main-container {
         display: grid;
-        grid-template-rows: 4rem auto 4rem;
+        grid-template-rows: auto 30rem auto;
         grid-template-columns: 4fr 5fr 4rem;
         grid-template-areas:
             "  .  form   .  "

@@ -6,6 +6,7 @@
     padding: 2rem;
 
     background: white;
+    position: relative;
 
     & ::before {
         content: '';
@@ -181,5 +182,43 @@
         &-param {
             font-weight: $bold;
         }
+    }
+}
+
+.activated-form .form {
+    &__header {
+        animation: titleAppear 0.9s ease-out;
+    }
+
+    &__input-group, &__submit-group {
+        animation: inputAppear 1.2s ease-out;
+    }
+}
+
+@keyframes titleAppear {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    33% {
+        opacity: 1;
+    }
+    67% {
+        transform: translateY(100%);
+    }
+    100% {
+        transform: translateY(0%);
+    }
+}
+
+@keyframes inputAppear {
+    0% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }

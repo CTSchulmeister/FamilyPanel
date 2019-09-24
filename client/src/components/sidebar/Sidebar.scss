@@ -67,6 +67,18 @@
         color: $light-gray;
     }
 
+    &__buttons--full {
+        animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        } to {
+            opacity: 1;
+        }
+    }
+
     &__create-household-button {
         display: flex;
         align-items: center;
