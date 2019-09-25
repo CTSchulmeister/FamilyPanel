@@ -11,14 +11,20 @@ class SideBar extends Component {
         super(props);
 
         this.toggleHouseholdCreationForm.bind(this);
+
+        this.createHouseholdFormWrapper = React.createRef();
     }
 
     toggleHouseholdCreationForm = () => {
         if(this.props.householdCreationFormIsActive) {
-            this.props.hideHouseholdCreationForm();
+            this.createHouseholdFormWrapper.current.className = 'side-bar__household-create-form-wrapper deactivated-form';
+
+            setTimeout(() => {
+                this.props.hideHouseholdCreationForm();
+            }, 600);
         } else {
             this.props.showHouseholdCreationForm();
-        }
+        } 
     }
 
     render() {
@@ -28,7 +34,7 @@ class SideBar extends Component {
         
         let householdForm = (this.props.householdCreationFormIsActive)
             ?
-            <div className="side-bar__household-create-form-wrapper activated-form">
+            <div className="side-bar__household-create-form-wrapper activated-form" ref={ this.createHouseholdFormWrapper }>
                 <CreateHouseholdForm/>
             </div>
             : null;

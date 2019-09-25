@@ -69,6 +69,7 @@
 
     &__buttons--full {
         animation: fadeIn 1s ease-in;
+        transform-origin: bottom;
     }
 
     @keyframes fadeIn {

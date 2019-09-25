@@ -222,3 +222,60 @@
         opacity: 1;
     }
 }
+
+.deactivated-form {
+    animation: hideForm 0.3s ease-out;
+    animation-delay: 0.3s;
+    transform-origin: left;
+
+    & .form {
+        &__header {
+            animation: titleDisappear 0.45s ease-out;
+            animation-delay: 0.15s;
+        }
+
+        &__input-group, &__submit-group {
+            animation: inputDisappear 0.6s ease-out;
+        }
+    }
+}
+
+@keyframes hideForm {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+@keyframes titleDisappear {
+    0% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+    33% {
+        transform: translateY(100%);
+        opacity: 1;
+    }
+    67% {
+        transform: translateY(100%);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes inputDisappear {
+    0% {
+        opacity: 1
+    }
+    25% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}

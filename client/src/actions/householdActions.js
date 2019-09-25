@@ -16,7 +16,7 @@ export const createHousehold = (householdData) => async dispatch => {
             ownerId: user._id,
             memberIds: [user._id],
             name: householdData.name
-        }
+        };
 
         dispatch({
             type: PENDING_CREATE_HOUSEHOLD

@@ -50,7 +50,11 @@ class CreateHouseholdForm extends Component {
     }
 
     componentDidMount() {
-        this.nameRef.current.focus();
+        if(!this.props.isActive) {
+            setTimeout(() => {
+                this.nameRef.current.focus();
+            }, 1200);
+        }
     }
 
     render() {
@@ -82,4 +86,10 @@ class CreateHouseholdForm extends Component {
     }
 }
 
-export default connect(null, { createHousehold, hideHouseholdCreationForm })(CreateHouseholdForm);
+const mapStateToProps = (state) => {
+    return {
+        isShown: state.view.householdCreationFormIsActive
+    };
+}
+
+export default connect(mapStateToProps, { createHousehold, hideHouseholdCreationForm })(CreateHouseholdForm);
