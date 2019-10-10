@@ -70,7 +70,7 @@ class SideBar extends Component {
                         <span className="side-bar__sub-heading">
                             You have no households...
                         </span>
-                        <button className="side-bar__create-household-button" onClick={ this.toggleHouseholdCreationForm }>
+                        <button className="button button--med button--create-household" onClick={ this.toggleHouseholdCreationForm }>
                             Create one!
                         </button>
                         { householdForm }

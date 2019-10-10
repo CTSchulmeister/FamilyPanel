@@ -109,7 +109,7 @@ class LogInForm extends Component {
                 </div>
                 <div className="form__submit-group">
                     <input
-                        className="form__submit-button"
+                        className="button button--med"
                         type="submit"
                         value="Log In"
                     />

@@ -57,7 +57,7 @@ class Landing extends Component {
                         <hr className="landing__divider" />
                         <div className="landing__form-switcher">
                             { this.state.buttonIntro }
-                            <button className="landing__form-switcher-button" onClick={ this.toggleForm }>
+                            <button className="button button--med" onClick={ this.toggleForm }>
                                 { this.state.buttonText }
                             </button>
                         </div>

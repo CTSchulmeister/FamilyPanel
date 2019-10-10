@@ -1,11 +1,13 @@
 import {
     CHANGE_VIEW, 
+    CHANGE_SUB_VIEW,
     SHOW_HOUSEHOLD_CREATION_FORM,
     HIDE_HOUSEHOLD_CREATION_FORM
 } from '../actions/types';
 
 const initialState = {
     currentView: 'profile',
+    subView: null,
     showHouseholdCreationForm: false
 };
 
@@ -16,6 +18,11 @@ export default function(state = initialState, action) {
                 ...state,
                 currentView: action.currentView,
                 householdCreationFormIsActive: false
+            };
+        case CHANGE_SUB_VIEW:
+            return {
+                ...state,
+                subView: action.subView
             };
         case SHOW_HOUSEHOLD_CREATION_FORM:
             return {

@@ -1,4 +1,4 @@
-@import '../../scss/variables.scss';
+@import '../../scss/main.scss';
 
 .side-bar {
     grid-area: sidebar;
@@ -77,33 +77,6 @@
             opacity: 0;
         } to {
             opacity: 1;
-        }
-    }
-
-    &__create-household-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 0.5rem 1.5rem;
-        margin: 0.5rem 0rem 1.5rem;
-
-        border: none;
-        background: $color-gradient;
-        background-size: 200% auto;
-
-        color: white;
-        text-transform: uppercase;
-        font-size: 1rem;
-        font-weight: $bold;
-
-        transition: all ease-out 0.3s;
-
-        &:hover {
-            cursor: pointer;
-            background-position: right center;
-
-            transition: all ease-out 0.3s;
         }
     }
 

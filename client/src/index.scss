@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:regular,bold,italic&subset=latin,latin-ext');
-@import './scss/variables.scss';
+@import './scss/main.scss';
 
 * {
     box-sizing: border-box;
@@ -11,6 +11,11 @@ html, body {
     min-height: 100vh;
     min-width: 100vw;
     position: relative;
+}
+
+#root {
+    min-height: 100vh;
+    min-width: 100vw;
 }
 
 input:focus,

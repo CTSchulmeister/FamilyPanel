@@ -1,5 +1,3 @@
-@import './variables.scss';
-
 .form {
     height: 100%;
     width: 100%;
@@ -73,6 +71,11 @@
 
             background-color: $gray;
         }
+
+        &--text-area {
+            flex-direction: column-reverse;
+            margin-top: 1.1rem;
+        }
     }
 
     &__label {
@@ -94,6 +97,50 @@
         &:hover {
             cursor: text;
         }
+
+        &--text-area {
+            position: absolute;
+            top: 0rem;
+            left: 0rem;
+
+            color: $dark-gray;
+            font-size: 1rem;
+            text-transform: uppercase;
+
+            transform: translateY(0rem) translateX(0rem) scale(1);
+            transform-origin: top left;
+
+            transition: all ease-out 0.3s;
+
+            &:hover {
+                cursor: text;
+            }
+        }
+    }
+
+    &__text-area {
+        display: block;
+        min-height: 150px;
+        width: 100%;
+        resize: none;
+        font-size: 1rem;
+        border: none;
+
+        &:focus + .form__label--text-area {
+            transform: translateY(-1.1rem) translateX(0.05rem) scale(0.75);
+            color: $gray;
+            transform-origin: top left;
+
+            transition: all ease-out 0.3s;
+        }
+    }
+
+    &__label--text-area--not-empty {
+        transform: translateY(-1.1rem) translateX(0.05rem) scale(0.75);
+        color: $gray;
+        transform-origin: top left;
+
+        transition: all ease-out 0.3s;
     }
 
     &__text-input {
@@ -129,32 +176,6 @@
 
         height: 3rem;
         width: 100%;
-    }
-
-    &__submit-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 0.5rem 1.5rem;
-
-        border: none;
-        background: $color-gradient;
-        background-size: 200% auto;
-
-        color: white;
-        text-transform: uppercase;
-        font-size: 1rem;
-        font-weight: $bold;
-
-        transition: all ease-out 0.3s;
-
-        &:hover {
-            cursor: pointer;
-            background-position: right center;
-
-            transition: all ease-out 0.3s;
-        }
     }
 
     &__errors {

@@ -12,7 +12,7 @@ const initialState = {
     user: {},
     token: '',
     authenticated: false
-}
+};
 
 export default function(state = initialState, action) {
     switch(action.type) {

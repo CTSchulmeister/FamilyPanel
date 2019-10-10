@@ -1,0 +1,85 @@
+@import '../../scss/main.scss';
+
+.event-details, .event-details--no-events {
+    grid-area: event-details;
+
+    background: rgba(white, 0.7);
+    height: 100%;
+    width: 100%;
+    padding: 2rem;
+}
+
+.event-details__form {
+    &-button-group {
+        height: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    &-wrapper {
+        height: calc(100% - 3.5rem);
+    }
+}
+
+.event-details--no-events {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    width: 100%;
+
+    & h3 {
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2rem;
+        margin: 0.5rem 0rem;
+    }
+
+    & span {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        color: $gray;
+        margin-bottom: 2rem;
+        position: relative;
+
+        &::after {
+            content: '';
+            height: 0.25rem;
+            width: 60%;
+            background: $gray;
+            position: absolute;
+            top: 2.5rem;
+            left: 20%;
+        }
+    }
+
+    & button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0.5rem 1.5rem;
+
+        border: none;
+        background: $color-gradient;
+        background-size: 200% auto;
+
+        color: white;
+        text-transform: uppercase;
+        font-size: 1rem;
+        font-weight: $bold;
+
+        transition: all ease-out 0.3s;
+
+        &:hover {
+            cursor: pointer;
+            background-position: right center;
+
+            transition: all ease-out 0.3s;
+        }
+    }
+}
