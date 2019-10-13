@@ -87,7 +87,7 @@
         left: calc(100% + 1rem);
         z-index: 5;
 
-        box-shadow: $shadow;
+        box-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.15);
 
         animation: appear 0.6s;
         transform-origin: left;

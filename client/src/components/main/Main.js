@@ -11,7 +11,16 @@ const Main = (props) => {
             componentToShow = <EventView />;
             break;
         default:
-            componentToShow = null;
+            componentToShow = (
+                <div className="introduction__wrapper">
+                    <div className="introduction">
+                        <span className="introduction__subtitle">
+                            Welcome to
+                        </span>
+                        <h2 className="introduction__heading">FamilyPanel</h2>
+                    </div>
+                </div>  
+            );
     }
 
     return (

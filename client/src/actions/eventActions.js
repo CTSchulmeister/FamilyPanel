@@ -44,6 +44,8 @@ export const createEvent = (eventData) => async dispatch => {
             type: CREATE_EVENT,
             event: response.event,
         });
+
+        
     } catch (error) {
         dispatch({
             type: CREATE_EVENT_ERROR,
