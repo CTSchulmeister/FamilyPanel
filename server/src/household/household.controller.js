@@ -376,22 +376,6 @@ module.exports.deleteTask = async (householdId, taskId) => {
  * @param {String} [body] - The note's body.
  */
 module.exports.createNote = async (householdId, creatorId, title, body = null) => {
-    const household = await HouseholdModel.findById(householdId).exec();
-
-    if(!household) {
-        throw new Error(`No household exists with the id ${ householdId }`);
-    }
-
-    const user = await UserModel.findById(creatorId).exec();
-
-    if(!user) {
-        throw new Error(`User with id ${ creatorId } does not exist`);
-    }
-
-    if(!household._memberIds.includes(creatorId) || !user._householdIds.includes(householdId)) {
-        throw new Error(`User ${ creatorId } does not belong to household ${ householdId }`);
-    }
-
     let note = {
         _creatorId: creatorId,
         title: title,
@@ -400,9 +384,17 @@ module.exports.createNote = async (householdId, creatorId, title, body = null) =
 
     if(body) note.body = body;
 
-    note = await household.notes.create(note);
+    const household = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId, _memberIds: creatorId },
+        { $push: { notes: note } },
+        { new: true }
+    ).exec();
 
-    return note;
+    if(!household) {
+        throw new Error(`No household was found that matched the query criteria.`);
+    }
+
+    return household;
 };
 
 /**
@@ -454,13 +446,7 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
         throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
     }
 
-    const note = household.notes.id(noteId);
-
-    if(!note) {
-        throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
-    }
-
-    return note;
+    return household;
 };
 
 /**
@@ -472,18 +458,12 @@ module.exports.deleteNote = async (householdId, noteId) => {
     const household = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'notes._id': noteId },
         { $pull: { notes: { _id: noteId } } },
-        { new: false}
+        { new: true }
     ).exec();
 
     if(!household) {
         throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
     }
 
-    const note = household.notes.id(noteId);
-
-    if(!note) {
-        throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
-    }
-
-    return note;
+    return household;
 };

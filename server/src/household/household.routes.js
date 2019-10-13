@@ -479,10 +479,7 @@ router.delete('/:household/task/:task', async (req, res) => {
 
 // --- Routes (Notes)
 // CREATE
-router.post('/:household/note', jsonParser, [
-    check('creatorId')
-        .exists({ checkFalsy: true, checkNull: true })
-            .withMessage('The creatorId field cannot be left emtpy'),
+router.post('/:household/note', auth, jsonParser, [
     check('title')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The title field cannot be left empty')
@@ -504,16 +501,16 @@ router.post('/:household/note', jsonParser, [
         try {
             const body = (req.body.body) ? req.body.body : null;
 
-            const note = await HouseholdController.createNote(
+            const household = await HouseholdController.createNote(
                 req.params.household,
-                req.body.creatorId,
+                req.user._id,
                 req.body.title,
                 body
             );
 
             res.status(200).json({
                 success: true,
-                note: note
+                household: household
             });
         } catch (err) {
             console.error(`Error creating note on household ${ req.params.household }: ${ err }`);
@@ -571,7 +568,7 @@ router.put('/:household/note/:note', jsonParser, [
             const title = (req.body.title) ? req.body.title : null;
             const body = (req.body.body) ? req.body.body : null;
 
-            const note = await HouseholdController.updateNote(
+            const household = await HouseholdController.updateNote(
                 req.params.household,
                 req.params.note,
                 title,
@@ -580,7 +577,7 @@ router.put('/:household/note/:note', jsonParser, [
 
             res.status(200).json({
                 success: true,
-                note: note
+                household: household
             });
         } catch (err) {
             console.error(`Error updating note ${ req.params.note } from household ${ req.params.household }: ${ err }`);
@@ -595,11 +592,11 @@ router.put('/:household/note/:note', jsonParser, [
 // DELETE
 router.delete('/:household/note/:note', async (req, res) => {
     try {
-        const note = await HouseholdController.deleteNote(req.params.household, req.params.note);
+        const household = await HouseholdController.deleteNote(req.params.household, req.params.note);
 
         res.status(200).json({
             success: true,
-            note: note
+            household: household
         });
     } catch (err) {
         console.error(`Error updating note ${ req.params.note } from household ${ req.params.hosehold }: ${ err }`);
