@@ -7,7 +7,6 @@ import {
 
 const initialState = {
     currentView: 'profile',
-    subView: null,
     showHouseholdCreationForm: false
 };
 

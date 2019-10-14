@@ -2,6 +2,7 @@ import React from 'react';
 import './Main.scss';
 
 import EventView from '../EventView/EventView';
+import NoteView from '../NoteView/NoteView';
 
 const Main = (props) => {
     let componentToShow;
@@ -9,6 +10,9 @@ const Main = (props) => {
     switch(props.view) {
         case 'events':
             componentToShow = <EventView />;
+            break;
+        case 'notes':
+            componentToShow = <NoteView />;
             break;
         default:
             componentToShow = (

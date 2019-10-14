@@ -1,0 +1,35 @@
+@import '../../scss/main.scss';
+
+.note-list {
+    grid-area: note-list;
+
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+
+    background: rgba(white, 0.5);
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 1rem;
+        margin-bottom: 1rem;
+
+        background: white;
+
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        font-size: 1.25rem;
+    }
+
+    &__divider {
+        height: 0.125rem;
+        width: 100%;
+        margin: 0rem;
+
+        background: $light-gray;
+        border: none;
+    }
+}

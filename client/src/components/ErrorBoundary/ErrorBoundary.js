@@ -26,7 +26,7 @@ class ErrorBoundary extends Component {
                         <div className="error-boundary__info">
                             { this.state.error.toString() }
                         </div>
-                        <button className="button button--med">
+                        <button className="button button--med" href="/">
                             Go Back to Home
                         </button>
                     </div>

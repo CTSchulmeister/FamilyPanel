@@ -1,0 +1,77 @@
+@import '../../scss/main.scss';
+
+.note-summary {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    grid-template-rows: 0.5rem 1rem 1rem 1rem 0.5rem;
+    grid-template-areas:
+        "photo   .    "
+        "photo  title "
+        "photo creator"
+        "photo   body "
+        "photo   .    ";
+
+    background: rgba(white, 0.5);
+
+    transition: all ease-out 0.15s;
+
+    &:hover {
+        cursor: pointer;
+        background: white;
+        transition: all ease-in 0.15s;
+    }
+
+    &--active {
+        background: white;
+    }
+
+    &__photo-container {
+        grid-area: photo;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__photo {
+        height: 3rem;
+        width: 3rem;
+        
+        border-radius: 50%;
+        border: 0.125rem solid $primary;
+    }
+
+    &__title {
+        grid-area: title;
+
+        display: flex;
+        align-items: center;
+
+        font-weight: $bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        color: $dark-gray;
+    }
+
+    &__creator {
+        grid-area: creator;
+
+        display: flex;
+        align-items: center;
+
+        text-transform: uppercase;
+        color: $gray;
+        font-size: 0.75rem;
+        letter-spacing: 0.05rem;
+    }
+
+    &__body {
+        grid-area: body;
+
+        display: flex;
+        align-items: center;
+
+        font-size: 0.75rem;
+        color: $gray;
+    }
+}
