@@ -4,13 +4,20 @@ import {
     CREATE_HOUSEHOLD_ERROR,
     PENDING_GET_HOUSEHOLDS,
     GET_HOUSEHOLDS,
-    UNAUTH_USER
+    UNAUTH_USER,
+    PENDING_CREATE_NOTE,
+    CREATE_NOTE,
+    CREATE_NOTE_ERROR,
+    READ_NOTE,
+    READ_NOTE_ERROR
 } from '../actions/types';
 
 const initialState = {
     loading: false,
     households: [],
-    currentHousehold: ''
+    currentHousehold: '',
+    currentNote: null,
+    noteLoading: false
 }
 
 export default function(state = initialState, action) {
@@ -50,6 +57,29 @@ export default function(state = initialState, action) {
                 households: [],
                 currentHousehold: ''
             };
+
+        // NOTES
+        case PENDING_CREATE_NOTE:
+            return {
+                ...state,
+                noteLoading: true
+            };
+        case CREATE_NOTE:
+            return {
+                ...state,
+                currentHousehold: action.household
+            };
+        case READ_NOTE:
+            return {
+                ...state,
+                currentNote: action.currentNote
+            };
+        case READ_NOTE_ERROR:
+            return {
+                ...state,
+                currentNote: null
+            };
+
         default:
             return state;
     }

@@ -6,7 +6,15 @@ import {
 } from '../actions/types';
 
 const initialState = {
-    currentView: 'profile',
+    viewData: {
+        currentView: 'profile',
+        previousEvent: null,
+        currentEvent: null,
+        previousNote: null,
+        currentNote: null,
+        previousTask: null,
+        currentTask: null
+    },
     showHouseholdCreationForm: false
 };
 

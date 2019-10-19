@@ -1,0 +1,202 @@
+.side-bar {
+    grid-area: sidebar;
+
+    display: grid;
+    grid-template-rows: 4rem 1fr;
+
+    position: relative;
+    z-index: 2;
+    padding: 0rem 2rem;
+
+    background: $dark-gray-scale-gradient;
+    box-shadow: $side-shadow;
+
+    &__logo {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        height: 4rem;
+        width: 100%;
+
+        text-decoration: none;
+
+        & h1 {
+            margin: 0rem;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            color: white;
+            font-weight: $bold;
+            font-size: 1.5rem;
+            letter-spacing: 0.25rem;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    &__main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    &__header--household, &__header--no-household {
+        width: 100%;
+        margin-bottom: 3rem;
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0rem;
+            bottom: 0.5rem;
+            height: 0.25rem;
+            width: 50%;
+            background-color: white;
+        }
+    }
+
+    &__header--household {
+        height: 4.5rem;
+    }
+
+    &__header--no-household {
+        height: 5rem;
+    }
+
+    &__sub-heading {
+        font-size: 1rem;
+        text-transform: uppercase;
+        color: $light-gray;
+    }
+
+    &__household-create-form-wrapper {
+        width: 25rem;
+        position: absolute;
+        top: -2.75rem;
+        left: calc(100% + 1rem);
+        z-index: 5;
+
+        box-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.15);
+
+        animation: appear 0.6s;
+        transform-origin: left;
+        
+        ::before {
+            content: '';
+
+            height: 2rem;
+            width: 2rem;
+            transform: rotate(45deg);
+            top: calc(50% - 1rem);
+            left: -1rem;
+            background: white;
+            position: absolute;
+        }
+
+        & .form {
+            padding: 1rem;
+            
+            &__title {
+                font-size: 1.2rem;
+            }
+        }
+    }
+
+    @keyframes appear {
+        from {
+            transform: scaleX(0);
+        }
+        to {
+            transform: scaleX(1);
+        }
+    }
+
+    &__household-name {
+        margin: 0.5rem 0rem 1.5rem;
+        font-size: 1.5rem;
+        font-weight: $normal-weight;
+        text-transform: uppercase;
+        color: white;
+        letter-spacing: 0.25rem;
+    }
+}
+
+.side-bar-group, .side-bar-group--active {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    position: relative;
+    height: 3rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
+
+    background: transparent;
+    border: none;
+
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    letter-spacing: 0.25rem;
+    text-transform: uppercase;
+
+    &:hover {
+        cursor: pointer;
+        text-shadow: 0rem 0rem 0.5rem rgba(255, 255, 255, 0.5);
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-right: 1.5rem;
+
+        height: 100%;
+        width: 2rem;
+
+        color: white;
+        font-size: 1.5rem;
+    }
+}
+
+.side-bar-group {
+    &::before {
+        content: '';
+
+        position: absolute;
+        top: 0rem;
+        left: -2rem;
+        height: 100%;
+        width: 0.5rem;
+
+        background: $color-gradient;
+
+        transform: scaleX(0);
+        transform-origin: left;
+
+        transition: all ease-out 0.3s;
+    }
+
+    &:hover::before {
+        transform: scaleX(1);
+        
+        transition: all ease-out 0.3s;
+    }
+}
+
+.side-bar-group--active {
+    &::before {
+        content: '';
+
+        position: absolute;
+        top: 0rem;
+        left: -2rem;
+        height: 100%;
+        width: 1rem;
+
+        background: $color-gradient;
+    }
+}

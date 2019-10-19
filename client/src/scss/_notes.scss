@@ -1,0 +1,363 @@
+.notes {
+    &__wrapper {
+        padding: 2rem;
+    }
+
+    &__view {
+        display: grid;
+        grid-template-rows: 7rem calc(100% - 7rem);
+        grid-template-columns: 20rem calc(100% - 20rem);
+        grid-template-areas:
+            "notes-heading notes-heading"
+            "  notes-list   note-details";
+
+        height: 100%;
+        width: 100%;
+        box-shadow: $large-shadow;
+    }
+
+    &__heading {
+        grid-area: notes-heading;
+
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        padding: 1rem;
+        margin: 0rem;
+
+        background: rgba(white, 0.3);
+
+        font-size: 3rem;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.2rem;
+    }
+
+    &__subheading {
+        margin-top: 1rem;
+
+        font-size: 1.5rem;
+        color: $dark-gray;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+    }
+
+    &-list {
+        grid-area: notes-list;
+
+        display: grid;
+        grid-template-rows: 3rem 1fr;
+        grid-gap: 1rem;
+        grid-template-areas: 
+            "header"
+            "list";
+
+        padding: 1rem;
+
+        background: rgba(white, 0.5);
+
+        &__header {
+            grid-area: header;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 1rem;   
+                
+            background: white;
+
+            text-transform: uppercase;
+            color: $dark-gray;
+            letter-spacing: 0.1rem;
+        }
+
+        &__list {
+            grid-area: list;
+
+            overflow: auto;
+        }
+    }
+}
+
+.note-summary {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    grid-template-rows: 0.5rem 1rem 1rem 1rem 0.5rem;
+    grid-template-areas:
+        "photo   .    "
+        "photo  title "
+        "photo creator"
+        "photo   body "
+        "photo   .    ";
+
+    margin-bottom: 0.125rem;
+
+    background: rgba(white, 0.5);
+
+    transition: all ease-out 0.15s;
+
+    &:hover {
+        cursor: pointer;
+        background: white;
+        transition: all ease-in 0.15s;
+    }
+
+    &--active {
+        background: white;
+    }
+
+    &__photo-container {
+        grid-area: photo;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__photo {
+        height: 3rem;
+        width: 3rem;
+        
+        border-radius: 50%;
+        border: 0.125rem solid $primary;
+    }
+
+    &__title {
+        grid-area: title;
+
+        overflow: hidden;
+
+        font-weight: $bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        color: $dark-gray;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__creator {
+        grid-area: creator;
+
+        overflow: hidden;
+
+        text-transform: uppercase;
+        color: $gray;
+        font-size: 0.75rem;
+        letter-spacing: 0.05rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__body {
+        grid-area: body;
+
+        overflow: hidden;
+        
+        max-height: 1rem;
+        max-width: 100%;
+
+        font-size: 0.75rem;
+        color: $gray;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.note-details {
+    grid-area: note-details;
+
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+
+    background: rgba(white, 0.7);
+
+    &--active-note {
+        display: grid;
+        grid-template-rows: 4rem 4rem 1fr;
+        grid-template-columns: 6rem 0.125rem 1fr;
+        grid-template-areas:
+            "  title     title  title "
+            "from-label divider author"
+            "body-label divider body  ";
+    }
+
+    &__title {
+        grid-area: title;
+
+        margin: 0rem;
+        padding: 1rem 0rem;
+        position: relative;
+        overflow: hidden;
+
+        text-transform: uppercase;
+        font-size: 2rem;
+        color: $dark-gray;
+        letter-spacing: 0.2rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+            bottom: 0rem;
+            left: 0rem;
+            width: 100%;
+            height: 0.125rem;
+            
+            background: $color-gradient;
+        }
+        
+    }
+
+    &__label {
+        padding-top: 1.5rem;
+        padding-right: 1rem;
+
+        text-align: right;
+        text-transform: uppercase;
+        color: $dark-gray;
+        letter-spacing: 0.1rem;
+    }
+
+    &__divider {
+        grid-area: divider;
+
+        background: rgba(black, 0.2);
+    }
+
+    &__from-label {
+        grid-area: from-label;
+
+        position: relative;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+            bottom: 0rem;
+            left: 0rem;
+            width: 100%;
+            height: 0.125rem;
+            
+            background: rgba(black, 0.2);
+        }
+    }
+
+    &__note-author {
+        grid-area: author;
+
+        display: flex;
+        align-items: center;
+        padding-left: 1rem;
+
+        position: relative;
+
+        color: $dark-gray;
+
+        &::after {
+            content: '';
+
+            position: absolute;
+            bottom: 0rem;
+            left: 0rem;
+            width: 100%;
+            height: 0.125rem;
+            
+            background: rgba(black, 0.2);
+        }
+    }
+
+    &__photo {
+        height: 3rem;
+        width: 3rem;
+        border-radius: 50%;
+        border: 0.125rem solid $primary;
+        margin-right: 1rem;
+    }
+
+    &__body-label {
+        grid-area: body-label;
+    }
+
+    &__body {
+        grid-area: body;
+
+        padding: 1.5rem 0rem 0rem 1rem;
+
+        color: $dark-gray;
+    }
+
+    &--no-notes {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+
+        & h3 {
+            margin: 0.5rem 0rem;
+
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2rem;
+            margin: 0.5rem 0rem;
+        }
+
+        & span {
+            display: inline-block;
+
+            width: 100%;
+            margin-bottom: 2rem;
+            position: relative;
+
+            text-align: center;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: $gray;
+
+            &::after {
+                content: '';
+
+                height: 0.25rem;
+                width: 60%;
+                position: absolute;
+                top: 2.5rem;
+                left: 20%;
+
+                background: $gray;
+            }
+        }
+    }
+
+    &--form {
+        .note-details__form-button-group {
+            height: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .note-details__form-wrapper {
+            height: calc(100% - 3.5rem);
+
+            background: white;
+        }
+    }
+}
+
+.note-form {
+    &__container {
+        grid-area: note-details;
+
+        display: grid;
+        grid-template-rows: 3rem 1fr;
+
+        padding: 1rem;
+
+        background: rgba(white, 0.7);
+    }
+}

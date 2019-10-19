@@ -3,3 +3,24 @@
 @import './shadows';
 @import './form.scss';
 @import './buttons.scss';
+
+
+@import './landing.scss';
+@import './topbar.scss';
+@import './layout.scss';
+@import './sidebar.scss';
+@import './requiresAuth';
+@import './spinner';
+@import './profile.scss';
+@import './notes';
+
+a {
+    display: block;
+    width: fit-content;
+    width: min-content;
+    text-decoration: none;
+
+    &:focus {
+        outline: none;
+    }
+}

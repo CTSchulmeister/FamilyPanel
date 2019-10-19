@@ -1,0 +1,27 @@
+.req-auth {
+    width: 500px;
+    padding: 2rem;
+
+    background: white;
+    box-shadow: $large-shadow;
+    
+    color: $dark-gray;
+    
+
+    &__wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        height: 100vh;
+        width: 100vw;
+        background: $color-gradient;
+    }
+
+    &__heading {
+        margin: 0rem;
+
+        text-transform: uppercase;
+        letter-spacing: 0.2rem;
+    }
+}

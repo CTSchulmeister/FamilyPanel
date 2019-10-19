@@ -1,9 +1,18 @@
 // Primary Color
 $primary: rgb(42, 234, 128);
-// $primary: #98EA2A;
+$primary-gradient: linear-gradient(
+    to bottom,
+    $primary,
+    darken($primary, 5%)
+);
 
 // Secondary Color
 $secondary: #11C3E3;
+$secondary-gradient: linear-gradient(
+    to bottom,
+    $secondary,
+    darken($secondary, 5%)
+);
 
 // Color Gradient
 $color-gradient: linear-gradient(to bottom right, 
@@ -21,15 +30,19 @@ $dark-gray: #484848;
 $extra-dark-gray: #2F2F2F;
 
 // Gray Scale Gradient
-$light-gray-scale-gradient: linear-gradient(to bottom right,
+$light-gray-scale-gradient: linear-gradient(
+    to bottom right,
     $extra-light-gray,
     $light-gray);
-$medium-light-gray-scale-gradient: linear-gradient(to bottom right,
+$medium-light-gray-scale-gradient: linear-gradient(
+    to bottom right,
     $light-gray,
     $gray);
-$medium-dark-gray-scale-gradient: linear-gradient(to bottom right,
+$medium-dark-gray-scale-gradient: linear-gradient(
+    to bottom right,
     $gray,
     $dark-gray);
-$dark-gray-scale-gradient: linear-gradient(to bottom right,
+$dark-gray-scale-gradient: linear-gradient(
+    to bottom right,
     $dark-gray,
     $extra-dark-gray);
