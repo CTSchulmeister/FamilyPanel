@@ -25,6 +25,7 @@ export const registerUser = (userData) => async dispatch => {
             },
             body: JSON.stringify(userData)
         });
+
         response = await response.json();
 
         if(response.success === false) {
@@ -100,10 +101,32 @@ export const logUserIn = (userData) => async (dispatch) => {
                 if(response.success === false) {
                     throw new Error(response.errors.toString());
                 }
+
+                let household = {
+                    ...response.household,
+                    members: []
+                };
+
+                response = await fetch(`${ROOT_URL}/api/household/${ householdId }/users`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+                    }
+                });
+
+                response = await response.json();
+
+                if(response.success === false) {
+                    throw new Error(response.errors.toString());
+                };
+
+                household.members = [...response.users];
         
                 dispatch({
                     type: GET_HOUSEHOLDS,
-                    currentHousehold: response.household
+                    currentHousehold: household
                 });
             }
         }
@@ -115,8 +138,24 @@ export const logUserIn = (userData) => async (dispatch) => {
     }
 }
 
-export const logUserOut = () => dispatch => {
-    dispatch({
-        type: UNAUTH_USER
-    });
+export const logUserOut = () => async dispatch => {
+    try {
+        const response = await fetch(`${ROOT_URL}/api/user/me/logout-all`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+            }
+        });
+    
+        if(response.success === true) {
+            dispatch({
+                type: UNAUTH_USER
+            });
+        } else {
+            alert('Logout unsuccessful: ' + JSON.stringify(response));
+        }    
+    } catch (error) {
+        alert(error);
+    }
 };

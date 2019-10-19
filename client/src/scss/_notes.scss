@@ -107,9 +107,9 @@
 
     &__container {
         display: grid;
-        grid-template-columns: 1fr 3rem;
+        grid-template-columns: 1fr 0.125rem 3rem;
         grid-template-areas:
-            "note-summary buttons";
+            "note-summary . buttons";
     }
 
     &:hover {
@@ -156,7 +156,6 @@
 
         overflow: hidden;
 
-        text-transform: uppercase;
         color: $gray;
         font-size: 0.75rem;
         letter-spacing: 0.05rem;

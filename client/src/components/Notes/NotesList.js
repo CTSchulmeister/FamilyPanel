@@ -17,16 +17,15 @@ const NotesList = (props) => {
         let isActive = (props.currentNote && props.currentNote._id === note._id) ? true : false;
 
         return (
-            <React.Fragment>
-                <NoteSummary 
-                    key={ note._id }
-                    noteId={ note._id }
-                    creatorId={ note._creatorId }
-                    isActive={ isActive }
-                    title={ note.title }
-                    body={ note.body }
-                />
-            </React.Fragment>
+            <NoteSummary 
+                key={ note._id }
+                noteId={ note._id }
+                creatorId={ note._creatorId }
+                createdAt={ new Date(note.createdAt) }
+                isActive={ isActive }
+                title={ note.title }
+                body={ note.body }
+            />
         );
     });
 

@@ -91,7 +91,8 @@ export default function(state = initialState, action) {
         case DELETE_NOTE:
             return {
                 ...state,
-                currentHousehold: action.household
+                currentHousehold: action.household,
+                currentNote: action.currentNote
             };
         case DELETE_NOTE_ERROR:
             return {

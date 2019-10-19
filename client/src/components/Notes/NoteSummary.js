@@ -37,6 +37,10 @@ class NoteSummary extends Component {
             )
             : null;
 
+        let creator = this.props.currentHousehold.members.filter(member => {
+            return member._id === this.props.creatorId;
+        })[0];
+
         return (
             <div className="note-summary__container">
                 <div className={ className } key={ this.props.key } onClick={ this.handleClick }>
@@ -44,11 +48,11 @@ class NoteSummary extends Component {
                         <img 
                             className="note-summary__photo" 
                             src={ process.env.PUBLIC_URL + '/anonymousProfilePicture.png ' }
-                            alt='Anonymous Profile PH'
+                            alt={ creator.firstName + ' ' + creator.lastName }
                         />
                     </div>
                     <span className="note-summary__title">{ this.props.title }</span>
-                    <span className="note-summary__creator">{ this.props.createdOn } - { this.props.creator || 'Person' }</span>
+                    <span className="note-summary__creator">{ this.props.createdAt.toLocaleDateString() } - { creator.firstName } { creator.lastName }</span>
                     <span className="note-summary__body">{ this.props.body }</span>
                 </div>
                 <div className="note-summary__button-container">
@@ -61,7 +65,8 @@ class NoteSummary extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        userId: state.auth.user._id
+        userId: state.auth.user._id,
+        currentHousehold: state.households.currentHousehold
     };
 }
 

@@ -86,6 +86,23 @@ router.get('/:household', auth, async (req, res) => {
     }
 });
 
+router.get('/:household/users', auth, async (req, res) => {
+    try {
+        const users = await HouseholdController.getUsersFromHousehold(req.params.household, req.user._id);
+
+        res.status(200).json({
+            success: true,
+            users: users
+        });
+    } catch (err) {
+        console.error(`Error getting users from household ${ req.params.household }: ${ err }`);
+        res.status(500).json({
+            success: false,
+            errors: [...err]
+        });
+    }
+});
+
 // UPDATE
 router.patch('/:household', auth, jsonParser, [
     check('ownerId')

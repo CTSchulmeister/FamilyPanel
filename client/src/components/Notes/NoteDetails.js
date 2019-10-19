@@ -6,6 +6,10 @@ class NoteDetails extends Component {
         if(this.props.currentNote) {
             let body = this.props.currentNote.body;
 
+            let creator = this.props.currentHousehold.members.filter(member => {
+                return member._id === this.props.currentNote._creatorId;
+            })[0];
+
             return (
                 <div className="note-details note-details--active-note">
                     <h2 className="note-details__title">{ this.props.currentNote.title }</h2>
@@ -15,9 +19,12 @@ class NoteDetails extends Component {
                         <img 
                             className="note-details__photo" 
                             src={ process.env.PUBLIC_URL + '/anonymousProfilePicture.png ' }
-                            alt='Anonymous Profile PH'
+                            alt={ creator.firstName + ' ' + creator.lastName }
                         />
-                        Person
+                        { 
+                            `${ creator.firstName } ${ creator.lastName }\
+                             at ${ new Date(this.props.currentNote.createdAt).toLocaleString() }`
+                        }
                     </div>
                     <div className="note-details__body-label note-details__label">Body</div>
                     <div className="note-details__body">{ body }</div>

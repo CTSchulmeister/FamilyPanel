@@ -51,6 +51,27 @@ module.exports.readHousehold = async (id) => {
 };
 
 /**
+ * Retrieves the users belonging to a household.
+ * @param {mongoose.Types.ObjectId} householdId - The household's _id value.
+ * @param {mongoose.Types.ObjectId} userId - The id of the user making the request.
+ */
+module.exports.getUsersFromHousehold = async (householdId, userId) => {
+    const household = await HouseholdModel.findOne({ _id: householdId, _memberIds: userId }).exec();
+
+    if(!household) {
+        throw new Error(`No household has the id ${ householdId } with a member with the id ${ userId }`);
+    }
+
+    const users = await UserModel.find({ _householdIds: household._id });
+
+    if(!users) {
+        throw new Error(`No users were found belonging to the household ${ household._id }`);
+    }
+
+    return users;
+};
+
+/**
  * Updates a household document by id given update parameters.
  * Pass null to fields not being update.
  * @param {mongoose.Types.ObjectId} id - The household's id.

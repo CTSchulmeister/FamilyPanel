@@ -38,7 +38,7 @@ const Profile = (props) => {
 const mapStateToProps = (state) => {
     return {
         isAuthenticated: state.auth.authenticated,
-        isLoading: state.auth.loading
+        isLoading: state.auth.loading || state.households.loading
     };
 }
 

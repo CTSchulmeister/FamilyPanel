@@ -50,9 +50,16 @@ export const createHousehold = (householdData) => async dispatch => {
             throw new Error(response.errors.toString());
         }
 
+        let household = {
+            ...response.household,
+            members: [
+                user
+            ]
+        }
+
         dispatch({
             type: CREATE_HOUSEHOLD,
-            household: response.household
+            household: household
         });
 
         response = await fetch(`${ROOT_URL}/api/user/me`, {
@@ -109,9 +116,14 @@ export const createNote = (noteData) => async dispatch => {
             throw new Error(response.errors.toString());
         }
 
+        let household = {
+            ...store.getState().households.currentHousehold,
+            ...response.household
+        }
+
         dispatch({
             type: CREATE_NOTE,
-            household: response.household
+            household: household
         });
     } catch (error) {
         dispatch({
@@ -170,9 +182,22 @@ export const deleteNote = (noteId) => async dispatch => {
             throw new Error(response.errors.toString());
         }
 
+        let currentNote = store.getState().households.currentNote;
+        let newCurrentNote = currentNote;
+
+        if(currentNote && currentNote._id === noteId) {
+            newCurrentNote = null;
+        }
+
+        let household = {
+            ...store.getState().households.currentHousehold,
+            ...response.household
+        };
+
         dispatch({
             type: DELETE_NOTE,
-            household: response.household
+            household: household,
+            currentNote: newCurrentNote
         });
     } catch (error) {
         dispatch({
