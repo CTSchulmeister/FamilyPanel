@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { changeView } from '../../actions/viewActions';
 
 class SideBarGroup extends Component {
     constructor(props) {
@@ -48,19 +46,13 @@ class SideBarGroup extends Component {
             default:
                 throw new Error(`Invalid type value given.  Must be 'profile', 'home', 'members', 'events', tasks', or 'notes'`);
         }
-
-        this.changeView.bind(this);
-    }
-
-    changeView = () => {
-        this.props.changeView(this.view);
     }
 
     render() {
         let className = (this.props.active) ? 'side-bar-group--active' : 'side-bar-group';
 
         return (
-            <Link to={ this.route } className={ className } aria-label={ this.title } onClick={ this.changeView }>
+            <Link to={ this.route } className={ className } aria-label={ this.title }>
                 <div className="side-bar-group__icon">
                     { this.icon }
                 </div>
@@ -81,4 +73,4 @@ SideBarGroup.propTypes = {
     ])
 }
 
-export default connect(null, { changeView })(SideBarGroup);
+export default SideBarGroup;
