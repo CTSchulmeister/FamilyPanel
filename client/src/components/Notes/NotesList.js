@@ -21,6 +21,7 @@ const NotesList = (props) => {
                 <NoteSummary 
                     key={ note._id }
                     noteId={ note._id }
+                    creatorId={ note._creatorId }
                     isActive={ isActive }
                     title={ note.title }
                     body={ note.body }
@@ -34,7 +35,7 @@ const NotesList = (props) => {
             <div className="notes-list__header">
                 { displayedNumberOfNotes }
                 <Link to="/notes/create-note" className="button button--sqr">
-                    <i className="fas fa-plus"></i>
+                    <i className="fas fa-edit"></i>
                 </Link>
             </div>
             <div className="notes-list__list">

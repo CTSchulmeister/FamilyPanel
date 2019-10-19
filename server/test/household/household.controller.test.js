@@ -1077,7 +1077,7 @@ describe('Household Controller', () => {
                     }]
                 }).save();
 
-                await HouseholdController.deleteNote(household._id, household.notes[0]._id);
+                await HouseholdController.deleteNote(household._id, user._id, household.notes[0]._id);
 
                 household = await HouseholdModel.findById(household._id);
 

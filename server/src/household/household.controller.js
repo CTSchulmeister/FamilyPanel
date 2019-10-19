@@ -452,12 +452,13 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
 /**
  * Deletes an event document.
  * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
+ * @param {mongoose.Types.ObjectId} userId - The id of the user requesting this note deletion.
  * @param {mongoose.Types.ObjectId} noteId - The note's id.
  */
-module.exports.deleteNote = async (householdId, noteId) => {
+module.exports.deleteNote = async (householdId, userId, noteId) => {
     const household = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId, 'notes._id': noteId },
-        { $pull: { notes: { _id: noteId } } },
+        { _id: householdId, _memberIds: userId, 'notes._id': noteId },
+        { $pull: { notes: { _id: noteId, _creatorId: userId } } },
         { new: true }
     ).exec();
 

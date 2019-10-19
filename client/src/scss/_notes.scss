@@ -82,30 +82,44 @@
 }
 
 .note-summary {
+    grid-area: note-summary;
+
     display: grid;
     grid-template-columns: 4rem 1fr;
     grid-template-rows: 0.5rem 1rem 1rem 1rem 0.5rem;
     grid-template-areas:
-        "photo   .    "
+        "photo    .   "
         "photo  title "
         "photo creator"
         "photo   body "
-        "photo   .    ";
+        "photo    .   ";
 
     margin-bottom: 0.125rem;
 
-    background: rgba(white, 0.5);
+    background: linear-gradient(
+        to right, 
+        white, 
+        rgba(white, 0.4) 50%, 
+        rgba(white, 0.4));
+    background-size: 200% auto;
+    background-position: right;
+    transition: all ease-out 0.3s;
 
-    transition: all ease-out 0.15s;
+    &__container {
+        display: grid;
+        grid-template-columns: 1fr 3rem;
+        grid-template-areas:
+            "note-summary buttons";
+    }
 
     &:hover {
         cursor: pointer;
-        background: white;
-        transition: all ease-in 0.15s;
+        background-position: left;
+        transition: all ease-out 0.3s;
     }
 
     &--active {
-        background: white;
+        background-position: left;
     }
 
     &__photo-container {
@@ -162,6 +176,18 @@
         color: $gray;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    &__button-container {
+        grid-area: buttons;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 0.125rem;
+
+        background: rgba(white, 0.4);
     }
 }
 

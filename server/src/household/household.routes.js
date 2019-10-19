@@ -541,7 +541,7 @@ router.get('/:household/note/:note', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household/note/:note', jsonParser, [
+router.put('/:household/note/:note', auth, jsonParser, [
     check('title')
         .optional()
         .isString()
@@ -590,9 +590,9 @@ router.put('/:household/note/:note', jsonParser, [
 });
 
 // DELETE
-router.delete('/:household/note/:note', async (req, res) => {
+router.delete('/:household/note/:note', auth, async (req, res) => {
     try {
-        const household = await HouseholdController.deleteNote(req.params.household, req.params.note);
+        const household = await HouseholdController.deleteNote(req.params.household, req.user._id, req.params.note);
 
         res.status(200).json({
             success: true,

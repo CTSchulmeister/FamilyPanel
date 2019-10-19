@@ -9,7 +9,11 @@ import {
     CREATE_NOTE,
     CREATE_NOTE_ERROR,
     READ_NOTE,
-    READ_NOTE_ERROR
+    READ_NOTE_ERROR,
+    PENDING_DELETE_NOTE,
+    DELETE_NOTE,
+    DELETE_NOTE_ERROR,
+    PENDING_UPDATE_NOTE
 } from '../actions/types';
 
 const initialState = {
@@ -78,6 +82,20 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 currentNote: null
+            };
+        case PENDING_DELETE_NOTE:
+            return {
+                ...state,
+                noteLoading: true
+            };
+        case DELETE_NOTE:
+            return {
+                ...state,
+                currentHousehold: action.household
+            };
+        case DELETE_NOTE_ERROR:
+            return {
+                ...state
             };
 
         default:
