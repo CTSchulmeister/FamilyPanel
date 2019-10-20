@@ -145,6 +145,8 @@ router.post('/me/logout', auth, async (req, res) => {
 
 // Logout on all devices
 router.post('/me/logout-all', auth, async (req, res) => {
+    console.log('Recieved request');
+
     try {
         req.user.tokens.splice(0, req.user.tokens.length);
         await req.user.save();
@@ -152,6 +154,7 @@ router.post('/me/logout-all', auth, async (req, res) => {
             success: true
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({
             success: false,
             errors: [err.message]

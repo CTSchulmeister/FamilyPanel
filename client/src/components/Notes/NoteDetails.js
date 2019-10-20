@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { deleteNote } from '../../actions/householdActions';
 
 class NoteDetails extends Component {
+    constructor(props) {
+        super(props);
+
+        this.handleDelete.bind(this);
+    }
+
+    handleDelete() {
+        this.props.deleteNote(this.props.noteId);
+    }
+
     render() {
         if(this.props.currentNote) {
             let body = this.props.currentNote.body;
@@ -12,7 +23,23 @@ class NoteDetails extends Component {
 
             return (
                 <div className="note-details note-details--active-note">
-                    <h2 className="note-details__title">{ this.props.currentNote.title }</h2>
+                    <h2 className="note-details__title">
+                        { this.props.currentNote.title }
+                        <div className="note-details__buttons">
+                            <button className="button button--sqr">
+                                <i className="fas fa-edit"></i>
+                            </button>
+                            <button className="button button--sqr" onClick={ 
+                                () => {
+                                    if(window.confirm(`Are you sure you wanted to delete the note ${ this.props.title}?`)) {
+                                        this.handleDelete();
+                                    }
+                                }
+                            }>
+                                <i className="fas fa-trash-alt"></i>
+                            </button>
+                        </div> 
+                    </h2>
                     <div className="note-details__divider"></div>
                     <div className="note-details__from-label note-details__label">From</div>
                     <div className="note-details__note-author">
@@ -48,4 +75,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps)(NoteDetails);
+export default connect(mapStateToProps, { deleteNote })(NoteDetails);

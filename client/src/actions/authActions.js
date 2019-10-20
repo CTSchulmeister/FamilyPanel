@@ -140,13 +140,15 @@ export const logUserIn = (userData) => async (dispatch) => {
 
 export const logUserOut = () => async dispatch => {
     try {
-        const response = await fetch(`${ROOT_URL}/api/user/me/logout-all`, {
+        let response = await fetch(`${ROOT_URL}/api/user/me/logout-all`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
             }
         });
+
+        response = await response.json();
     
         if(response.success === true) {
             dispatch({
