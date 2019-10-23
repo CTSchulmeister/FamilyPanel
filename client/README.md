@@ -10,7 +10,9 @@ First, install the required packages.
 npm install
 ```
 
-Then, simply start the application.
+Then, make sure to provide proper environment variables.  A .env.example file is included as a template.
+
+Now you can start the application!
 
 ```
 npm start
