@@ -6,5 +6,6 @@ module.exports = {
         useCreateIndex: true,
         autoIndex: false
     },
-    PORT: 8080
+    PORT: 8080,
+    JWT_KEY: 'insecureJWTKey'
 }
