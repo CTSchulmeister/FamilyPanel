@@ -27,9 +27,8 @@ const App = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        view: state.view.view,
-        isAuthenticated: state.auth.authenticated,
-        user: state.auth.user
+        isAuthenticated: state.user.authenticated,
+        user: state.user.user
     };
 }
 

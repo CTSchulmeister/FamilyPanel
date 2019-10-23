@@ -3,7 +3,7 @@
 // --- Modules
 const UserModel = require('./user.model');
 const HouseholdModel = require('../household/household.model');
-const { generateSalt, generateHash }= require('../util');
+const { generateSalt, generateHash, nonPersonalUserData } = require('../util');
 const mongoose = require('mongoose');
 
 // --- Controller Logic
@@ -51,25 +51,88 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
  * @param {String} password - The user's unhashed password.
  */
 module.exports.loginUser = async (email, password) => {
-    try {
-        const user = await UserModel.findOne({ email: email }).exec();
+    const user = await UserModel.findOne({ email: email }).exec();
 
-        if(!user) {
-            throw `Invalid login credentials`;
-        }
-
-        const hashedPassword = generateHash(password, user.salt);
-
-        if(hashedPassword != user.password) {
-            throw `Invalid login credentials`;
-        }
-
-        const token = await user.generateAuthToken();
-
-        return { user, token };
-    } catch (err) {
-        throw err;
+    if(!user) {
+        throw `Invalid login credentials`;
     }
+
+    const hashedPassword = generateHash(password, user.salt);
+
+    if(hashedPassword != user.password) {
+        throw `Invalid login credentials`;
+    }
+
+    const token = await user.generateAuthToken();
+
+    let households = null;
+    let currentHousehold = null;
+
+    if(user._householdIds.length !== 0) {
+        households = await HouseholdModel.find({ _id: { $in: user._householdIds } }).exec();
+
+        for(let household = 0; household < households.length; household++) {
+            if(households[0]._id = user.currentHousehold) {
+                currentHousehold = {
+                    ...households[0]
+                };
+                break;
+            }
+        }
+
+        let members = await getHouseholdMembers(currentHousehold._doc._id);
+
+        currentHousehold = {
+            ...currentHousehold._doc,
+            members: members
+        };
+    }
+
+    return { user, token, households, currentHousehold };
+};
+
+/**
+ * Retrieves all households contains the passed user id.
+ * @param {mongoose.Types.ObjectId} userId - The user's _id.
+ */
+module.exports.getHouseholds = async (userId) => {
+    const households = await HouseholdModel.find({ _memberIds: userId }).exec();
+
+    if(!households) {
+        throw new Error(`No households were found that had a member with the id ${ userId }`);
+    }
+
+    return households;
+}
+
+/**
+ * Changes the user's current household.
+ * @param {mongoose.Types.ObjectId} userId - The id of the user
+ * @param {mongoose.Types.ObjectId} householdId - The id of the household
+ */
+module.exports.changeCurrentHousehold = async (userId, householdId) => {
+    let newCurrentHousehold = await HouseholdModel.findById(householdId).exec();
+
+    if(!newCurrentHousehold || !newCurrentHousehold._memberIds.includes(userId)) {
+        throw new Error('The user does not have access to this household');
+    }
+
+    const user = await UserModel.findByIdAndUpdate(userId, {
+        currentHousehold: householdId
+    }, { new: true }).exec();
+
+    if(!user) {
+        throw new Error(`No user with the id ${ userId } was found`);
+    }
+
+    let members = await getHouseholdMembers(newCurrentHousehold._id);
+
+    newCurrentHousehold = {
+        ...newCurrentHousehold._doc,
+        members: members
+    };
+
+    return newCurrentHousehold;
 };
 
 /** 
@@ -171,3 +234,15 @@ module.exports.deleteUser = async (id) => {
 
     return user;
 }
+
+// HELPER METHODS
+
+/**
+ * Gets the member user documents of a household with personal data removed.
+ * @param {mongoose.Types.ObjectId} householdId
+ */
+const getHouseholdMembers = async householdId => {
+    const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+
+    return members;
+};

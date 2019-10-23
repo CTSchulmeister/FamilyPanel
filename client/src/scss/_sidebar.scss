@@ -42,7 +42,7 @@
         justify-content: center;
     }
 
-    &__header--household, &__header--no-household {
+    &__header {
         width: 100%;
         margin-bottom: 3rem;
         position: relative;
@@ -51,25 +51,93 @@
             content: '';
             position: absolute;
             left: 0rem;
-            bottom: 0.5rem;
+            top: 100%;
             height: 0.25rem;
             width: 50%;
             background-color: white;
         }
     }
 
-    &__header--household {
-        height: 4.5rem;
-    }
-
-    &__header--no-household {
-        height: 5rem;
-    }
-
     &__sub-heading {
         font-size: 1rem;
         text-transform: uppercase;
         color: $light-gray;
+    }
+
+    &__household-select-trigger {
+        height: 1rem;
+        margin: 0rem;
+        padding: 0rem;
+        
+        border: none;
+        background: none;
+
+        transition: all ease-out 0.3s;
+
+        &:hover {
+            cursor: pointer;
+            color: $extra-light-gray;
+
+            transition: all ease-in 0.3s;
+        }
+    }
+
+    &__household-select {
+        height: auto;
+        max-height: 40vh;
+        width: 100%;
+        padding: 0.5rem;
+        position: absolute;
+        left: 0rem;
+        top: 1.5rem;
+        z-index: 2;
+        
+        background: white;
+        box-shadow: $large-shadow;
+
+        transform-origin: top;
+        animation: appear-vertical 0.3s ease-out;
+    }
+
+    @keyframes appear-vertical {
+        from {
+            transform: scaleY(0);
+        } to {
+            transform: scaleY(1);
+        }
+    }
+
+    &__household-option {
+        width: 100%;
+        padding: 0.5rem 1rem;
+
+        border: none;
+        border-bottom: 0.125rem solid rgba(0, 0, 0, 0.05);
+        background: linear-gradient(
+            to right, 
+            $extra-light-gray, 
+            white 50%, 
+            white);
+        background-size: 200% auto;
+        background-position: right;
+    
+        text-align: center;
+        font-size: 1rem;
+        text-transform: uppercase;
+        color: $dark-gray;
+        letter-spacing: 0.1rem;
+
+        transition: all ease-out 0.3s;
+
+        &:hover {
+            cursor: pointer;
+            background-position: left;
+            transition: all ease-out 0.3s;
+        }
+
+        &:last-of-type {
+            border-bottom: none;
+        }
     }
 
     &__household-create-form-wrapper {
@@ -115,7 +183,7 @@
     }
 
     &__household-name {
-        margin: 0.5rem 0rem 1.5rem;
+        margin: 0.5rem 0rem 1rem;
         font-size: 1.5rem;
         font-weight: $normal-weight;
         text-transform: uppercase;

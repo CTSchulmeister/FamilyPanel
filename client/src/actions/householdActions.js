@@ -1,28 +1,20 @@
 import {
-    CREATE_HOUSEHOLD,
-    PENDING_CREATE_HOUSEHOLD,
-    CREATE_HOUSEHOLD_ERROR,
-    AUTH_USER,
-    PENDING_CREATE_NOTE,
-    PENDING_UPDATE_NOTE,
-    PENDING_DELETE_NOTE,
-    CREATE_NOTE,
-    CREATE_NOTE_ERROR,
-    READ_NOTE,
-    READ_NOTE_ERROR,
-    UPDATE_NOTE,
-    UPDATE_NOTE_ERROR,
-    DELETE_NOTE,
-    DELETE_NOTE_ERROR
+    PENDING_HOUSEHOLD_CREATION,
+    HOUSEHOLD_CREATED,
+    HOUSEHOLD_CREATION_ERROR,
+    PENDING_CURRENT_HOUSEHOLD_CHANGE,
+    CURRENT_HOUSEHOLD_CHANGED,
+    CURRENT_HOUSEHOLD_CHANGE_ERROR
 } from './types';
 
 import store from '../store';
+import config from '../config';
 
-const ROOT_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const ROOT_URL = process.env.REACT_APP_API_URL || `http://localhost:${ config.PORT }`;
 
 export const createHousehold = (householdData) => async dispatch => {
     try {
-        let user = store.getState().auth.user;
+        let user = store.getState().user.user;
 
         let submissionData = {
             ownerId: user._id,
@@ -31,10 +23,10 @@ export const createHousehold = (householdData) => async dispatch => {
         };
 
         dispatch({
-            type: PENDING_CREATE_HOUSEHOLD
+            type: PENDING_HOUSEHOLD_CREATION
         });
 
-        let response = await fetch(`${ROOT_URL}/api/household`, {
+        let createHouseholdResponse = await fetch(`${ ROOT_URL }/api/household`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -43,166 +35,53 @@ export const createHousehold = (householdData) => async dispatch => {
             },
             body: JSON.stringify(submissionData)
         });
+        createHouseholdResponse = await createHouseholdResponse.json();
 
-        response = await response.json();
-
-        if(response.success === false) {
-            throw new Error(response.errors.toString());
-        }
-
-        let household = {
-            ...response.household,
-            members: [
-                user
-            ]
-        }
+        if(!createHouseholdResponse.success) throw createHouseholdResponse.errors;
 
         dispatch({
-            type: CREATE_HOUSEHOLD,
-            household: household
+            type: HOUSEHOLD_CREATED,
+            currentHousehold: createHouseholdResponse.currentHousehold,
+            households: createHouseholdResponse.households,
+            user: createHouseholdResponse.user
         });
-
-        response = await fetch(`${ROOT_URL}/api/user/me`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
-            }
-        });
-
-        response = await response.json();
-
-        dispatch({
-            type: AUTH_USER,
-            user: response.user,
-            token: localStorage.getItem('auth_jwt_token')
-        });
-
-        if(response.success === false) {
-            throw new Error(response.errors.toString());
-        }
     } catch (error) {
         dispatch({
-            type: CREATE_HOUSEHOLD_ERROR,
-            error: error
+            type: HOUSEHOLD_CREATION_ERROR,
+            errors: error
         });
     }
-}
+};
 
-// Notes
-
-export const createNote = (noteData) => async dispatch => {
+export const changeCurrentHousehold = (householdId) => async dispatch => {
     try {
         dispatch({
-            type: PENDING_CREATE_NOTE
+            type: PENDING_CURRENT_HOUSEHOLD_CHANGE
         });
 
-        let householdId = store.getState().households.currentHousehold._id;
-
-        let response = await fetch(`${ ROOT_URL }/api/household/${ householdId }/note`, {
+        let householdResponse = await fetch(`${ ROOT_URL }/api/user/me/change-current-household`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
             },
-            body: JSON.stringify(noteData)
+            body: JSON.stringify({ 
+                currentHousehold: householdId
+            })
         });
+        householdResponse = await householdResponse.json();
 
-        response = await response.json();
-
-        if(response.success === false) {
-            throw new Error(response.errors.toString());
-        }
-
-        let household = {
-            ...store.getState().households.currentHousehold,
-            ...response.household
-        }
+        if(!householdResponse.success) throw householdResponse.errors;
 
         dispatch({
-            type: CREATE_NOTE,
-            household: household
+            type: CURRENT_HOUSEHOLD_CHANGED,
+            currentHousehold: householdResponse.household
         });
     } catch (error) {
         dispatch({
-            type: CREATE_NOTE_ERROR,
-            error: error
-        });
-    }
-};
-
-export const readNote = (noteId) => dispatch => {
-    let currentHouseholdNotes = store.getState().households.currentHousehold.notes;
-    let noteToRead = null;
-
-    for(let i = 0; i < currentHouseholdNotes.length; i++) {
-        if(noteId === currentHouseholdNotes[i]._id) {
-            noteToRead = currentHouseholdNotes[i];
-        }
-    }
-
-    if(noteToRead) {
-        dispatch({
-            type: READ_NOTE,
-            currentNote: noteToRead
-        });
-    } else {
-        dispatch({
-            type: READ_NOTE_ERROR
-        });
-    }
-};
-
-export const updateNote = (noteId, noteData) => async dispatch => {
-
-};
-
-export const deleteNote = (noteId) => async dispatch => {
-    try {
-        dispatch({
-            type: PENDING_DELETE_NOTE
-        });
-
-        let householdId = store.getState().households.currentHousehold._id;
-
-        let response = await fetch(`${ ROOT_URL }/api/household/${ householdId }/note/${ noteId }`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
-            }
-        });
-
-        response = await response.json();
-
-        if(response.success === false) {
-            throw new Error(response.errors.toString());
-        }
-
-        let currentNote = store.getState().households.currentNote;
-        let newCurrentNote = currentNote;
-
-        if(currentNote && currentNote._id === noteId) {
-            newCurrentNote = null;
-        }
-
-        let household = {
-            ...store.getState().households.currentHousehold,
-            ...response.household
-        };
-
-        dispatch({
-            type: DELETE_NOTE,
-            household: household,
-            currentNote: newCurrentNote
-        });
-    } catch (error) {
-        dispatch({
-            type: DELETE_NOTE_ERROR,
-            error: error
+            type: CURRENT_HOUSEHOLD_CHANGE_ERROR,
+            errors: error
         });
     }
 };

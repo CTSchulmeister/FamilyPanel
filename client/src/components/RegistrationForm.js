@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { registerUser } from '../actions/authActions';
+import { registerUser } from '../actions/userActions';
 
 class RegistrationForm extends Component {
     constructor(props) {
@@ -196,8 +196,8 @@ class RegistrationForm extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.auth.authenticated,
-        registrationErrors: state.auth.registrationErrors
+        isAuthenticated: state.user.authenticated,
+        registrationErrors: state.user.registrationErrors
     }
 }
 

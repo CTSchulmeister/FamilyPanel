@@ -42,7 +42,7 @@ router.post('/', auth, jsonParser, [
         });
     } else {
         try {
-            const household = await HouseholdController.createHousehold(
+            const { newHousehold, households, updatedUser } = await HouseholdController.createHousehold(
                 req.body.ownerId,
                 req.body.memberIds,
                 req.body.name
@@ -50,7 +50,9 @@ router.post('/', auth, jsonParser, [
 
             res.status(200).json({
                 success: true,
-                household: household
+                currentHousehold: newHousehold,
+                households: households,
+                user: updatedUser
             });
         } catch (err) {
             console.error(`Error creating household: ${ err }`);
@@ -86,16 +88,16 @@ router.get('/:household', auth, async (req, res) => {
     }
 });
 
-router.get('/:household/users', auth, async (req, res) => {
+router.get('/:household/members', auth, async (req, res) => {
     try {
-        const users = await HouseholdController.getUsersFromHousehold(req.params.household, req.user._id);
+        const members  = await HouseholdController.getMembersFromHousehold(req.params.household, req.user._id);
 
         res.status(200).json({
             success: true,
-            users: users
+            members: members
         });
     } catch (err) {
-        console.error(`Error getting users from household ${ req.params.household }: ${ err }`);
+        console.error(`Error getting members from household ${ req.params.household }: ${ err }`);
         res.status(500).json({
             success: false,
             errors: [...err]

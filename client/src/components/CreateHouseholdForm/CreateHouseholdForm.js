@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createHousehold } from '../../actions/householdActions';
-import { hideHouseholdCreationForm } from '../../actions/viewActions';
 import './CreateHouseholdForm.scss';
 
 class CreateHouseholdForm extends Component {
@@ -43,7 +42,6 @@ class CreateHouseholdForm extends Component {
 
         try {
             this.props.createHousehold(this.state);
-            this.props.hideHouseholdCreationForm();
         } catch (err) {
             alert(`Error encountered: ${ err }`);
         }
@@ -86,10 +84,4 @@ class CreateHouseholdForm extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        isShown: state.view.householdCreationFormIsActive
-    };
-}
-
-export default connect(mapStateToProps, { createHousehold, hideHouseholdCreationForm })(CreateHouseholdForm);
+export default connect(null, { createHousehold })(CreateHouseholdForm);

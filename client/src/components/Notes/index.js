@@ -51,7 +51,7 @@ const Notes = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.auth.authenticated
+        isAuthenticated: state.user.authenticated
     };
 };
 

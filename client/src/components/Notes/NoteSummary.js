@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { readNote, deleteNote } from '../../actions/householdActions';
+import { readNote, deleteNote } from '../../actions/noteActions';
 
 class NoteSummary extends Component {
     constructor(props) { 
@@ -65,7 +65,7 @@ class NoteSummary extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        userId: state.auth.user._id,
+        userId: state.user.user._id,
         currentHousehold: state.households.currentHousehold
     };
 }

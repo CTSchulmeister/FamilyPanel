@@ -28,7 +28,7 @@ app.use((err, req, res, next) => {
 });
 
 // --- Server Setup
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || config.PORT
 app.listen(port, () => {
     console.log(`FamilyPanel server ready on port: ${ port }`);
 });

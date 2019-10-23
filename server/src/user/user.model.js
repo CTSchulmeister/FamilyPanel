@@ -8,6 +8,7 @@ const { generateHash } = require('../util');
 // --- Schema
 const UserSchema = new mongoose.Schema({
     _householdIds: Array,
+    currentHousehold: mongoose.Types.ObjectId,
     firstName: {
         type: String,
         required: true

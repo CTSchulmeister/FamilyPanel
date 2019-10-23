@@ -110,13 +110,6 @@ const HouseholdSchema = new mongoose.Schema({
     }
 });
 
-HouseholdSchema.pre('save', function(next) {
-    if(Object.values(this._memberIds).indexOf(this._ownerId) == -1) {
-        this._memberIds.push(this._ownerId);
-    }
-    next();
-});
-
 const Household = mongoose.connection.model('Household', HouseholdSchema);
 
 module.exports = Household;

@@ -4,6 +4,7 @@
 const mongoose = require('mongoose');
 const HouseholdModel = require('./household.model');
 const UserModel = require('../user/user.model');
+const { nonPersonalUserData } = require('../util');
 
 // --- Household Controller Logic
 
@@ -14,6 +15,7 @@ const UserModel = require('../user/user.model');
  * @param {String} name - The household's name.
  */
 module.exports.createHousehold = async (ownerId, memberIds, name) => {
+    memberIds = [...memberIds];
     memberIds = (memberIds.length > 0) ? memberIds : [ownerId];
     if(!memberIds.includes(ownerId)) memberIds.push(ownerId);
 
@@ -21,21 +23,34 @@ module.exports.createHousehold = async (ownerId, memberIds, name) => {
         throw new Error(`At least one user in memberIds does not exist`);
     }
 
-    let household = await new HouseholdModel({
+    let newHousehold = await new HouseholdModel({
         _ownerId: ownerId,
         _memberIds: memberIds,
         name: name
     })
     
-    household.validate((err) => {
+    newHousehold.validate((err) => {
         if(err) throw err;
     });
 
-    household = await household.save();
+    newHousehold = await newHousehold.save();
+    newHousehold = newHousehold._doc;
 
-    await UserModel.updateMany({ _id: { $in: memberIds }}, { $push: { _householdIds: household._id } }).exec();
+    await UserModel.updateMany({ _id: { $in: memberIds }}, { $push: { _householdIds: newHousehold._id } }).exec();
 
-    return household;
+    let members = await getHouseholdMembers(newHousehold._id);
+
+    newHousehold = {
+        ...newHousehold,
+        members: members
+    };
+
+    let updatedUser = await UserModel.findByIdAndUpdate(ownerId, {
+        currentHousehold: newHousehold._id
+    }, { new: true }).exec();
+    let households = await HouseholdModel.find({ _id: updatedUser._householdIds }).exec();
+
+    return { newHousehold, households, updatedUser };
 };
 
 /**
@@ -51,24 +66,20 @@ module.exports.readHousehold = async (id) => {
 };
 
 /**
- * Retrieves the users belonging to a household.
+ * Retrieves the members belonging to a household.
  * @param {mongoose.Types.ObjectId} householdId - The household's _id value.
  * @param {mongoose.Types.ObjectId} userId - The id of the user making the request.
  */
-module.exports.getUsersFromHousehold = async (householdId, userId) => {
+module.exports.getMembersFromHousehold = async (householdId, userId) => {
     const household = await HouseholdModel.findOne({ _id: householdId, _memberIds: userId }).exec();
 
     if(!household) {
         throw new Error(`No household has the id ${ householdId } with a member with the id ${ userId }`);
     }
 
-    const users = await UserModel.find({ _householdIds: household._id });
+    let members = await getHouseholdMembers(householdId);
 
-    if(!users) {
-        throw new Error(`No users were found belonging to the household ${ household._id }`);
-    }
-
-    return users;
+    return members;
 };
 
 /**
@@ -405,15 +416,20 @@ module.exports.createNote = async (householdId, creatorId, title, body = null) =
 
     if(body) note.body = body;
 
-    const household = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId, _memberIds: creatorId },
+    let household = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId },
         { $push: { notes: note } },
         { new: true }
     ).exec();
 
-    if(!household) {
-        throw new Error(`No household was found that matched the query criteria.`);
-    }
+    if(!household) throw new Error(`No household was found that matched the query criteria.`);
+
+    let members = await getHouseholdMembers(household._id);
+
+    household = {
+        ...household._doc,
+        members: members
+    };
 
     return household;
 };
@@ -477,8 +493,10 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
  * @param {mongoose.Types.ObjectId} noteId - The note's id.
  */
 module.exports.deleteNote = async (householdId, userId, noteId) => {
-    const household = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId, _memberIds: userId, 'notes._id': noteId },
+    console.log(`Parameters: \n\tHouseholdId: ${ householdId }\n\tUserId: ${ userId }\n\tNoteId: ${ noteId }`);
+
+    let household = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId, _memberIds: String(userId), 'notes._id': noteId },
         { $pull: { notes: { _id: noteId, _creatorId: userId } } },
         { new: true }
     ).exec();
@@ -487,5 +505,27 @@ module.exports.deleteNote = async (householdId, userId, noteId) => {
         throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
     }
 
+    let members = await getHouseholdMembers(household._id);
+    household = {
+        ...household._doc,
+        members: members
+    };
+
+    console.log(household);
+
     return household;
+};
+
+// HELPER METHODS
+
+/**
+ * Gets the member user documents of a household with personal data removed.
+ * @param {mongoose.Types.ObjectId} householdId
+ */
+const getHouseholdMembers = async householdId => {
+    return await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+};
+
+const getHouseholdMembersLean = async householdId => {
+    return await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).lean().exec();
 };

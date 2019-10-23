@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { deleteNote } from '../../actions/householdActions';
+import { deleteNote } from '../../actions/noteActions';
 
 class NoteDetails extends Component {
     constructor(props) {
@@ -14,7 +14,7 @@ class NoteDetails extends Component {
     }
 
     render() {
-        if(this.props.currentNote) {
+        if(this.props.currentNote !== null) {
             let body = this.props.currentNote.body;
 
             let creator = this.props.currentHousehold.members.filter(member => {
@@ -70,8 +70,7 @@ class NoteDetails extends Component {
 const mapStateToProps = (state) => {
     return {
         currentHousehold: state.households.currentHousehold,
-        currentNote: state.households.currentNote,
-        currentPath: state.view.currentPath
+        currentNote: state.households.currentNote
     };
 }
 

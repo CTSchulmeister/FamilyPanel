@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { logUserIn } from '../actions/authActions';
+import { logUserIn } from '../actions/userActions';
 
 class LogInForm extends Component {
     constructor(props) {
@@ -60,8 +60,8 @@ class LogInForm extends Component {
         }
 
         let errors = null;
-        if(this.props.loginErrors) {
-            let errorsArray = this.props.loginErrors;
+        if(this.props.logInErrors) {
+            let errorsArray = this.props.logInErrors;
 
             errors = errorsArray.map(error => {
                 let param;
@@ -133,8 +133,8 @@ class LogInForm extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.auth.authenticated,
-        loginErrors: state.auth.loginErrors
+        isAuthenticated: state.user.authenticated,
+        logInErrors: state.user.logInErrors
     };
 }
 

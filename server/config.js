@@ -5,5 +5,6 @@ module.exports = {
         useFindAndModify: false,
         useCreateIndex: true,
         autoIndex: false
-    }
+    },
+    PORT: 8080
 }

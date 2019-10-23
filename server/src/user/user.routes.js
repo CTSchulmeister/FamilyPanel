@@ -102,12 +102,14 @@ router.post('/login', jsonParser, [
         .trim()
 ], async (req, res) => {
     try {
-        const { user, token } = await UserController.loginUser(req.body.email, req.body.password);
+        const { user, token, households, currentHousehold } = await UserController.loginUser(req.body.email, req.body.password);
 
         res.status(200).json({
             success: true,
             user: user,
-            token: token
+            token: token,
+            households: households,
+            currentHousehold: currentHousehold
         });
     } catch (err) {
         res.status(400).json({
@@ -143,10 +145,24 @@ router.post('/me/logout', auth, async (req, res) => {
     }
 });
 
+router.get('/me/households', auth, async (req, res) => {
+    try {
+        let households = await UserController.getHouseholds(req.user._id);
+
+        res.status(200).json({
+            success: true,
+            households: households
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            errors: [err.message]
+        });
+    }
+});
+
 // Logout on all devices
 router.post('/me/logout-all', auth, async (req, res) => {
-    console.log('Recieved request');
-
     try {
         req.user.tokens.splice(0, req.user.tokens.length);
         await req.user.save();
@@ -173,12 +189,32 @@ router.post('/me/change-password', auth, jsonParser, [
         .exists({ checkFalsy: true, checkNull: true })
 ], async (req, res) => {
     try {
-        const user = UserController.updateUser(req.user._id, null, null, null, req.body.password);
+        const user = await UserController.updateUser(req.user._id, null, null, null, req.body.password);
         req.user = user;
 
         res.status(200).json({
             success: true,
             user: user
+        });
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            errors: [err.message]
+        });
+    }
+});
+
+router.post('/me/change-current-household', auth, jsonParser, [
+    check('currentHousehold')
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The id for the new current household must be passed')
+], async (req, res) => {
+    try {
+        const newCurrentHousehold = await UserController.changeCurrentHousehold(req.user._id, req.body.currentHousehold);
+
+        res.status(200).json({
+            success: true,
+            household: newCurrentHousehold
         });
     } catch (err) {
         res.status(400).json({

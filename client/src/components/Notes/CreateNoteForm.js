@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { createNote } from '../../actions/householdActions';
+import { createNote } from '../../actions/noteActions';
 
 class CreateNoteForm extends Component {
     constructor(props) {

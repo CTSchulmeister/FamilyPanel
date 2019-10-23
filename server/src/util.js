@@ -39,3 +39,15 @@ module.exports.checkPasswordFormat = (password) => {
 
     return passwordFormat.test(password);
 };
+
+module.exports.removePersonalData = (user) => {
+    user.currentHousehold = undefined;
+    user.hasVerifiedEmail = undefined;
+    user.password = undefined;
+    user.salt = undefined;
+    user.tokens = undefined;
+
+    return user;
+};
+
+module.exports.nonPersonalUserData = '_id firstName lastName email';

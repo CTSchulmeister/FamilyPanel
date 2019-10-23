@@ -26,9 +26,9 @@ describe('Household Controller', () => {
                     salt: salt
                 }).save();
 
-                const household = await HouseholdController.createHousehold(user._id, [user._id,], 'Our Apartment');
+                const { newHousehold } = await HouseholdController.createHousehold(user._id, [user._id,], 'Our Apartment');
 
-                expect(household.name).toBe('Our Apartment');
+                expect(newHousehold.name).toBe('Our Apartment');
             });
 
             test('Throws an error if creating a household with missing data', async () => {
@@ -914,6 +914,8 @@ describe('Household Controller', () => {
                     user._id,
                     'My Note',
                 );
+
+                console.log(household);
 
                 let success = household.notes.some((note) => {
                     return note.title === 'My Note';
