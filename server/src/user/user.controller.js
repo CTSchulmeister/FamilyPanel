@@ -93,7 +93,7 @@ module.exports.loginUser = async (email, password) => {
 
 /**
  * Retrieves all households contains the passed user id.
- * @param {mongoose.Types.ObjectId} userId - The user's _id.
+ * @param {String} userId - The user's _id.
  */
 module.exports.getHouseholds = async (userId) => {
     const households = await HouseholdModel.find({ _memberIds: userId }).exec();
@@ -107,8 +107,8 @@ module.exports.getHouseholds = async (userId) => {
 
 /**
  * Changes the user's current household.
- * @param {mongoose.Types.ObjectId} userId - The id of the user
- * @param {mongoose.Types.ObjectId} householdId - The id of the household
+ * @param {String} userId - The id of the user
+ * @param {String} householdId - The id of the household
  */
 module.exports.changeCurrentHousehold = async (userId, householdId) => {
     let newCurrentHousehold = await HouseholdModel.findById(householdId).exec();
@@ -137,7 +137,7 @@ module.exports.changeCurrentHousehold = async (userId, householdId) => {
 
 /** 
  * Retrieves a user document by id.
- * @param {mongoose.Types.ObjectId} id - The user's _id value.
+ * @param {String} id - The user's _id value.
  */
 module.exports.readUser = async (id) => {
     let user = await UserModel.findById(id).exec();
@@ -152,7 +152,7 @@ module.exports.readUser = async (id) => {
 
 /**
  * Updates a user document by id given update parameters.
- * @param {mongoose.Types.ObjectId} id - The user's id.
+ * @param {String} id - The user's id.
  * @param {String} [firstName] - The user's new first name.
  * @param {String} [lastName] - The user's new last name.
  * @param {String} [email] - The user's new email.
@@ -188,7 +188,7 @@ module.exports.updateUser = async (id, firstName = null, lastName = null, email 
 
 /**
  * Deletes a user document by id.
- * @param {mongoose.Types.ObjectId} id - The user's id.
+ * @param {String} id - The user's id.
  */
 module.exports.deleteUser = async (id) => {
     await HouseholdModel.deleteMany({ _ownerId: id }).exec();
@@ -239,7 +239,7 @@ module.exports.deleteUser = async (id) => {
 
 /**
  * Gets the member user documents of a household with personal data removed.
- * @param {mongoose.Types.ObjectId} householdId
+ * @param {String} householdId
  */
 const getHouseholdMembers = async householdId => {
     const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
