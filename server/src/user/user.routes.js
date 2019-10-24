@@ -147,7 +147,9 @@ router.post('/me/logout', auth, async (req, res) => {
 
 router.get('/me/households', auth, async (req, res) => {
     try {
-        let households = await UserController.getHouseholds(req.user._id);
+        let households = await UserController.getHouseholds(
+            String(req.user._id)
+        );
 
         res.status(200).json({
             success: true,
@@ -189,7 +191,13 @@ router.post('/me/change-password', auth, jsonParser, [
         .exists({ checkFalsy: true, checkNull: true })
 ], async (req, res) => {
     try {
-        const user = await UserController.updateUser(req.user._id, null, null, null, req.body.password);
+        const user = await UserController.updateUser(
+            String(req.user._id), 
+            null, 
+            null, 
+            null, 
+            req.body.password
+        );
         req.user = user;
 
         res.status(200).json({
@@ -210,7 +218,10 @@ router.post('/me/change-current-household', auth, jsonParser, [
             .withMessage('The id for the new current household must be passed')
 ], async (req, res) => {
     try {
-        const newCurrentHousehold = await UserController.changeCurrentHousehold(req.user._id, req.body.currentHousehold);
+        const newCurrentHousehold = await UserController.changeCurrentHousehold(
+            String(req.user._id), 
+            req.body.currentHousehold
+        );
 
         res.status(200).json({
             success: true,
@@ -227,7 +238,9 @@ router.post('/me/change-current-household', auth, jsonParser, [
 // READ
 router.get('/:user', auth, async (req, res) => {
     try {
-        const user = await UserController.readUser(req.params.user);
+        const user = await UserController.readUser(
+            String(req.params.user)
+        );
 
         if(req.user._id != user._id ) {
             user.hasVerifiedEmail = undefined;
@@ -313,7 +326,7 @@ router.patch('/:user', auth, jsonParser, [
             const password = (req.body.password) ? req.body.password : null;
 
             const user = await UserController.updateUser(
-                req.params.user,
+                String(req.params.user),
                 firstName,
                 lastName,
                 email,
@@ -343,7 +356,9 @@ router.delete('/:user', auth, async (req, res) => {
         });
     } else {
         try {
-            const user = await UserController.deleteUser(req.params.user);
+            const user = await UserController.deleteUser(
+                String(req.params.user)
+            );
     
             res.status(200).json({
                 success: true,

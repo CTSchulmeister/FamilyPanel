@@ -42,9 +42,11 @@ router.post('/', auth, jsonParser, [
         });
     } else {
         try {
+            let memberIds = req.body.memberIds.map(memberId => String(memberId));
+
             const { newHousehold, households, updatedUser } = await HouseholdController.createHousehold(
-                req.body.ownerId,
-                req.body.memberIds,
+                String(req.body.ownerId),
+                memberIds,
                 req.body.name
             );
 
@@ -67,7 +69,9 @@ router.post('/', auth, jsonParser, [
 // READ
 router.get('/:household', auth, async (req, res) => {
     try {
-        const household = await HouseholdController.readHousehold(req.params.household);
+        const household = await HouseholdController.readHousehold(
+            String(req.params.household)
+        );
 
         if(!household._memberIds.includes(req.user._id)) {
             household.events = undefined;
@@ -90,7 +94,10 @@ router.get('/:household', auth, async (req, res) => {
 
 router.get('/:household/members', auth, async (req, res) => {
     try {
-        const members  = await HouseholdController.getMembersFromHousehold(req.params.household, req.user._id);
+        const members  = await HouseholdController.getMembersFromHousehold(
+            String(req.params.household), 
+            String(req.user._id)
+        );
 
         res.status(200).json({
             success: true,
@@ -126,7 +133,9 @@ router.patch('/:household', auth, jsonParser, [
         });
     } else {
         try {
-            let household = await HouseholdController.readHousehold(req.params.household);
+            let household = await HouseholdController.readHousehold(
+                String(req.params.household)
+            );
 
             if(household._ownerId != req.user._id) {
                 res.status(400).json({
@@ -163,7 +172,9 @@ router.patch('/:household', auth, jsonParser, [
 // DELETE
 router.delete('/:household', async (req, res) => {
     try {
-        const household = await HouseholdController.deleteHousehold(req.params.household);
+        const household = await HouseholdController.deleteHousehold(
+            String(req.params.household)
+        );
 
         res.status(200).json({
             success: true,
@@ -219,8 +230,8 @@ router.post('/:household/event', jsonParser, [
             const location = (req.body.location) ? req.body.location : null;
 
             const household = await HouseholdController.createEvent(
-                req.params.household,
-                req.body.creatorId,
+                String(req.params.household),
+                String(req.body.creatorId),
                 req.body.title,
                 description,
                 time,
@@ -244,7 +255,10 @@ router.post('/:household/event', jsonParser, [
 // READ
 router.get('/:household/event/:event', async (req, res) => {
     try {
-        const event = await HouseholdController.readEvent(req.params.household, req.params.event);
+        const event = await HouseholdController.readEvent(
+            String(req.params.household), 
+            String(req.params.event)
+        );
 
         res.status(200).json({
             success: true,
@@ -298,8 +312,8 @@ router.put('/:household/event/:event', jsonParser, [
             const location = (req.body.location) ? req.body.location : null;
 
             const household = await HouseholdController.updateEvent(
-                req.params.household,
-                req.params.event,
+                String(req.params.household),
+                String(req.params.event),
                 title,
                 time,
                 description,
@@ -323,7 +337,10 @@ router.put('/:household/event/:event', jsonParser, [
 // DELETE
 router.delete('/:household/event/:event', async (req, res) => {
     try {
-        const household = await HouseholdController.deleteEvent(req.params.household, req.params.event);
+        const household = await HouseholdController.deleteEvent(
+            String(req.params.household), 
+            String(req.params.event)
+        );
 
         res.status(200).json({
             success: true,
@@ -374,8 +391,8 @@ router.post('/:household/task', jsonParser, [
             const completeBy = (req.body.completeBy) ? req.body.completeBy : null;
             
             const household = await HouseholdController.createTask(
-                req.params.household,
-                req.body.creatorId,
+                String(req.params.household),
+                String(req.body.creatorId),
                 req.body.title,
                 assignedUserIds,
                 description,
@@ -399,7 +416,10 @@ router.post('/:household/task', jsonParser, [
 // READ
 router.get('/:household/task/:task', async (req, res) => {
     try {
-        const task = await HouseholdController.readTask(req.params.household, req.params.task);
+        const task = await HouseholdController.readTask(
+            String(req.params.household), 
+            String(req.params.task)
+        );
 
         res.status(200).json({
             success: true,
@@ -448,15 +468,15 @@ router.put('/:household/task/:task', jsonParser, [
         });
     } else {
         try {
-            const assignedUserIds = (req.body.assignedUserIds) ? req.body.assignedUserIds : null;
+            const assignedUserIds = (req.body.assignedUserIds) ? req.body.assignedUserIds.map(userId => String(userId)) : null;
             const title = (req.body.title) ? req.body.title : null;
             const description = (req.body.description) ? req.body.description : null;
             const completeBy = (req.body.completeBy) ? req.body.completeBy : null;
             const completed = (req.body.completed) ? req.body.completed : null;
 
             const household = await HouseholdController.updateTask(
-                req.params.household,
-                req.params.task,
+                String(req.params.household),
+                String(req.params.task),
                 assignedUserIds,
                 title,
                 description,
@@ -481,7 +501,10 @@ router.put('/:household/task/:task', jsonParser, [
 // DELETE
 router.delete('/:household/task/:task', async (req, res) => {
     try {
-        const household = await HouseholdController.deleteTask(req.params.household, req.params.task);
+        const household = await HouseholdController.deleteTask(
+            String(req.params.household), 
+            String(req.params.task)
+        );
 
         res.status(200).json({
             success: true,
@@ -521,8 +544,8 @@ router.post('/:household/note', auth, jsonParser, [
             const body = (req.body.body) ? req.body.body : null;
 
             const household = await HouseholdController.createNote(
-                req.params.household,
-                req.user._id,
+                String(req.params.household),
+                String(req.user._id),
                 req.body.title,
                 body
             );
@@ -544,7 +567,10 @@ router.post('/:household/note', auth, jsonParser, [
 // READ
 router.get('/:household/note/:note', async (req, res) => {
     try {
-        const note = await HouseholdController.readNote(req.params.household, req.params.note);
+        const note = await HouseholdController.readNote(
+            String(req.params.household), 
+            String(req.params.note)
+        );
 
         res.status(200).json({
             success: true,
@@ -588,8 +614,8 @@ router.put('/:household/note/:note', auth, jsonParser, [
             const body = (req.body.body) ? req.body.body : null;
 
             const household = await HouseholdController.updateNote(
-                req.params.household,
-                req.params.note,
+                String(req.params.household),
+                String(req.params.note),
                 title,
                 body
             );
@@ -611,14 +637,18 @@ router.put('/:household/note/:note', auth, jsonParser, [
 // DELETE
 router.delete('/:household/note/:note', auth, async (req, res) => {
     try {
-        const household = await HouseholdController.deleteNote(req.params.household, req.user._id, req.params.note);
+        const household = await HouseholdController.deleteNote(
+            String(req.params.household), 
+            String(req.user._id), 
+            String(req.params.note)
+        );
 
         res.status(200).json({
             success: true,
             household: household
         });
     } catch (err) {
-        console.error(`Error updating note ${ req.params.note } from household ${ req.params.hosehold }: ${ err }`);
+        console.error(`Error deleting note ${ req.params.note } from household ${ req.params.household }: ${ err }`);
         res.status(500).json({
             success: false,
             errors: [err]

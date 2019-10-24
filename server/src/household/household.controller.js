@@ -10,8 +10,8 @@ const { nonPersonalUserData } = require('../util');
 
 /**
  * Creates a household.
- * @param {mongoose.Types.ObjectId} ownerId - The id of the household's owner.
- * @param {Array<mongoose.Types.ObjectId} memberIds - An array of the ids of the household's members.
+ * @param {String} ownerId - The id of the household's owner.
+ * @param {Array<String} memberIds - An array of the ids of the household's members.
  * @param {String} name - The household's name.
  */
 module.exports.createHousehold = async (ownerId, memberIds, name) => {
@@ -38,11 +38,9 @@ module.exports.createHousehold = async (ownerId, memberIds, name) => {
 
     await UserModel.updateMany({ _id: { $in: memberIds }}, { $push: { _householdIds: newHousehold._id } }).exec();
 
-    let members = await getHouseholdMembers(newHousehold._id);
-
     newHousehold = {
         ...newHousehold,
-        members: members
+        members: await getHouseholdMembers(newHousehold._id)
     };
 
     let updatedUser = await UserModel.findByIdAndUpdate(ownerId, {
@@ -55,7 +53,7 @@ module.exports.createHousehold = async (ownerId, memberIds, name) => {
 
 /**
  * Retrieves a household document by id.
- * @param {mongoose.Types.ObjectId} id - The household's _id value.
+ * @param {String} id - The household's _id value.
  */
 module.exports.readHousehold = async (id) => {
     let household = await HouseholdModel.findById(id).exec();
@@ -64,7 +62,7 @@ module.exports.readHousehold = async (id) => {
 
     household = {
         ...household._doc,
-        members: await getHouseholdMembers(id)
+        members: await getHouseholdMembers(household._id)
     };
 
     return household;
@@ -72,8 +70,8 @@ module.exports.readHousehold = async (id) => {
 
 /**
  * Retrieves the members belonging to a household.
- * @param {mongoose.Types.ObjectId} householdId - The household's _id value.
- * @param {mongoose.Types.ObjectId} userId - The id of the user making the request.
+ * @param {String} householdId - The household's _id value.
+ * @param {String} userId - The id of the user making the request.
  */
 module.exports.getMembersFromHousehold = async (householdId, userId) => {
     const household = await HouseholdModel.findOne({ _id: householdId, _memberIds: userId }).exec();
@@ -82,7 +80,7 @@ module.exports.getMembersFromHousehold = async (householdId, userId) => {
         throw new Error(`No household has the id ${ householdId } with a member with the id ${ userId }`);
     }
 
-    let members = await getHouseholdMembers(householdId);
+    let members = await getHouseholdMembers(household._id);
 
     return members;
 };
@@ -90,9 +88,9 @@ module.exports.getMembersFromHousehold = async (householdId, userId) => {
 /**
  * Updates a household document by id given update parameters.
  * Pass null to fields not being update.
- * @param {mongoose.Types.ObjectId} id - The household's id.
- * @param {mongoose.Types.ObjectId} [ownerId] - The household's new ownerId.
- * @param {Array<mongoose.Types.ObjectId>} [memberIds] - The household's new array of memberIds.
+ * @param {String} id - The household's id.
+ * @param {String} [ownerId] - The household's new ownerId.
+ * @param {Array<String>} [memberIds] - The household's new array of memberIds.
  * @param {String} [name] - The household's new name.
  */
 module.exports.updateHousehold = async (id, ownerId = null, memberIds = null, name = null) => {
@@ -112,7 +110,7 @@ module.exports.updateHousehold = async (id, ownerId = null, memberIds = null, na
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(id)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -120,7 +118,7 @@ module.exports.updateHousehold = async (id, ownerId = null, memberIds = null, na
 
 /**
  * Deletes a household document by id.
- * @param {mongoose.Types.ObjectId} id - The household's id.
+ * @param {String} id - The household's id.
  */
 module.exports.deleteHousehold = async (id) => {
     await UserModel.updateMany({ _householdIds: id }, { $pull: { _householdIds: id } }).exec();
@@ -136,8 +134,8 @@ module.exports.deleteHousehold = async (id) => {
 
 /**
  * Creates a new event document.
- * @param {mongoose.Types.ObjectId} householdId - The _id of the household document this event belongs to.
- * @param {mongoose.Types.ObjectId} creatorId - The _id of the user creating the event.
+ * @param {String} householdId - The _id of the household document this event belongs to.
+ * @param {String} creatorId - The _id of the user creating the event.
  * @param {String} title - The title of the event.
  * @param {Date} [time] - The datetime of the event.
  * @param {String} [description] - The event's description.
@@ -175,7 +173,7 @@ module.exports.createEvent = async (householdId, creatorId, title, time = Date.n
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -183,8 +181,8 @@ module.exports.createEvent = async (householdId, creatorId, title, time = Date.n
 
 /**
  * Retrieves an event document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this event belongs to.
- * @param {mongoose.Types.ObjectId} eventId - The event's _id.
+ * @param {String} householdId - The id of the household this event belongs to.
+ * @param {String} eventId - The event's _id.
  */
 module.exports.readEvent = async (householdId, eventId) => {
     const household = await HouseholdModel.findOne({ _id: householdId, 'events._id': eventId }).exec();
@@ -204,8 +202,8 @@ module.exports.readEvent = async (householdId, eventId) => {
 
 /**
  * Updates an event document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the househld this event belongs to.
- * @param {mongoose.Types.ObjectId} eventId - The event's _id.
+ * @param {String} householdId - The id of the househld this event belongs to.
+ * @param {String} eventId - The event's _id.
  * @param {String} [title] - The event's new title.
  * @param {Date} [time] - The event's new datetime.
  * @param {String} [description] - The event's new description.
@@ -235,7 +233,7 @@ module.exports.updateEvent = async (householdId, eventId, title = null, time = n
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -243,8 +241,8 @@ module.exports.updateEvent = async (householdId, eventId, title = null, time = n
 
 /**
  * Deletes an event document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this event belongs to.
- * @param {mongoose.Types.ObjectId} eventId - The event's _id.
+ * @param {String} householdId - The id of the household this event belongs to.
+ * @param {String} eventId - The event's _id.
  */
 module.exports.deleteEvent = async (householdId, eventId) => {
     let updatedHousehold = await HouseholdModel.findOneAndUpdate(
@@ -259,7 +257,7 @@ module.exports.deleteEvent = async (householdId, eventId) => {
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -269,10 +267,10 @@ module.exports.deleteEvent = async (householdId, eventId) => {
 
 /**
  * Creates a new task document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this task will belong to.
- * @param {mongoose.Types.ObjectId} creatorId - The id of the user creating this task.
+ * @param {String} householdId - The id of the household this task will belong to.
+ * @param {String} creatorId - The id of the user creating this task.
  * @param {String} title - The title of this task.
- * @param {Array<mongoose.Types.ObjectId} [assignedUserIds] - The users assigned to this task. Null will default to all users in the household.
+ * @param {Array<String} [assignedUserIds] - The users assigned to this task. Null will default to all users in the household.
  * @param {String} [description] - The description of this task.
  * @param {Date} [completeBy] - The datetime by which this task should be completed by.
  */
@@ -317,7 +315,7 @@ module.exports.createTask = async (householdId, creatorId, title, assignedUserId
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -325,8 +323,8 @@ module.exports.createTask = async (householdId, creatorId, title, assignedUserId
 
 /**
  * Retrieves a task document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this task belongs to.
- * @param {mongoose.Types.ObjectId} taskId - The note's id.
+ * @param {String} householdId - The id of the household this task belongs to.
+ * @param {String} taskId - The note's id.
  */
 module.exports.readTask = async (householdId, taskId) => {
     const household = await HouseholdModel.findOne({ _id: householdId, 'tasks._id': taskId }).exec();
@@ -346,9 +344,9 @@ module.exports.readTask = async (householdId, taskId) => {
 
 /**
  * Updates a task document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this task belongs to.
- * @param {mongoose.Types.ObjectId} taskId - The task's id.
- * @param {Array<mongoose.Types.ObjectId>} [assignedUserIds] - The task's new assigned users.
+ * @param {String} householdId - The id of the household this task belongs to.
+ * @param {String} taskId - The task's id.
+ * @param {Array<String>} [assignedUserIds] - The task's new assigned users.
  * @param {String} [title] - The task's new title.
  * @param {String} [description] - The task's new description.
  * @param {Date} [completeBy] - The task's new completion deadline.
@@ -387,7 +385,7 @@ module.exports.updateTask = async (householdId, taskId, assignedUserIds = null, 
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -395,8 +393,8 @@ module.exports.updateTask = async (householdId, taskId, assignedUserIds = null, 
 
 /**
  * Deletes a task document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this task belongs to.
- * @param {mongoose.Types.ObjectId} taskId - The task's id.
+ * @param {String} householdId - The id of the household this task belongs to.
+ * @param {String} taskId - The task's id.
  */
 module.exports.deleteTask = async (householdId, taskId) => {
     let updatedHousehold = await HouseholdModel.findOneAndUpdate(
@@ -411,7 +409,7 @@ module.exports.deleteTask = async (householdId, taskId) => {
     
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -421,8 +419,8 @@ module.exports.deleteTask = async (householdId, taskId) => {
 
 /**
  * Creates a new note document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this note will belong to.
- * @param {mongoose.Types.ObjectId} creatorId - The id of the user creating this note.
+ * @param {String} householdId - The id of the household this note will belong to.
+ * @param {String} creatorId - The id of the user creating this note.
  * @param {String} title - The note's title.
  * @param {String} [body] - The note's body.
  */
@@ -442,10 +440,11 @@ module.exports.createNote = async (householdId, creatorId, title, body = null) =
     ).exec();
 
     if(!updatedHousehold) throw new Error(`No household was found that matched the query criteria.`);
+ 
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -453,8 +452,8 @@ module.exports.createNote = async (householdId, creatorId, title, body = null) =
 
 /**
  * Retrieves a note document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
- * @param {mongoose.Types.ObjectId} noteId - The note's id.
+ * @param {String} householdId - The id of the household this note belongs to.
+ * @param {String} noteId - The note's id.
  */
 module.exports.readNote = async (householdId, noteId) => {
     const household = await HouseholdModel.findOne({ _id: householdId, 'notes._id': noteId }).exec();
@@ -474,8 +473,8 @@ module.exports.readNote = async (householdId, noteId) => {
 
 /**
  * Updates a note document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
- * @param {mongoose.Types.ObjectId} noteId - The note's _id.
+ * @param {String} householdId - The id of the household this note belongs to.
+ * @param {String} noteId - The note's _id.
  * @param {String} [title] - The note's new title.
  * @param {String} [body] - The note's new body.
  */
@@ -502,7 +501,7 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -510,9 +509,9 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
 
 /**
  * Deletes a note document.
- * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
- * @param {mongoose.Types.ObjectId} userId - The id of the user requesting this note deletion.
- * @param {mongoose.Types.ObjectId} noteId - The note's id.
+ * @param {String} householdId - The id of the household this note belongs to.
+ * @param {String} userId - The id of the user requesting this note deletion.
+ * @param {String} noteId - The note's id.
  */
 module.exports.deleteNote = async (householdId, userId, noteId) => {
     let updatedHousehold = await HouseholdModel.findOneAndUpdate(
@@ -527,7 +526,7 @@ module.exports.deleteNote = async (householdId, userId, noteId) => {
 
     updatedHousehold = {
         ...updatedHousehold._doc,
-        members: await getHouseholdMembers(householdId)
+        members: await getHouseholdMembers(updatedHousehold._id)
     };
 
     return updatedHousehold;
@@ -537,10 +536,12 @@ module.exports.deleteNote = async (householdId, userId, noteId) => {
 
 /**
  * Gets the member user documents of a household with personal data removed.
- * @param {mongoose.Types.ObjectId} householdId
+ * @param {String} householdId
  */
 const getHouseholdMembers = async householdId => {
-    return await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+    const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+
+    return members;
 };
 
 const getHouseholdMembersLean = async householdId => {
