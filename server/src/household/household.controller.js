@@ -58,9 +58,14 @@ module.exports.createHousehold = async (ownerId, memberIds, name) => {
  * @param {mongoose.Types.ObjectId} id - The household's _id value.
  */
 module.exports.readHousehold = async (id) => {
-    const household = await HouseholdModel.findById(id).exec();
+    let household = await HouseholdModel.findById(id).exec();
 
     if(!household) throw new Error(`Household with id ${ id } does not exist`);
+
+    household = {
+        ...household._doc,
+        members: await getHouseholdMembers(id)
+    };
 
     return household;
 };
@@ -101,11 +106,16 @@ module.exports.updateHousehold = async (id, ownerId = null, memberIds = null, na
     if(memberIds) update._memberIds = memberIds;
     if(name) update.name = name;
 
-    const household = await HouseholdModel.findByIdAndUpdate(id, update, { new: true }).exec();
+    let updatedHousehold = await HouseholdModel.findByIdAndUpdate(id, update, { new: true }).exec();
 
-    if(!household) throw new Error(`Household with id ${ id } does not exist`);
+    if(!updatedHousehold) throw new Error(`Household with id ${ id } does not exist`);
 
-    return household;
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(id)
+    };
+
+    return updatedHousehold;
 };
 
 /**
@@ -159,9 +169,16 @@ module.exports.createEvent = async (householdId, creatorId, title, time = Date.n
     if(description) event.description = description;
     if(location) event.location = location;
 
-    event = await household.events.create(event);
+    let updatedHousehold = await HouseholdModel.findByIdAndUpdate(householdId, {
+        $push: { events: event }
+    }, { new: true }).exec();
 
-    return event;
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
+    };
+
+    return updatedHousehold;
 };
 
 /**
@@ -206,23 +223,22 @@ module.exports.updateEvent = async (householdId, eventId, title = null, time = n
     if(description) update['events.$.description'] = description;
     if(location) update['events.$.location'] = location;
     
-    const household = await HouseholdModel.findOneAndUpdate(
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'events._id': eventId },
         update,
         { new: true }
     ).exec();
 
-    if(!household) {
+    if(!updatedHousehold) {
         throw new Error(`The household ${ householdId } does not have an event with the id ${ eventId }`);
     }
 
-    const event = household.events.id(eventId);
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
+    };
 
-    if(!event) { 
-        throw new Error(`Error retrieving event ${ eventId } from household ${ householdId }`);
-    }
-
-    return event;
+    return updatedHousehold;
 };
 
 /**
@@ -231,23 +247,22 @@ module.exports.updateEvent = async (householdId, eventId, title = null, time = n
  * @param {mongoose.Types.ObjectId} eventId - The event's _id.
  */
 module.exports.deleteEvent = async (householdId, eventId) => {
-    const household = await HouseholdModel.findOneAndUpdate(
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'events._id': eventId },
         { $pull: { events: { _id: eventId } } },
-        { new: false }
+        { new: true }
     ).exec();
 
-    if(!household) {
+    if(!updatedHousehold) {
         throw new Error(`The household ${ householdId} does not have an event with the id ${ eventId }`);
     }
 
-    const event = household.events.id(eventId);
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
+    };
 
-    if(!event) {
-        throw new Error(`Error retrieving event ${ eventId } from household ${ householdId }`);
-    }
-
-    return event;
+    return updatedHousehold;
 };
 
 // --- Task Controller Logic
@@ -296,9 +311,16 @@ module.exports.createTask = async (householdId, creatorId, title, assignedUserId
     if(description) task.description = description;
     if(completeBy) task.completeBy = completeBy;
 
-    task = await household.tasks.create(task);
+    let updatedHousehold = await HouseholdModel.findByIdAndUpdate(householdId, {
+        $push: { tasks: task }
+    }, { new: true }).exec();
 
-    return task;
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
+    };
+
+    return updatedHousehold;
 };
 
 /**
@@ -338,10 +360,9 @@ module.exports.updateTask = async (householdId, taskId, assignedUserIds = null, 
     }
 
     let update = {};
-    let household;
 
     if(assignedUserIds) {
-        household = await HouseholdModel.findOne({ _id: householdId, 'tasks._id': taskId }).exec();
+        let household = await HouseholdModel.findOne({ _id: householdId, 'tasks._id': taskId }).exec();
 
         if(household._memberIds.some(member => assignedUserIds.indexOf(member) == -1)) {
             throw new Error(`At least one assigned user does not belong to household ${ householdId }`);
@@ -354,23 +375,22 @@ module.exports.updateTask = async (householdId, taskId, assignedUserIds = null, 
     if(completeBy) update['tasks.$.completeBy'] = completeBy;
     if(completed) update['tasks.$.completed'] = completed;
 
-    household = await HouseholdModel.findOneAndUpdate(
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'tasks._id': taskId },
         update,
         { new: true }
     ).exec();
 
-    if(!household) {
+    if(!updatedHousehold) {
         throw new Error(`The household ${ householdId } does not have a task with the id ${ taskId }`);
     }
 
-    const task = household.tasks.id(taskId);
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
+    };
 
-    if(!task) {
-        throw new Error(`Error retrieving task ${ taskId } from household ${ householdId }`);
-    }
-
-    return task;
+    return updatedHousehold;
 };
 
 /**
@@ -379,23 +399,22 @@ module.exports.updateTask = async (householdId, taskId, assignedUserIds = null, 
  * @param {mongoose.Types.ObjectId} taskId - The task's id.
  */
 module.exports.deleteTask = async (householdId, taskId) => {
-    const household = await HouseholdModel.findOneAndUpdate(
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'tasks._id': taskId },
         { $pull: { tasks: { _id: taskId } } },
-        { new: false }
+        { new: true }
     ).exec();
 
-    if(!household) {
+    if(!updatedHousehold) {
         throw new Error(`The household ${ householdId } does not have a task with the id ${ taskId }`);
     }
+    
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
+    };
 
-    const task = household.tasks.id(taskId);
-
-    if(!task) {
-        throw new Error(`Error retrieving task ${ taskId } from household ${ householdId }`);
-    }
-
-    return task;
+    return updatedHousehold;
 };
 
 // --- Note Controller Logic
@@ -416,22 +435,20 @@ module.exports.createNote = async (householdId, creatorId, title, body = null) =
 
     if(body) note.body = body;
 
-    let household = await HouseholdModel.findOneAndUpdate(
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
         { _id: householdId },
         { $push: { notes: note } },
         { new: true }
     ).exec();
 
-    if(!household) throw new Error(`No household was found that matched the query criteria.`);
+    if(!updatedHousehold) throw new Error(`No household was found that matched the query criteria.`);
 
-    let members = await getHouseholdMembers(household._id);
-
-    household = {
-        ...household._doc,
-        members: members
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
     };
 
-    return household;
+    return updatedHousehold;
 };
 
 /**
@@ -473,47 +490,47 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
     if(body) update['notes.$.body'] = body;
     update['notes.$.updatedAt'] = Date.now();
 
-    const household = await HouseholdModel.findOneAndUpdate(
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
         { _id: householdId, 'notes._id': noteId },
         update,
         { new: true }
     ).exec();
 
-    if(!household) {
+    if(!updatedHousehold) {
         throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
     }
 
-    return household;
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
+    };
+
+    return updatedHousehold;
 };
 
 /**
- * Deletes an event document.
+ * Deletes a note document.
  * @param {mongoose.Types.ObjectId} householdId - The id of the household this note belongs to.
  * @param {mongoose.Types.ObjectId} userId - The id of the user requesting this note deletion.
  * @param {mongoose.Types.ObjectId} noteId - The note's id.
  */
 module.exports.deleteNote = async (householdId, userId, noteId) => {
-    console.log(`Parameters: \n\tHouseholdId: ${ householdId }\n\tUserId: ${ userId }\n\tNoteId: ${ noteId }`);
-
-    let household = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId, _memberIds: String(userId), 'notes._id': noteId },
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId, _memberIds: userId, 'notes._id': noteId },
         { $pull: { notes: { _id: noteId, _creatorId: userId } } },
         { new: true }
     ).exec();
 
-    if(!household) {
+    if(!updatedHousehold) {
         throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
     }
 
-    let members = await getHouseholdMembers(household._id);
-    household = {
-        ...household._doc,
-        members: members
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(householdId)
     };
 
-    console.log(household);
-
-    return household;
+    return updatedHousehold;
 };
 
 // HELPER METHODS

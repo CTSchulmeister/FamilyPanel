@@ -218,7 +218,7 @@ router.post('/:household/event', jsonParser, [
             const time = (req.body.time) ? req.body.time : null;
             const location = (req.body.location) ? req.body.location : null;
 
-            const event = await HouseholdController.createEvent(
+            const household = await HouseholdController.createEvent(
                 req.params.household,
                 req.body.creatorId,
                 req.body.title,
@@ -229,7 +229,7 @@ router.post('/:household/event', jsonParser, [
 
             res.status(200).json({
                 success: true,
-                event: event
+                household: household
             });
         } catch (err) {
             console.error(`Error creating event on household ${ req.params.household }: ${ err }`);
@@ -297,7 +297,7 @@ router.put('/:household/event/:event', jsonParser, [
             const description = (req.body.description) ? req.body.description : null;
             const location = (req.body.location) ? req.body.location : null;
 
-            const event = await HouseholdController.updateEvent(
+            const household = await HouseholdController.updateEvent(
                 req.params.household,
                 req.params.event,
                 title,
@@ -308,7 +308,7 @@ router.put('/:household/event/:event', jsonParser, [
 
             res.status(200).json({
                 success: true,
-                event: event
+                household: household
             });
         } catch (err) {
             console.error(`Error updating event ${ req.params.event } from household ${ req.params.household }: ${ err }`);
@@ -323,11 +323,11 @@ router.put('/:household/event/:event', jsonParser, [
 // DELETE
 router.delete('/:household/event/:event', async (req, res) => {
     try {
-        const event = await HouseholdController.deleteEvent(req.params.household, req.params.event);
+        const household = await HouseholdController.deleteEvent(req.params.household, req.params.event);
 
         res.status(200).json({
             success: true,
-            event: event
+            household: household
         });
     } catch (err) {
         console.error(`Error deleting event ${ req.params.event } from household ${ req.params.household }: ${ err }`);
@@ -373,7 +373,7 @@ router.post('/:household/task', jsonParser, [
             const description = (req.body.description) ? req.body.description : null;
             const completeBy = (req.body.completeBy) ? req.body.completeBy : null;
             
-            const task = await HouseholdController.createTask(
+            const household = await HouseholdController.createTask(
                 req.params.household,
                 req.body.creatorId,
                 req.body.title,
@@ -384,7 +384,7 @@ router.post('/:household/task', jsonParser, [
 
             res.status(200).json({
                 success: true,
-                task: task
+                household: household
             });
         } catch (err) {
             console.error(`Error creating task on household ${ req.params.household }: ${ err }`);
@@ -454,7 +454,7 @@ router.put('/:household/task/:task', jsonParser, [
             const completeBy = (req.body.completeBy) ? req.body.completeBy : null;
             const completed = (req.body.completed) ? req.body.completed : null;
 
-            const task = await HouseholdController.updateTask(
+            const household = await HouseholdController.updateTask(
                 req.params.household,
                 req.params.task,
                 assignedUserIds,
@@ -466,7 +466,7 @@ router.put('/:household/task/:task', jsonParser, [
 
             res.status(200).json({
                 success: true,
-                task: task
+                household: household
             });
         } catch (err) {
             console.error(`Error updating task ${ req.params.task } from household ${ req.params.household }: ${ err }`);
@@ -481,11 +481,11 @@ router.put('/:household/task/:task', jsonParser, [
 // DELETE
 router.delete('/:household/task/:task', async (req, res) => {
     try {
-        const task = await HouseholdController.deleteTask(req.params.household, req.params.task);
+        const household = await HouseholdController.deleteTask(req.params.household, req.params.task);
 
         res.status(200).json({
             success: true,
-            task: task
+            household: household
         });
     } catch (err) {
         console.error(`Error updating task ${ req.params.task } from household ${ req.params.household }: ${ err }`);

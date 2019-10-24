@@ -3,6 +3,14 @@
 // --- Modules
 const mongoose = require('mongoose');
 const { generateSalt, generateHash } = require('../../src/util');
+const { 
+    randomStringGenerator, 
+    userFactory, 
+    householdFactory, 
+    householdWithEventsFactory,
+    householdWithTasksFactory,
+    householdWithNotesFactory
+} = require('../testUtilties');
 
 const HouseholdController = require('../../src/household/household.controller');
 const HouseholdModel = require('../../src/household/household.model');
@@ -11,24 +19,33 @@ const UserModel = require('../../src/user/user.model');
 process.env.TEST_SUITE = 'familypanel-household-controller-test';
 process.env.JWT_KEY = 'testkey';
 
+// Utilities and Mock Factories
+
 describe('Household Controller', () => {
     describe('Household', () => {
         describe('createHousehold()', () => {
             test('Can create a household', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
+                const user = await userFactory();
+                const { newHousehold } = await HouseholdController.createHousehold(user._id, [user._id], 'Our Apartment');
+                expect(newHousehold.name).toStrictEqual('Our Apartment');
+            });
 
-                const user = await new UserModel({
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'jdoe@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
+            test('Adds the new household to the user\'s _householdIds', async () => {
+                const user = await userFactory();
+                const { newHousehold, updatedUser } = await HouseholdController.createHousehold(user._id, [user._id], randomStringGenerator(15));
+                expect(updatedUser._householdIds[0]).toStrictEqual(newHousehold._id);
+            });
 
-                const { newHousehold } = await HouseholdController.createHousehold(user._id, [user._id,], 'Our Apartment');
+            test('Returns the new household in the user\'s list of households', async () => {
+                const user = await userFactory();
+                const { newHousehold, households } = await HouseholdController.createHousehold(user._id, [user._id], randomStringGenerator(15));
+                expect(households[0]._id).toStrictEqual(newHousehold._id);
+            });
 
-                expect(newHousehold.name).toBe('Our Apartment');
+            test('Returns the household with members', async () => {
+                const user = await userFactory();
+                const { newHousehold } = await HouseholdController.createHousehold(user._id, [user._id], 'Our Apartment');
+                expect(newHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if creating a household with missing data', async () => {
@@ -60,19 +77,8 @@ describe('Household Controller', () => {
                 let error = null;
 
                 try {
-                    const salt = generateSalt();
-                    const hashedPassword = generateHash('testpassword', salt);
-
-                    const owner = await new UserModel({
-                        firstName: 'John',
-                        lastName: 'Doe',
-                        email: 'jdoe@test.com',
-                        password: hashedPassword,
-                        salt: salt
-                    }).save();
-
+                    const owner = await userFactory();
                     const mockMemberId = new mongoose.Types.ObjectId();
-
                     await HouseholdController.createHousehold(owner._id, [owner._id, mockMemberId], 'Our Apartment');
                 } catch (err) {
                     error = err;
@@ -84,17 +90,18 @@ describe('Household Controller', () => {
 
         describe('readHousehold()', () => {
             test('Can retrieve a household', async () => {
-                const userId = new mongoose.Types.ObjectId();
+                const household = await householdFactory();
+                const retrievedHousehold = await HouseholdController.readHousehold(household._id);
+                expect(retrievedHousehold.name).toStrictEqual(household.name);
+            });
 
-                let household = await new HouseholdModel({
-                    _ownerId: userId,
-                    _memberIds: [userId, ],
-                    name: 'Our Apartment'
-                }).save();
+            test('Returns the household with members', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
 
-                household = await HouseholdController.readHousehold(household._id);
+                const retrievedHousehold = await HouseholdController.readHousehold(household._id);
 
-                expect(household.name).toBe('Our Apartment');
+                expect(retrievedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if retrieving a non-existant user', async () => {
@@ -124,17 +131,18 @@ describe('Household Controller', () => {
 
         describe('updateHousehold()', () => {
             test('Can update a household', async () => {
-                const userId = new mongoose.Types.ObjectId();
+                const household = await householdFactory();
+                const updatedHousehold = await HouseholdController.updateHousehold(household._id, null, null, 'Our Condo');
+                expect(updatedHousehold.name).toStrictEqual('Our Condo');
+            });
 
-                let household = await new HouseholdModel({
-                    _ownerId: userId,
-                    _memberIds: [userId, ],
-                    name: 'Our Apartment'
-                }).save();
+            test('Returns the household with members', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
 
-                household = await HouseholdController.updateHousehold(household._id, null, null, 'Our Condo');
+                const updatedHousehold = await HouseholdController.updateHousehold(household._id, null, null, 'Our Condo');
 
-                expect(household.name).toBe('Our Condo');
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if the household does not exist', async () => {
@@ -156,17 +164,16 @@ describe('Household Controller', () => {
 
         describe('deleteHousehold()', () => {
             test('Can delete a household', async () => {
-                const userId = new mongoose.Types.ObjectId();
+                const household = await householdFactory();
+                await HouseholdController.deleteHousehold(household._id);
+                const queryResult = await HouseholdModel.findById(household._id).exec();
+                expect(queryResult).toBeNull();
+            });
 
-                let household = await new HouseholdModel({
-                    _ownerId: userId,
-                    _memberIds: [userId, ],
-                    name: 'Our Apartment'
-                }).save();
-
-                household = await HouseholdController.deleteHousehold(household._id);
-
-                expect(household.name).toBe('Our Apartment');
+            test('Returns the deleted household', async () => {
+                const household = await householdFactory();
+                const deletedHousehold = await HouseholdController.deleteHousehold(household._id);
+                expect(deletedHousehold.name).toStrictEqual(household.name);
             });
 
             test('Throws an error if the household does not exist', async () => {
@@ -194,66 +201,26 @@ describe('Household Controller', () => {
             });
 
             test('Removes household id from the owner\'s _householdIds', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-
-                let user = await new UserModel({
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'jdoe@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment'
-                }).save();
-
-                await UserModel.findByIdAndUpdate(user._id, { $push: { _householdIds: household._id } }).exec();
+                const user = await userFactory();
+                const household = await householdFactory(user);
 
                 await HouseholdController.deleteHousehold(household._id);
 
-                user = await UserModel.findById(user._id).exec();
-
-                expect(user._householdIds.length).toBe(0);
+                const updatedUser = await UserModel.findById(user._id).exec();
+                
+                expect(updatedUser._householdIds.length).toStrictEqual(0);
             });
 
             test('Removes household id from a member\'s _householdIds', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-
-                let member = await new UserModel({
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'jdoe@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-
-                const owner = await new UserModel({
-                    firstName: 'Jane',
-                    lastName: 'Doe',
-                    email: 'jdoe1@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-
-                const household = await new HouseholdModel({
-                    _ownerId: owner._id,
-                    _memberIds: [owner._id, member._id],
-                    name: 'Our Apartment'
-                }).save(); 
-
-                await UserModel.findByIdAndUpdate(member._id, { $push: { _householdIds: household._id } });
-                await UserModel.findByIdAndUpdate(owner._id, { $push: { _householdIds: household._id } });
-
+                const member = await userFactory();
+                const owner = await userFactory();
+                const household = await householdFactory(owner, member);
+                
                 await HouseholdController.deleteHousehold(household._id);
 
-                member = await UserModel.findById(member._id).exec();
+                const updatedMember = await UserModel.findById(member._id).exec();
 
-                expect(member._householdIds.length).toBe(0);
+                expect(updatedMember._householdIds.length).toStrictEqual(0);
             });
         });
     });
@@ -261,32 +228,42 @@ describe('Household Controller', () => {
     describe('Events', () => {
         describe('createEvent()', () => {
             test('Can create an event', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
+                const user = await userFactory();
+                const household = await householdFactory(user);
 
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment'
-                }).save();
-
-                await UserModel.findByIdAndUpdate(user._id, { $push: { _householdIds: household._id } }).exec();
-
-                const event = await HouseholdController.createEvent(
+                const householdWithEvent = await HouseholdController.createEvent(
                     household._id,
                     user._id,
-                    'My Event'
+                    randomStringGenerator()
                 );
 
-                expect(event.title).toBe('My Event');
+                expect(householdWithEvent.events.length).toStrictEqual(1);
+            });
+
+            test('Returns the updated household', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                const householdWithEvent = await HouseholdController.createEvent(
+                    household._id,
+                    user._id,
+                    randomStringGenerator()
+                );
+
+                expect(householdWithEvent.name).toStrictEqual(household.name);
+            });
+
+            test('Returns the updated household with members', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                const householdWithEvent = await HouseholdController.createEvent(
+                    household._id,
+                    user._id,
+                    randomStringGenerator()
+                );
+
+                expect(householdWithEvent.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if the user does not exist', async () => {
@@ -317,14 +294,10 @@ describe('Household Controller', () => {
                 let error = null;
 
                 try {
-                    const user = await new UserModel({
-                        firstName: 'Adam',
-                        lastName: 'Smith',
-                        email: 'asmith@test.com',
-                        password: hashedPassword,
-                        salt: salt,
-                        _householdIds: [mockHouseholdId, ]
-                    }).save();
+                    const user = await userFactory();
+                    await UserModel.findByIdAndUpdate(user._id, {
+                        $push: { _householdIds: mockHouseholdId }
+                    }).exec();
 
                     await HouseholdController.createEvent(
                         mockHouseholdId,
@@ -341,31 +314,12 @@ describe('Household Controller', () => {
 
         describe('readEvent()', () => {
             test('Can retrieve an event document', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-    
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-    
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    events: [{
-                        _creatorId: user._id,
-                        title: 'My Event',
-                        time: Date.now()
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithEventsFactory(user);
     
                 const event = await HouseholdController.readEvent(household._id, household.events[0]._id);
     
-                expect(event.title).toBe('My Event');
+                expect(event.title).toStrictEqual(household.events[0].title);
             });
 
             test('Throws an error if the event does not exist', async () => {
@@ -391,65 +345,36 @@ describe('Household Controller', () => {
 
         describe('updateEvent()', () => {
             test('Can update an event', async () => {
-                const mockUserId = new mongoose.Types.ObjectId();
-                let household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    events: [{
-                        _creatorId: mockUserId,
-                        title: 'My Event',
-                        time: Date.now()
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithEventsFactory(user);
 
-                await HouseholdController.updateEvent(
+                const updatedHousehold = await HouseholdController.updateEvent(
                     household._id,
                     household.events[0]._id,
                     'Bar Crawl',
                 );
 
-                household = await HouseholdModel.findById(household._id).exec();
-
-                expect(household.events[0].title).toBe('Bar Crawl');
+                expect(updatedHousehold.events[0].title).toStrictEqual('Bar Crawl');
             });
 
-            test('Returns the updated event', async () => {
-                const mockUserId = new mongoose.Types.ObjectId();
-                const household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    events: [{
-                        _creatorId: mockUserId,
-                        title: 'My Event',
-                        time: Date.now()
-                    }]
-                }).save();
+            test('Returns the updated household with members', async () => {
+                const user = await userFactory();
+                const household = await householdWithEventsFactory(user);
 
-                const event = await HouseholdController.updateEvent(
+                const updatedHousehold = await HouseholdController.updateEvent(
                     household._id,
                     household.events[0]._id,
                     'Bar Crawl',
                 );
 
-                expect(event.title).toBe('Bar Crawl');
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if no update data is passed', async () => {
                 let error = null;
 
-                const mockUserId = new mongoose.Types.ObjectId();
-                const household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    events: [{
-                        _creatorId: mockUserId,
-                        title: 'My Event',
-                        time: Date.now()
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithEventsFactory(user);
 
                 try {
                     await HouseholdController.updateEvent(household._id, household.events[0]._id);
@@ -463,61 +388,21 @@ describe('Household Controller', () => {
 
         describe('deleteEvent()', () => {
             test('Can delete an event', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
+                const user = await userFactory();
+                const household = await householdWithEventsFactory(user);
 
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
+                const updatedHousehold = await HouseholdController.deleteEvent(household._id, household.events[0]._id);
 
-                let household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    events: [{
-                        _creatorId: user._id,
-                        title: 'My Event',
-                        time: Date.now()
-                    }]
-                }).save();
-
-                await HouseholdController.deleteEvent(household._id, household.events[0]._id);
-
-                household = await HouseholdModel.findById(household._id);
-
-                expect(household.events.length).toBe(0);
+                expect(updatedHousehold.events.length).toStrictEqual(0);
             });
 
-            test('Returns the correct event', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
+            test('Returns the updated household with members', async () => {
+                const user = await userFactory();
+                const household = await householdWithEventsFactory(user);
 
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
+                const updatedHousehold = await HouseholdController.deleteEvent(household._id, household.events[0]._id);
 
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    events: [{
-                        _creatorId: user._id,
-                        title: 'My Event',
-                        time: Date.now()
-                    }]
-                }).save();
-
-                const event = await HouseholdController.deleteEvent(household._id, household.events[0]._id);
-
-                expect(event.title).toBe('My Event');
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if the event does not exist', async () => {
@@ -545,63 +430,43 @@ describe('Household Controller', () => {
     describe('Tasks', () => {
         describe('createTask()', () => {
             test('Can create a task', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
+                const user = await userFactory();
+                const household = await householdFactory(user);
 
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment'
-                }).save();
-
-                await UserModel.findByIdAndUpdate(user._id, { $push: { _householdIds: household._id } }).exec();
-
-                const task = await HouseholdController.createTask(
+                const updatedHousehold = await HouseholdController.createTask(
                     household._id,
                     user._id,
                     'My Task'
                 );
 
-                expect(task.title).toBe('My Task');
+                expect(updatedHousehold.tasks.length).toStrictEqual(1);
             });
 
             test('Assigns all household members to a task if no specific assigned users are passed', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-    
-                const creator = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
+                const creator = await userFactory();
+                const member = await userFactory();
+                const household = await householdFactory(creator, member);
 
-                const mockMemberId = new mongoose.Types.ObjectId();
-
-                const household = await new HouseholdModel({
-                    _ownerId: creator._id,
-                    _memberIds: [creator._id, mockMemberId, ],
-                    name: 'Our Apartment'
-                }).save();
-
-                await UserModel.findByIdAndUpdate(creator._id, { $push: { _householdIds: household._id } }).exec();
-
-                const task = await HouseholdController.createTask(
+                const updatedHousehold = await HouseholdController.createTask(
                     household._id, 
                     creator._id, 
                     'My Task'
                 );
 
-                expect(task._assignedUserIds.length).toBe(2);
+                expect(updatedHousehold.tasks[0]._assignedUserIds.length).toStrictEqual(2);
+            });
+
+            test('Returns the household with members', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                const updatedHousehold = await HouseholdController.createTask(
+                    household._id,
+                    user._id,
+                    'My Task'
+                );
+
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if the creator does not exist', async () => {
@@ -656,31 +521,12 @@ describe('Household Controller', () => {
 
         describe('readTask()', () => {
             test('Can retrieve a task document', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-    
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-    
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    tasks: [{
-                        _creatorId: user._id,
-                        _assignedUserIds: [user._id, ],
-                        title: 'My Task'
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithTasksFactory(user);
     
                 const task = await HouseholdController.readTask(household._id, household.tasks[0]._id);
     
-                expect(task.title).toBe('My Task'); 
+                expect(task.title).toStrictEqual(household.tasks[0].title);
             });
 
             test('Throws an error if the task does not exist', async () => {
@@ -706,67 +552,38 @@ describe('Household Controller', () => {
 
         describe('updateTask()', () => {
             test('Can update a task', async () => {
-                const mockUserId = new mongoose.Types.ObjectId();
-                let household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    tasks: [{
-                        _creatorId: mockUserId,
-                        _assignedUserIds: [mockUserId, ],
-                        title: 'My Task'
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithTasksFactory(user);
 
-                await HouseholdController.updateTask(
+                const updatedHousehold = await HouseholdController.updateTask(
                     household._id,
                     household.tasks[0]._id,
                     null,
                     'Do the Dishes!',
                 );
 
-                household = await HouseholdModel.findById(household._id).exec();
-
-                expect(household.tasks[0].title).toBe('Do the Dishes!');
+                expect(updatedHousehold.tasks[0].title).toStrictEqual('Do the Dishes!');
             });
 
-            test('Returns the updated task', async () => {
-                const mockUserId = new mongoose.Types.ObjectId();
-                const household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    tasks: [{
-                        _creatorId: mockUserId,
-                        _assignedUserIds: [mockUserId, ],
-                        title: 'My Task'
-                    }]
-                }).save();
+            test('The updated household contains the members of the household', async () => {
+                const user = await userFactory();
+                const household = await householdWithTasksFactory(user);
 
-                const task = await HouseholdController.updateTask(
+                const updatedHousehold = await HouseholdController.updateTask(
                     household._id,
                     household.tasks[0]._id,
                     null,
                     'Do the Dishes!',
                 );
 
-                expect(task.title).toBe('Do the Dishes!');
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if no update data is passed', async () => {
                 let error = null;
 
-                const mockUserId = new mongoose.Types.ObjectId();
-                const household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    tasks: [{
-                        _creatorId: mockUserId,
-                        _assignedUserIds: [mockUserId, ],
-                        title: 'My Task'
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithTasksFactory(user);
 
                 try {
                     await HouseholdController.updateTask(household._id, household.tasks[0]._id);
@@ -778,25 +595,17 @@ describe('Household Controller', () => {
             });
 
             test('Throws an error if an assignedUser does not belong to the household', async () => {
-                const mockCreatorId = new mongoose.Types.ObjectId();
-                const mockMemberId = new mongoose.Types.ObjectId();
-                const household = await new HouseholdModel({
-                    _ownerId: mockCreatorId,
-                    _memberIds: [mockCreatorId, ],
-                    name: 'Our Apartment',
-                    tasks: [{
-                        _creatorId: mockCreatorId,
-                        _assignedUserIds: [mockCreatorId, ],
-                        title: 'My Task'
-                    }]
-                });
+                const member = await userFactory();
+                const nonMember = await userFactory();
+                const household = await householdWithTasksFactory(member);
+
                 let error = null;
 
                 try {
                     await HouseholdController.updateTask(
                         household._id,
                         household.tasks[0]._id,
-                        [mockCreatorId, mockMemberId]
+                        [member._id, nonMember._id]
                     );
                 } catch (err) {
                     error = err;
@@ -808,61 +617,21 @@ describe('Household Controller', () => {
 
         describe('deleteTask()', () => {
             test('Can delete a task', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-    
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-    
-                let household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    tasks: [{
-                        _creatorId: user._id,
-                        _assignedUserIds: [user._id, ],
-                        title: 'My Task'
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithTasksFactory(user);
 
-                await HouseholdController.deleteTask(household._id, household.tasks[0]._id);
+                const updatedHousehold = await HouseholdController.deleteTask(household._id, household.tasks[0]._id);
 
-                household = await HouseholdModel.findById(household._id);
-
-                expect(household.tasks.length).toBe(0);
+                expect(updatedHousehold.tasks.length).toStrictEqual(0);
             });
 
-            test('Returns the correct task', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-    
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-    
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    tasks: [{
-                        _creatorId: user._id,
-                        _assignedUserIds: [user._id, ],
-                        title: 'My Task'
-                    }]
-                }).save();
+            test('The updated household contains the members of the household', async () => {
+                const user = await userFactory();
+                const household = await householdWithTasksFactory(user);
 
-                const task = await HouseholdController.deleteTask(household._id, household.tasks[0]._id);
+                const updatedHousehold = await HouseholdController.deleteTask(household._id, household.tasks[0]._id);
 
-                expect(task.title).toBe('My Task');
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if the task does not exist', async () => {
@@ -890,38 +659,29 @@ describe('Household Controller', () => {
     describe('Notes', () => {
         describe('createNote()', () => {
             test('Can create a note', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
+                const user = await userFactory();
+                const household = await householdFactory(user);
 
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-
-                let household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment'
-                }).save();
-
-                await UserModel.findByIdAndUpdate(user._id, { $push: { _householdIds: household._id } }).exec();
-
-                household = await HouseholdController.createNote(
+                const updatedHousehold = await HouseholdController.createNote(
                     household._id,
                     user._id,
                     'My Note',
                 );
 
-                console.log(household);
+                expect(updatedHousehold.notes.length).toStrictEqual(1);
+            });
 
-                let success = household.notes.some((note) => {
-                    return note.title === 'My Note';
-                });
+            test('Returns the household with members', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
 
-                expect(success).toBe(true);
+                const updatedHousehold = await HouseholdController.createNote(
+                    household._id,
+                    user._id,
+                    'My Note',
+                );
+
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if the household does not exist', async () => {
@@ -953,32 +713,12 @@ describe('Household Controller', () => {
 
         describe('readNote()', () => {
             test('Can retrieve a note document', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
-    
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
-    
-                const household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    notes: [{
-                        _creatorId: user._id,
-                        title: 'My Note',
-                        body: 'This is my note!',
-                        createdAt: Date.now()
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithNotesFactory(user);
     
                 const note = await HouseholdController.readNote(household._id, household.notes[0]._id);
     
-                expect(note.title).toBe('My Note');
+                expect(note.title).toStrictEqual(household.notes[0].title);
             });
 
             test('Throws an error if the note does not exist', async () => {
@@ -1004,45 +744,36 @@ describe('Household Controller', () => {
 
         describe('updateNote()', () => {
             test('Can update a note', async () => {
-                const mockUserId = new mongoose.Types.ObjectId();
-                let household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    notes: [{
-                        _creatorId: mockUserId,
-                        title: 'My Note',
-                        body: 'This is my note!',
-                        createdAt: Date.now()
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithNotesFactory(user);
 
-                await HouseholdController.updateNote(
+                const updatedHousehold = await HouseholdController.updateNote(
                     household._id,
                     household.notes[0]._id,
                     'I Wrote a Note!'
                 );
 
-                household = await HouseholdModel.findById(household._id).exec();
+                expect(updatedHousehold.notes[0].title).toStrictEqual('I Wrote a Note!');
+            });
 
-                expect(household.notes[0].title).toBe('I Wrote a Note!');
+            test('Returns the household with members', async () => {
+                const user = await userFactory();
+                const household = await householdWithNotesFactory(user);
+
+                const updatedHousehold = await HouseholdController.updateNote(
+                    household._id,
+                    household.notes[0]._id,
+                    'I Wrote a Note!'
+                );
+
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if no update data is passed', async () => {
                 let error = null;
 
-                const mockUserId = new mongoose.Types.ObjectId();
-                const household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment',
-                    notes: [{
-                        _creatorId: mockUserId,
-                        title: 'My Note',
-                        body: 'This is my note!',
-                        createdAt: Date.now()
-                    }]
-                }).save();
+                const user = await userFactory();
+                const household = await householdWithNotesFactory(user);
 
                 try {
                     await HouseholdController.updateNote(household._id, household.notes[0]._id);
@@ -1056,34 +787,21 @@ describe('Household Controller', () => {
 
         describe('deleteNote()', () => {
             test('Can delete a note', async () => {
-                const salt = generateSalt();
-                const hashedPassword = generateHash('testpassword', salt);
+                const user = await userFactory();
+                const household = await householdWithNotesFactory(user);
 
-                const user = await new UserModel({
-                    firstName: 'Adam',
-                    lastName: 'Smith',
-                    email: 'asmith@test.com',
-                    password: hashedPassword,
-                    salt: salt
-                }).save();
+                const updatedHousehold = await HouseholdController.deleteNote(household._id, user._id, household.notes[0]._id);
 
-                let household = await new HouseholdModel({
-                    _ownerId: user._id,
-                    _memberIds: [user._id, ],
-                    name: 'Our Apartment',
-                    notes: [{
-                        _creatorId: user._id,
-                        title: 'My Note',
-                        body: 'This is my note!',
-                        createdAt: Date.now()
-                    }]
-                }).save();
+                expect(updatedHousehold.notes.length).toStrictEqual(0);
+            });
 
-                await HouseholdController.deleteNote(household._id, user._id, household.notes[0]._id);
+            test('Returns the household with members', async () => {
+                const user = await userFactory();
+                const household = await householdWithNotesFactory(user);
 
-                household = await HouseholdModel.findById(household._id);
+                const updatedHousehold = await HouseholdController.deleteNote(household._id, user._id, household.notes[0]._id);
 
-                expect(household.notes.length).toBe(0);
+                expect(updatedHousehold.members[0]._id).toStrictEqual(user._id);
             });
 
             test('Throws an error if the note does not exist', async () => {

@@ -19,6 +19,11 @@ const EventSchema = new mongoose.Schema({
         required: true,
         default: Date.now()
     },
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    },
+    updatedAt: Date,
     description: String,
     location: [Number]
 });
@@ -59,6 +64,7 @@ const TaskSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
+    updatedAt: Date,
     completeBy: {
         type: Date
     },
