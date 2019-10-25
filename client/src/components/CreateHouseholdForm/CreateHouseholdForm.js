@@ -3,6 +3,13 @@ import { connect } from 'react-redux';
 import { createHousehold } from '../../actions/householdActions';
 import './CreateHouseholdForm.scss';
 
+import FormErrorBoundary from '../Form/FormErrorBoundary';
+import FormHeader from '../Form/FormHeader';
+import TextInput from '../Form/TextInput';
+import SubmitButton from '../Form/SubmitButton';
+
+const inputRef = React.createRef();
+
 class CreateHouseholdForm extends Component {
     constructor(props) {
         super(props);
@@ -11,21 +18,8 @@ class CreateHouseholdForm extends Component {
             name: '',
         };
 
-        this.focusInput.bind(this);
         this.handleChange.bind(this);
         this.handleSubmit.bind(this);
-
-        this.nameRef = React.createRef();
-    }
-
-    focusInput = (event) => {
-        if(event.target.classList.contains('form__input-group')) {
-            event.target.querySelector('.form__text-input').focus();
-        } else if(event.target.parentElement.classList.contains('form__hint')) {
-            event.target.parentElement.parentElement.querySelector('.form__text-input').focus();
-        } else {
-            event.target.parentElement.querySelector('.form__text-input').focus();
-        }
     }
 
     handleChange = (event) => {
@@ -50,36 +44,27 @@ class CreateHouseholdForm extends Component {
     componentDidMount() {
         if(!this.props.isActive) {
             setTimeout(() => {
-                this.nameRef.current.focus();
+                inputRef.current.focus();
             }, 1200);
         }
     }
 
     render() {
         return (
-            <form className="form" onSubmit={ this.handleSubmit }>
-                <div className="form__header">
-                    <h2 className="form__title">Create a Household</h2>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input
-                        className="form__text-input"
+            <FormErrorBoundary formName="Create Household">
+                <form className="form" onSubmit={ this.handleSubmit }>
+                    <FormHeader text="Create a Household" />
+                    <TextInput
                         type="text"
                         name="name"
                         value={ this.state.name }
                         onChange={ this.handleChange }
-                        ref={ this.nameRef }
+                        label="Household Name"
+                        ref={ inputRef }
                     />
-                    <label className="form__label" htmlFor="name">Household Name</label>
-                </div>
-                <div className="form__submit-group">
-                    <input
-                        className="button button--med"
-                        type="submit"
-                        value="Create"
-                    />
-                </div>
-            </form>
+                    <SubmitButton text="Create" />
+                </form>
+            </FormErrorBoundary>
         );
     }
 }
