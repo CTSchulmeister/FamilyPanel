@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { logUserIn } from '../actions/userActions';
 
+import FormErrorBoundary from './Form/FormErrorBoundary';
 import FormHeader from './Form/FormHeader';
 import TextInput from './Form/TextInput';
 import SubmitButton from './Form/SubmitButton';
@@ -87,25 +88,27 @@ class LogInForm extends Component {
         }
 
         return (
-            <form className="form" onSubmit={ this.handleSubmit }>
-                { errors }
-                <FormHeader text="Log In" />
-                <TextInput
-                    type="email"
-                    name="email"
-                    value={ this.state.loginData.email }
-                    onChange={ this.handleChange }
-                    label="Email"
-                />
-                <TextInput
-                    type="password"
-                    name="password"
-                    value={ this.state.loginData.password }
-                    onChange={ this.handleChange }
-                    label="Password"
-                />
-                <SubmitButton text="Log In" />
-            </form>
+            <FormErrorBoundary formName="Log In">
+                <form className="form" onSubmit={ this.handleSubmit }>
+                    { errors }
+                    <FormHeader text="Log In" />
+                    <TextInput
+                        type="email"
+                        name="email"
+                        value={ this.state.loginData.email }
+                        onChange={ this.handleChange }
+                        label="Email"
+                    />
+                    <TextInput
+                        type="password"
+                        name="password"
+                        value={ this.state.loginData.password }
+                        onChange={ this.handleChange }
+                        label="Password"
+                    />
+                    <SubmitButton text="Log In" />
+                </form>
+            </FormErrorBoundary>
         );
     }
 }

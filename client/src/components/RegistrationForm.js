@@ -6,6 +6,7 @@ import { registerUser } from '../actions/userActions';
 import FormHeader from './Form/FormHeader';
 import TextInput from './Form/TextInput';
 import SubmitButton from './Form/SubmitButton';
+import FormErrorBoundary from './Form/FormErrorBoundary';
 
 class RegistrationForm extends Component {
     constructor(props) {
@@ -102,56 +103,58 @@ class RegistrationForm extends Component {
         }
 
         return (
-            <form className="form" onSubmit={ this.handleSubmit }>
-                { errors }
-                <FormHeader text="Register" />
-                <TextInput
-                    type="text"
-                    name="firstName"
-                    value={ this.state.registrationData.firstName }
-                    onChange={ this.handleChange }
-                    label="First Name"
-                    maxLength={ 30 }
-                />
-                <TextInput
-                    type="text"
-                    name="lastName"
-                    value={ this.state.registrationData.lastName }
-                    onChange={ this.handleChange }
-                    label="Last Name"
-                    maxLength={ 30 }
-                />
-                <TextInput
-                    type="email"
-                    name="email"
-                    value={ this.state.registrationData.email }
-                    onChange={ this.handleChange }
-                    label="Email"
-                />
-                <TextInput
-                    type="email"
-                    name="retypeEmail"
-                    value={ this.state.registrationData.retypeEmail }
-                    onChange={ this.handleChange }
-                    label="Retype Email"
-                />
-                <TextInput
-                    hint="A valid password must contain at least 8 characters, including letters, numbers, and special characters"
-                    type="password"
-                    name="password"
-                    value={ this.state.registrationData.password }
-                    onChange={ this.handleChange }
-                    label="Password"
-                />
-                <TextInput
-                    type="password"
-                    name="retypePassword"
-                    value={ this.state.registrationData.retypePassword }
-                    onChange={ this.handleChange }
-                    label="Retype Password"
-                />
-                <SubmitButton text="Register" />
-            </form>
+            <FormErrorBoundary formName="Registration">
+                <form className="form" onSubmit={ this.handleSubmit }>
+                    { errors }
+                    <FormHeader text="Register" />
+                    <TextInput
+                        type="text"
+                        name="firstName"
+                        value={ this.state.registrationData.firstName }
+                        onChange={ this.handleChange }
+                        label="First Name"
+                        maxLength={ 30 }
+                    />
+                    <TextInput
+                        type="text"
+                        name="lastName"
+                        value={ this.state.registrationData.lastName }
+                        onChange={ this.handleChange }
+                        label="Last Name"
+                        maxLength={ 30 }
+                    />
+                    <TextInput
+                        type="email"
+                        name="email"
+                        value={ this.state.registrationData.email }
+                        onChange={ this.handleChange }
+                        label="Email"
+                    />
+                    <TextInput
+                        type="email"
+                        name="retypeEmail"
+                        value={ this.state.registrationData.retypeEmail }
+                        onChange={ this.handleChange }
+                        label="Retype Email"
+                    />
+                    <TextInput
+                        hint="A valid password must contain at least 8 characters, including letters, numbers, and special characters"
+                        type="password"
+                        name="password"
+                        value={ this.state.registrationData.password }
+                        onChange={ this.handleChange }
+                        label="Password"
+                    />
+                    <TextInput
+                        type="password"
+                        name="retypePassword"
+                        value={ this.state.registrationData.retypePassword }
+                        onChange={ this.handleChange }
+                        label="Retype Password"
+                    />
+                    <SubmitButton text="Register" />
+                </form>
+            </FormErrorBoundary>
         );
     }
 }

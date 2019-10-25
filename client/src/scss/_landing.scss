@@ -10,7 +10,7 @@
     &__main-container {
         display: grid;
         grid-template-rows: auto 30rem auto;
-        grid-template-columns: 4fr 5fr 4rem;
+        grid-template-columns: calc(45% - 2rem) calc(55% - 2rem) 4rem;
         grid-template-areas:
             "  .  form   .  "
             "main form panel"
