@@ -16,9 +16,9 @@ class HouseholdOption extends Component {
 
     render() {
         return (
-            <div className="side-bar__household-option" onClick={ this.handleClick }>
+            <button className="side-bar__household-option" onClick={ this.handleClick }>
                 { this.props.name }
-            </div>
+            </button>
         );
     }
 }

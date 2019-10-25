@@ -8,6 +8,7 @@ import history from './history';
 import Landing from './components/Landing';
 import Profile from './components/Profile';
 import Notes from './components/Notes';
+import FormTest from './components/Form/FormTest';
 
 import './index.scss';
 
@@ -29,6 +30,9 @@ ReactDOM.render(
             </Route>
             <Route path="/notes/create-note" exact>
                 <Notes showCreateNoteForm={ true } history={ history } />
+            </Route>
+            <Route path="/formtest" exact>
+                <FormTest />
             </Route>
         </Router>
     </Provider>,

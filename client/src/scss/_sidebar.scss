@@ -83,6 +83,9 @@
     }
 
     &__household-select {
+        display: grid;
+        grid-template-rows: 3rem 1fr;
+
         height: auto;
         max-height: 40vh;
         width: 100%;
@@ -97,6 +100,10 @@
 
         transform-origin: top;
         animation: appear-vertical 0.3s ease-out;
+
+        &-list {
+            overflow-y: auto;
+        }
     }
 
     @keyframes appear-vertical {
@@ -108,7 +115,12 @@
     }
 
     &__household-option {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
         width: 100%;
+        height: 2rem;
         padding: 0.5rem 1rem;
 
         border: none;
@@ -121,11 +133,13 @@
         background-size: 200% auto;
         background-position: right;
     
-        text-align: center;
         font-size: 1rem;
         text-transform: uppercase;
         color: $dark-gray;
         letter-spacing: 0.1rem;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         transition: all ease-out 0.3s;
 
@@ -133,6 +147,10 @@
             cursor: pointer;
             background-position: left;
             transition: all ease-out 0.3s;
+        }
+
+        &:first-of-type {
+            margin-top: 0.5rem;
         }
 
         &:last-of-type {
@@ -145,7 +163,7 @@
         position: absolute;
         top: -2.75rem;
         left: calc(100% + 1rem);
-        z-index: 5;
+        z-index: 10;
 
         box-shadow: 0rem 0rem 1rem rgba(0, 0, 0, 0.15);
 

@@ -39,7 +39,8 @@ class SideBar extends Component {
 
     toggleHouseholdSelection = () => {
         this.setState({
-            showHouseholdSelection: (this.state.showHouseholdSelection) ? false : true
+            showHouseholdSelection: (this.state.showHouseholdSelection) ? false : true,
+            showHouseholdCreation: false
         });
     };
 
@@ -141,6 +142,7 @@ class SideBar extends Component {
                             id={ household._id }
                             name={ household.name }
                             closeWindow={ this.handleHouseholdSelection }
+                            isOwned={ household._ownerId === this.props.user._id }
                         />
                     );
                 });
@@ -149,7 +151,9 @@ class SideBar extends Component {
                     <div className="side-bar__household-select">
                         <button className="button button--wide" onClick={ this.toggleHouseholdCreationForm }>Create Household</button>
                         { householdForm }
-                        { households }
+                        <div className="side-bar__household-select-list">
+                            { households }
+                        </div>
                     </div>
                 );
             }
