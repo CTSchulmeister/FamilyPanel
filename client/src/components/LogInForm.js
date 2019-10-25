@@ -3,6 +3,10 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { logUserIn } from '../actions/userActions';
 
+import FormHeader from './Form/FormHeader';
+import TextInput from './Form/TextInput';
+import SubmitButton from './Form/SubmitButton';
+
 class LogInForm extends Component {
     constructor(props) {
         super(props);
@@ -15,19 +19,8 @@ class LogInForm extends Component {
             }
         };
 
-        this.focusInput.bind(this);
         this.handleChange.bind(this);
         this.handleSubmit.bind(this);
-    }
-
-    focusInput = (event) => {
-        if(event.target.classList.contains('form__input-group')) {
-            event.target.querySelector('.form__text-input').focus();
-        } else if(event.target.parentElement.classList.contains('form__hint')) {
-            event.target.parentElement.parentElement.querySelector('.form__text-input').focus();
-        } else {
-            event.target.parentElement.querySelector('.form__text-input').focus();
-        }
     }
 
     handleChange = (event) => {
@@ -96,36 +89,22 @@ class LogInForm extends Component {
         return (
             <form className="form" onSubmit={ this.handleSubmit }>
                 { errors }
-                <div className="form__header">
-                    <h2 className="form__title">Log In</h2>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input
-                        className="form__text-input"
-                        type="email"
-                        name="email"
-                        value={ this.state.loginData.email }
-                        onChange={ this.handleChange }
-                    />
-                    <label className="form__label" htmlFor="email">Email</label>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input 
-                        className="form__text-input"
-                        type="password"
-                        name="password"
-                        value={ this.state.loginData.password }
-                        onChange={ this.handleChange }
-                    />
-                    <label className="form__label" htmlFor="password">Password</label>
-                </div>
-                <div className="form__submit-group">
-                    <input
-                        className="button button--med"
-                        type="submit"
-                        value="Log In"
-                    />
-                </div>
+                <FormHeader text="Log In" />
+                <TextInput
+                    type="email"
+                    name="email"
+                    value={ this.state.loginData.email }
+                    onChange={ this.handleChange }
+                    label="Email"
+                />
+                <TextInput
+                    type="password"
+                    name="password"
+                    value={ this.state.loginData.password }
+                    onChange={ this.handleChange }
+                    label="Password"
+                />
+                <SubmitButton text="Log In" />
             </form>
         );
     }
