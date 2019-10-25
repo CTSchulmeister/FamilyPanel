@@ -12,8 +12,19 @@ const TextInput = props => {
         }
     }
 
+    let hint = (props.hint)
+        ? (
+            <div className="form__hint">
+                <i className="fas fa-info-circle"></i>
+                &nbsp;
+                { props.hint }
+            </div>
+        )
+        : null;
+
     return (
         <div className="form__input-group" onClick={ focusInput }>
+            { hint }
             <input
                 className="form__text-input"
                 type={ props.type }
@@ -31,6 +42,7 @@ const TextInput = props => {
 };
 
 TextInput.propTypes = {
+    hint: PropTypes.string,
     type: PropTypes.oneOf([
         'email',
         'text',
@@ -41,7 +53,15 @@ TextInput.propTypes = {
     name: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
-    label: PropTypes.string.isRequired
+    label: PropTypes.string.isRequired,
+    maxLength: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string
+    ]),
+    minLength: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string
+    ])
 };
 
 export default TextInput;

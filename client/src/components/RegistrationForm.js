@@ -3,6 +3,10 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { registerUser } from '../actions/userActions';
 
+import FormHeader from './Form/FormHeader';
+import TextInput from './Form/TextInput';
+import SubmitButton from './Form/SubmitButton';
+
 class RegistrationForm extends Component {
     constructor(props) {
         super(props);
@@ -19,19 +23,8 @@ class RegistrationForm extends Component {
             }
         };
 
-        this.focusInput.bind(this);
         this.handleChange.bind(this);
         this.handleSubmit.bind(this);
-    }
-
-    focusInput = (event) => {
-        if(event.target.classList.contains('form__input-group')) {
-            event.target.querySelector('.form__text-input').focus();
-        } else if(event.target.parentElement.classList.contains('form__hint')) {
-            event.target.parentElement.parentElement.querySelector('.form__text-input').focus();
-        } else {
-            event.target.parentElement.querySelector('.form__text-input').focus();
-        }
     }
 
     handleChange = (event) => {
@@ -111,84 +104,53 @@ class RegistrationForm extends Component {
         return (
             <form className="form" onSubmit={ this.handleSubmit }>
                 { errors }
-                <div className="form__header">
-                    <h2 className="form__title">Register</h2>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input 
-                        className="form__text-input"
-                        type="text"
-                        name="firstName"
-                        value={ this.state.registrationData.firstName }
-                        onChange={ this.handleChange }
-                        maxLength="30"
-                    />
-                    <label className="form__label" htmlFor="firstName">First Name</label>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input 
-                        className="form__text-input"
-                        type="text" 
-                        name="lastName"
-                        value={ this.state.registrationData.lastName }
-                        onChange={ this.handleChange }
-                        maxLength="30"
-                    />
-                    <label className="form__label" htmlFor="lastName">Last Name</label>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input
-                        className="form__text-input"
-                        type="email"
-                        name="email"
-                        value={ this.state.registrationData.email }
-                        onChange={ this.handleChange }
-                    />
-                    <label className="form__label" htmlFor="email">Email</label>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input
-                        className="form__text-input"
-                        type="email"
-                        name="retypeEmail"
-                        value={ this.state.registrationData.retypeEmail }
-                        onChange={ this.handleChange }
-                    />
-                    <label className="form__label" htmlFor="retypeEmail">Retype Email</label>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <div className="form__hint">
-                        <i className="fas fa-info-circle"></i>
-                        &nbsp;
-                        A valid password must contain at least 8 characters, including
-                        letters, numbers, and special characters
-                    </div>
-                    <input
-                        className="form__text-input"
-                        type="password"
-                        name="password"
-                        value={ this.state.registrationData.password }
-                        onChange={ this.handleChange }
-                    />
-                    <label className="form__label" htmlFor="password">Password</label>
-                </div>
-                <div className="form__input-group" onClick={ this.focusInput }>
-                    <input
-                        className="form__text-input"
-                        type="password"
-                        name="retypePassword"
-                        value={ this.state.registrationData.retypePassword }
-                        onChange={ this.handleChange }
-                    />
-                    <label className="form__label" htmlFor="retypePassword">Retype Password</label>
-                </div>
-                <div className="form__submit-group">
-                    <input
-                        className="button button--med"
-                        type="submit"
-                        value="Register"
-                    />
-                </div>
+                <FormHeader text="Register" />
+                <TextInput
+                    type="text"
+                    name="firstName"
+                    value={ this.state.registrationData.firstName }
+                    onChange={ this.handleChange }
+                    label="First Name"
+                    maxLength={ 30 }
+                />
+                <TextInput
+                    type="text"
+                    name="lastName"
+                    value={ this.state.registrationData.lastName }
+                    onChange={ this.handleChange }
+                    label="Last Name"
+                    maxLength={ 30 }
+                />
+                <TextInput
+                    type="email"
+                    name="email"
+                    value={ this.state.registrationData.email }
+                    onChange={ this.handleChange }
+                    label="Email"
+                />
+                <TextInput
+                    type="email"
+                    name="retypeEmail"
+                    value={ this.state.registrationData.retypeEmail }
+                    onChange={ this.handleChange }
+                    label="Retype Email"
+                />
+                <TextInput
+                    hint="A valid password must contain at least 8 characters, including letters, numbers, and special characters"
+                    type="password"
+                    name="password"
+                    value={ this.state.registrationData.password }
+                    onChange={ this.handleChange }
+                    label="Password"
+                />
+                <TextInput
+                    type="password"
+                    name="retypePassword"
+                    value={ this.state.registrationData.retypePassword }
+                    onChange={ this.handleChange }
+                    label="Retype Password"
+                />
+                <SubmitButton text="Register" />
             </form>
         );
     }
