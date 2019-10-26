@@ -4,3 +4,72 @@ $standard: 'Roboto', sans-serif;
 // --- Font Weights
 $bold: 700;
 $normal-weight: 400;
+
+.typography {
+    &__heading {
+        &--light,
+        &--dark {
+            display: inline-block;
+
+            height: 3rem;
+            width: 100%;
+            padding: 0.75rem 0rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+
+            font-size: 1.5rem;
+            line-height: 1.5rem;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+        }
+
+        &--light {
+            color: $white;
+        }
+
+        &--dark {
+            color: $dark-gray
+        }
+
+        &--colored-divider::after,
+        &--light-divider::after,
+        &--dark-divider::after {
+            content: '';
+
+            height: 0.25rem;
+            width: 100%;
+            position: absolute;
+            bottom: 0.25rem;
+            left: 0rem;
+        }
+
+        &--colored-divider::after {
+            background: $color-gradient;
+        }
+
+        &--light-divider::after {
+            background: $light-gray-scale-gradient;
+        }
+
+        &--dark-divider::after {
+            background: $dark-gray-scale-gradient;
+        }
+    }
+
+    &__paragraph {
+        &--light,
+        &--dark {
+            line-height: 1.5rem;
+            font-size: 1rem;
+            text-align: justify;
+        }
+
+        &--light {
+            color: $white;
+        }
+
+        &--dark {
+            color: $dark-gray;
+        }
+    }
+}

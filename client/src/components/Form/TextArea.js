@@ -10,24 +10,24 @@ const TextArea = props => {
         }
     };
 
+    const handleChange = event => {
+        if(event.target.value !== '') {
+            let label = event.target.parentElement.querySelector('.form__label--text-area');
+            label.classList.add('form__label--text-area--not-empty');
+        } else {
+            let label = event.target.parentElement.querySelector=('.form__label--text-area');
+            label.classList.remove('form__label--text-area--not-empty');
+        }
+
+        props.onChange(event); 
+    }
+
     return (
         <div className="form__input-group form__input-group--text-area" onClick={ focusTextArea }>
             <textarea
                 className="form__text-area"
                 name={ props.name }
-                onChange={ 
-                    event => {
-                        if(event.target.value !== '') {
-                            let label = event.target.parentElement.querySelector('.form__label--text-area');
-                            label.classList.add('form__label--text-area--not-empty');
-                        } else {
-                            let label = event.target.parentElement.querySelector=('.form__label--text-area');
-                            label.classList.remove('form__label--text-area--not-empty');
-                        }
-
-                        props.onChange(); 
-                    }
-                }
+                onChange={ handleChange }
                 value={ props.value }
             />
             <label className="form__label--text-area" htmlFor={ props.name }>
