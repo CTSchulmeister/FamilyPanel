@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import StandardButton from '../Buttons/StandardButton';
+
 const SubmitButton = props => {
     return (
         <div className="form__submit-group">
-            <input
-                className="button button--med"
+            <StandardButton
+                size="medium"
                 type="submit"
-                value={ props.text || 'Submit' }
-            />
+            >
+                Submit
+            </StandardButton>
         </div>
     );
     

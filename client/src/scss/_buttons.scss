@@ -1,56 +1,61 @@
-.button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.standard-button {
+    &--small,
+    &--medium,
+    &--large,
+    &--wide,
+    &--square {
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-    border: none;
-    background: $color-gradient;
-    background-size: 200% auto;
+        margin: 0rem;
 
-    color: white;
-    text-transform: uppercase;
-    font-weight: $bold;
-    text-decoration: none;
-    white-space: nowrap;
+        border: none;
+        background: $color-gradient;
+        background-size: 200% auto;
 
-    transition: all ease-out 0.3s;
+        color: $white;
+        text-transform: uppercase;
+        font-weight: $bold;
+        text-decoration: none;
+        white-space: nowrap;
 
-    &--sml {
-        padding: 0.25rem 0.75rem;
-        font-size: 0.5rem;
+        transition: all ease-out 0.3s;
+
+        &:hover {
+            cursor: pointer;
+            background-position: right center;
+
+            transition: all ease-in 0.3s;
+        }
     }
 
-    &--med {
-        padding: 0.5rem 1.5rem;
+    &--small {
+        padding: 0.25rem 1rem;
+        font-size: 0.5rem;
+    }
+    
+    &--medium {
+        padding: 0.5rem 2rem;
         font-size: 1rem;
     }
 
-    &--lrg {
-        padding: 0.75rem 2.25rem;
+    &--large {
+        padding: 0.75rem 3rem;
         font-size: 1.5rem;
     }
 
-    &--sqr {
-        height: 2rem;
-        width: 2rem;
-
-        font-size: 1rem;
-    }
-
     &--wide {
-        padding: 0.5rem 0rem;
+        padding: 0.5rem 0.5rem;
         width: 100%;
         font-size: 1rem;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
-    &--create-household {
-        margin: 0.5rem 0rem 2rem;
-    }
-
-    &:hover {
-        cursor: pointer;
-        background-position: right center;
-
-        transition: all ease-out 0.3s;
+    &--square {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
     }
 }

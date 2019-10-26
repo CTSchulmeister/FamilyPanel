@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import StandardButton from '../Buttons/StandardButton';
+
 import HouseholdOption from './HouseholdOption';
 
 const HouseholdSelection = props => {
@@ -21,9 +23,9 @@ const HouseholdSelection = props => {
 
     return (
         <div className="household-selection">
-            <button className="button button--wide" onClick={ props.toggleHouseholdCreationForm }>
+            <StandardButton size="wide" onClick={ props.toggleHouseholdCreationForm }>
                 Create Household
-            </button>
+            </StandardButton>
             <div className="household-selection__list">
                 { householdOptions }
             </div>

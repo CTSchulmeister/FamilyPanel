@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { deleteNote } from '../../actions/noteActions';
 
+import StandardButton from '../Buttons/StandardButton';
+
 class NoteDetails extends Component {
     constructor(props) {
         super(props);
@@ -10,7 +12,7 @@ class NoteDetails extends Component {
     }
 
     handleDelete() {
-        this.props.deleteNote(this.props.noteId);
+        this.props.deleteNote(this.props.currentNote._id);
     }
 
     render() {
@@ -26,10 +28,10 @@ class NoteDetails extends Component {
                     <h2 className="note-details__title">
                         { this.props.currentNote.title }
                         <div className="note-details__buttons">
-                            <button className="button button--sqr">
+                            <StandardButton size="square" onClick={ () => alert('Updating note, coming soon!')}>
                                 <i className="fas fa-edit"></i>
-                            </button>
-                            <button className="button button--sqr" onClick={ 
+                            </StandardButton>
+                            <StandardButton size="square" onClick= {
                                 () => {
                                     if(window.confirm(`Are you sure you wanted to delete the note ${ this.props.title}?`)) {
                                         this.handleDelete();
@@ -37,7 +39,7 @@ class NoteDetails extends Component {
                                 }
                             }>
                                 <i className="fas fa-trash-alt"></i>
-                            </button>
+                            </StandardButton>
                         </div> 
                     </h2>
                     <div className="note-details__divider"></div>

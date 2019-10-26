@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import StandardButton from '../Buttons/StandardButton';
+
 import NoteSummary from './NoteSummary';
 
 const NotesList = (props) => {
@@ -33,9 +35,9 @@ const NotesList = (props) => {
         <div className="notes-list">
             <div className="notes-list__header">
                 { displayedNumberOfNotes }
-                <Link to="/notes/create-note" className="button button--sqr">
+                <StandardButton size="square" onClick={ props.toggleShowCreateNote }>
                     <i className="fas fa-edit"></i>
-                </Link>
+                </StandardButton>
             </div>
             <div className="notes-list__list">
                 { notes }

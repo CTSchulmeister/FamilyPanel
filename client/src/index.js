@@ -6,8 +6,7 @@ import store from './store';
 import history from './history';
 
 import Landing from './components/Landing';
-import Profile from './components/Profile';
-import Notes from './components/Notes';
+import AppContainer from './components/Layout/AppContainer';
 
 import './index.scss';
 
@@ -22,13 +21,13 @@ ReactDOM.render(
                 <Landing history={ history } />
             </Route>
             <Route path="/profile" exact>
-                <Profile />
+                <AppContainer activeLink='profile' />
+            </Route>
+            <Route path="/home" exact>
+                <AppContainer activeLink='home' />
             </Route>
             <Route path="/notes" exact>
-                <Notes showCreateNoteForm={ false } />
-            </Route>
-            <Route path="/notes/create-note" exact>
-                <Notes showCreateNoteForm={ true } history={ history } />
+                <AppContainer activeLink='notes' />
             </Route>
         </Router>
     </Provider>,

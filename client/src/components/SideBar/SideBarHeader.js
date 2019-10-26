@@ -7,6 +7,7 @@ import HouseholdSelection from './HouseholdSelection';
 import Heading from '../Typography/Heading';
 import SubHeading from '../Typography/SubHeading';
 import Divider from '../Decorative/Divider';
+import StandardButton from '../Buttons/StandardButton';
 
 class SideBarHeader extends Component {
     constructor(props) {
@@ -21,6 +22,7 @@ class SideBarHeader extends Component {
         this.toggleHouseholdCreationForm.bind(this);
         this.toggleHouseholdSelection.bind(this);
         this.handleHouseholdSelection.bind(this);
+        this.handleHouseholdCreation.bind(this);
 
         this.createHouseholdFormWrapper = React.createRef();
     }
@@ -51,6 +53,13 @@ class SideBarHeader extends Component {
         });
     };
 
+    handleHouseholdCreation = () => {
+        this.setState({
+            showHouseholdCreation: false,
+            showHouseholdSelection: false
+        });
+    };
+
     handleHouseholdSelection = () => {
         this.setState({
             showHouseholdSelection: false
@@ -70,7 +79,7 @@ class SideBarHeader extends Component {
         const householdCreation = (this.state.showHouseholdCreation)
             ? (
                 <div className="side-bar__household-create-form-wrapper activated-form" ref={ this.createHouseholdFormWrapper }>
-                    <CreateHouseholdForm />
+                    <CreateHouseholdForm handleClick={ this.handleHouseholdCreation }/>
                 </div>
             )
             : null;
@@ -98,9 +107,9 @@ class SideBarHeader extends Component {
                         You have no households...
                     </SubHeading>
                     <br />
-                    <button className="button button--med" onClick={ this.toggleHouseholdCreationForm }>
-                        Create one!
-                    </button>
+                    <StandardButton size="medium" onClick={ this.toggleHouseholdCreationForm }>
+                        Create One!
+                    </StandardButton>
                     <br />
                     { householdCreation }
                     <Divider color="light" size="large" />

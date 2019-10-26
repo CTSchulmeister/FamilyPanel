@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { readNote, deleteNote } from '../../actions/noteActions';
 
+import StandardButton from '../Buttons/StandardButton';
+
 class NoteSummary extends Component {
     constructor(props) { 
         super(props);
@@ -25,7 +27,7 @@ class NoteSummary extends Component {
 
         let deleteButton = (this.props.creatorId === this.props.userId)
             ? (
-                <button className="button button--sqr" onClick={ 
+                <StandardButton size="square" onClick={
                     () => {
                         if(window.confirm(`Are you sure you wanted to delete the note ${ this.props.title}?`)) {
                             this.handleDelete();
@@ -33,7 +35,7 @@ class NoteSummary extends Component {
                     }
                 }>
                     <i className="fas fa-trash-alt"></i>
-                </button>
+                </StandardButton>
             )
             : null;
 

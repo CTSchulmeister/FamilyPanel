@@ -22,6 +22,7 @@ const SideBar = props => {
 SideBar.propTypes = {
     activeLink: PropTypes.oneOf([
         'profile',
+        'home',
         'notes'
     ]).isRequired
 };

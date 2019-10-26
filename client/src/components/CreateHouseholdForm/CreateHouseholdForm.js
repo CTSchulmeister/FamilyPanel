@@ -33,6 +33,8 @@ class CreateHouseholdForm extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
 
+        this.props.handleClick();
+
         try {
             this.props.createHousehold(this.state);
         } catch (err) {

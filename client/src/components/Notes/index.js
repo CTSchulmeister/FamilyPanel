@@ -1,58 +1,41 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react';
 
-import TopBar from '../TopBar';
-import SideBar from '../SideBar';
+import SectionHeader from '../Layout/SectionHeader';
 
-import NotesHeader from './NotesHeader';
 import NotesList from './NotesList';
 import NoteDetails from './NoteDetails';
-import CreateNoteForm from './CreateNoteForm';
+import ShowCreateNoteContainer from './CreateNoteFormContainer';
 
-import RequiresAuthentication from '../RequiresAuthentication';
+class Notes extends Component {
+    constructor(props) {
+        super(props);
 
-const Notes = (props) => {
-    if(props.isAuthenticated) {
-        let mainSection = (props.showCreateNoteForm) 
-            ? (
-                <div className="note-form__container">
-                    <div className="note-form__back-button-wrapper">
-                        <Link to="/notes" className="button button--med">
-                            Go Back
-                        </Link>
-                    </div>
-                    <div className="note-form__wrapper">
-                        <CreateNoteForm history={ props.history } />
-                    </div>
-                </div>
-            )
+        this.state = {
+            showCreateNote: false
+        };
+
+        this.toggleShowCreateNote.bind(this);
+    }
+
+    toggleShowCreateNote = () => {
+        this.setState({
+            showCreateNote: (this.state.showCreateNote) ? false : true
+        });
+    }
+
+    render() {
+        const detailsSection = (this.state.showCreateNote)
+            ? <ShowCreateNoteContainer toggleShowCreateNote={ this.toggleShowCreateNote } />
             : <NoteDetails />;
 
         return (
-            <div className="app-container">
-                <TopBar />
-                <SideBar activeLink="notes" />
-                <div className="main notes__wrapper">
-                    <section className="notes__view">
-                        <NotesHeader />
-                        <NotesList />
-                        { mainSection }
-                    </section>
-                </div>
-            </div>
-        );
-    } else {
-        return (
-            <RequiresAuthentication />
+            <section className="notes">
+                <SectionHeader title="Notes" />
+                <NotesList toggleShowCreateNote={ this.toggleShowCreateNote } />
+                { detailsSection }
+            </section>
         );
     }
-};
+}
 
-const mapStateToProps = (state) => {
-    return {
-        isAuthenticated: state.user.authenticated
-    };
-};
-
-export default connect(mapStateToProps)(Notes);
+export default Notes;

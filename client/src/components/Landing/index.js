@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import StandardButton from '../Buttons/StandardButton';
+
 import LogInForm from '../LogInForm';
 import RegistrationForm from '../RegistrationForm';
+
 
 class Landing extends Component {
     constructor(props) {
@@ -60,9 +63,9 @@ class Landing extends Component {
                         <hr className="landing__divider" />
                         <div className="landing__form-switcher">
                             { this.state.buttonIntro }
-                            <button className="button button--med" onClick={ this.toggleForm }>
+                            <StandardButton size="medium" onClick={ this.toggleForm }>
                                 { this.state.buttonText }
-                            </button>
+                            </StandardButton>
                         </div>
                     </aside>
                     <div className="landing__decorative-panel">.</div>

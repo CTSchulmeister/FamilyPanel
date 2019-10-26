@@ -12,6 +12,10 @@ const SideBarGroups = props => {
                     active={ props.activeLink === 'profile' }
                 />
                 <SideBarGroup
+                    type='home'
+                    active={ props.activeLink === 'home' }
+                />
+                <SideBarGroup
                     type='notes'
                     active={ props.activeLink === 'notes' }
                 />
