@@ -44,24 +44,8 @@
 
     &__header {
         width: 100%;
-        margin-bottom: 3rem;
         position: relative;
-
-        &::after {
-            content: '';
-            position: absolute;
-            left: 0rem;
-            top: 100%;
-            height: 0.25rem;
-            width: 50%;
-            background-color: white;
-        }
-    }
-
-    &__sub-heading {
-        font-size: 1rem;
-        text-transform: uppercase;
-        color: $light-gray;
+        margin-bottom: 3rem;
     }
 
     &__household-select-trigger {
@@ -79,38 +63,6 @@
             color: $extra-light-gray;
 
             transition: all ease-in 0.3s;
-        }
-    }
-
-    &__household-select {
-        display: grid;
-        grid-template-rows: 3rem 1fr;
-
-        height: auto;
-        max-height: 40vh;
-        width: 100%;
-        padding: 0.5rem;
-        position: absolute;
-        left: 0rem;
-        top: 1.5rem;
-        z-index: 2;
-        
-        background: white;
-        box-shadow: $large-shadow;
-
-        transform-origin: top;
-        animation: appear-vertical 0.3s ease-out;
-
-        &-list {
-            overflow-y: auto;
-        }
-    }
-
-    @keyframes appear-vertical {
-        from {
-            transform: scaleY(0);
-        } to {
-            transform: scaleY(1);
         }
     }
 
@@ -284,5 +236,37 @@
         width: 1rem;
 
         background: $color-gradient;
+    }
+}
+
+.household-selection {
+    display: grid;
+    grid-template-rows: 3rem 1fr;
+
+    height: auto;
+    max-height: 40vh;
+    width: 100%;
+    padding: 0.5rem;
+    position: absolute;
+    left: 0rem;
+    top: 1.5rem;
+    z-index: 2;
+    
+    background: white;
+    box-shadow: $large-shadow;
+
+    transform-origin: top;
+    animation: appear-vertical 0.3s ease-out;
+
+    &__list {
+        overflow-y: auto;
+    }
+}
+
+@keyframes appear-vertical {
+    from {
+        transform: scaleY(0);
+    } to {
+        transform: scaleY(1);
     }
 }

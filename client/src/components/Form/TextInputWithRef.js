@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const TextInput = props => {
+const TextInputWithRef = React.forwardRef((props, ref) => {
     const focusInput = event => {
         if(event.target.classList.contains('form__input-group')) {
             event.target.querySelector('.form__text-input').focus();
@@ -33,15 +33,16 @@ const TextInput = props => {
                 onChange={ props.onChange }
                 maxLength={ props.maxLength || null }
                 minLength={ props.minLength || null }
+                ref={ ref }
             />
             <label className="form__label" htmlFor={ props.name }>
                 { props.label }
             </label>
         </div>
     );
-};
+});
 
-TextInput.propTypes = {
+TextInputWithRef.propTypes = {
     hint: PropTypes.string,
     type: PropTypes.oneOf([
         'email',
@@ -64,4 +65,4 @@ TextInput.propTypes = {
     ])
 };
 
-export default TextInput;
+export default TextInputWithRef;

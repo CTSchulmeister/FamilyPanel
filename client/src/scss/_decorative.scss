@@ -1,0 +1,29 @@
+.divider {
+    &--light,
+    &--colored,
+    &--dark {
+        width: 100%;
+        
+        border: none;
+    }
+
+    &--light {
+        background: $light-gray-scale-gradient;
+    }
+
+    &--colored {
+        background: $color-gradient;
+    }
+
+    &--dark {
+        background: $dark-gray-scale-gradient;
+    }
+
+    &--small {
+        height: 0.125rem;
+    }
+
+    &--large {
+        height: 0.25rem;
+    }
+}

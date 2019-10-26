@@ -6,7 +6,11 @@ import Heading from '../Typography/Heading';
 const FormHeader = props => {
     return (
         <div className="form__header">
-            <Heading light={ false } divider='colored'>
+            <Heading 
+                light={ false } 
+                divider='colored' 
+                small={ props.small || false }
+            >
                 { props.text }
             </Heading>
         </div>
@@ -14,7 +18,8 @@ const FormHeader = props => {
 };
 
 FormHeader.propTypes = {
-    text: PropTypes.string.isRequired
+    text: PropTypes.string.isRequired,
+    small: PropTypes.bool
 };
 
 export default FormHeader;

@@ -16,6 +16,8 @@ class Heading extends Component {
             ? Heading.LIGHT_CLASS
             : Heading.DARK_CLASS;
 
+        this.className += (props.small) ? '-small' : '';
+
         if(props.divider) {
             switch(props.divider) {
                 case 'colored':
@@ -44,6 +46,7 @@ class Heading extends Component {
 
 Heading.propTypes = {
     light: PropTypes.bool,
+    small: PropTypes.bool,
     divider: PropTypes.oneOf([
         'colored',
         'light',

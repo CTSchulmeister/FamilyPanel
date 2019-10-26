@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createHousehold } from '../../actions/householdActions';
-import './CreateHouseholdForm.scss';
 
 import FormErrorBoundary from '../Form/FormErrorBoundary';
 import FormHeader from '../Form/FormHeader';
-import TextInput from '../Form/TextInput';
+import TextInputWithRef from '../Form/TextInputWithRef';
 import SubmitButton from '../Form/SubmitButton';
 
 const inputRef = React.createRef();
@@ -53,8 +52,8 @@ class CreateHouseholdForm extends Component {
         return (
             <FormErrorBoundary formName="Create Household">
                 <form className="form" onSubmit={ this.handleSubmit }>
-                    <FormHeader text="Create a Household" />
-                    <TextInput
+                    <FormHeader text="Create a Household" small={ true }/>
+                    <TextInputWithRef
                         type="text"
                         name="name"
                         value={ this.state.name }

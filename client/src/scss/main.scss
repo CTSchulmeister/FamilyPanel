@@ -1,17 +1,18 @@
-@import './colors';
+@import './variables';
+
 @import './typography';
-@import './shadows';
-@import './form.scss';
-@import './buttons.scss';
+@import './form';
+@import './buttons';
+@import './decorative';
 
 
-@import './landing.scss';
-@import './topbar.scss';
-@import './layout.scss';
-@import './sidebar.scss';
+@import './landing';
+@import './topbar';
+@import './layout';
+@import './sidebar';
 @import './requiresAuth';
 @import './spinner';
-@import './profile.scss';
+@import './profile';
 @import './notes';
 
 a {

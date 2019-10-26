@@ -1,26 +1,35 @@
-// --- Font Families
-$standard: 'Roboto', sans-serif;
-
-// --- Font Weights
-$bold: 700;
-$normal-weight: 400;
-
 .typography {
     &__heading {
         &--light,
-        &--dark {
-            display: inline-block;
+        &--dark,
+        &--light-small,
+        &--dark-small {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
 
-            height: 3rem;
             width: 100%;
             padding: 0.75rem 0rem;
-            margin-bottom: 0.5rem;
+            margin: 0rem 0rem 0.5rem;
             position: relative;
 
-            font-size: 1.5rem;
-            line-height: 1.5rem;
             letter-spacing: 0.2rem;
             text-transform: uppercase;
+            white-space: pre-wrap;
+        }
+
+        &--light,
+        &--dark {
+            min-height: 3rem;
+            font-size: 1.5rem;
+            letter-spacing: 0.2rem;
+        }
+
+        &--light-small,
+        &--dark-small {
+            min-height: 3rem;
+            font-size: 1.2rem;
+            letter-spacing: 0.1rem;
         }
 
         &--light {
@@ -54,6 +63,32 @@ $normal-weight: 400;
         &--dark-divider::after {
             background: $dark-gray-scale-gradient;
         }
+    }
+
+    &__subheading {
+        &--light,
+        &--dark {
+            display: block;
+
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+        }
+
+        &--light {
+            color: $light-gray;
+            transition: all ease-out 0.3s;
+
+            &--button:hover {
+                color: $extra-light-gray;
+                transition: all ease-in 0.3s;
+            }
+        }
+
+        &--dark {
+            color: $gray;
+        }
+
     }
 
     &__paragraph {
