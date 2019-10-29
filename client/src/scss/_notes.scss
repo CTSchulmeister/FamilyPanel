@@ -17,6 +17,7 @@
         grid-template-areas: 
             "header"
             "list";
+        grid-gap: 1rem;
 
         padding: 1rem;
 
@@ -70,13 +71,6 @@
     background-size: 200% auto;
     background-position: right;
     transition: all ease-out 0.3s;
-
-    &__container {
-        display: grid;
-        grid-template-columns: 1fr 0.125rem 3rem;
-        grid-template-areas:
-            "note-summary . buttons";
-    }
 
     &:hover {
         cursor: pointer;
@@ -212,6 +206,8 @@
         align-items: center;
         justify-content: space-between;
 
+        padding-right: 0.125rem;
+
         & button {
             margin-left: 0.5rem;
         }
@@ -340,7 +336,7 @@
     }
 }
 
-.create-note-form {
+.note-form {
     &__container {
         grid-area: noteDetails;
 

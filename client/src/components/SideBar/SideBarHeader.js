@@ -15,8 +15,7 @@ class SideBarHeader extends Component {
 
         this.state = {
             showHouseholdSelection: false,
-            showHouseholdCreation: false,
-            caretIcon: <i className="fas fa-caret-down"></i>
+            showHouseholdCreation: false
         }
 
         this.toggleHouseholdCreationForm.bind(this);
@@ -28,28 +27,15 @@ class SideBarHeader extends Component {
     }
 
     toggleHouseholdCreationForm = () => {
-        if(this.state.showHouseholdCreation) {
-            this.createHouseholdFormWrapper.current.className = 'side-bar__household-create-form-wrapper deactivated-form';
-
-            setTimeout(() => {
-                this.setState({
-                    showHouseholdCreation: false
-                });
-            }, 600);
-        } else {
-            this.setState({
-                showHouseholdCreation: true
-            });
-        } 
+        this.setState({
+            showHouseholdCreation: (this.state.showHouseholdCreation) ? false : true
+        });
     };
 
     toggleHouseholdSelection = () => {
         this.setState({
             showHouseholdSelection: (this.state.showHouseholdSelection) ? false : true,
-            showHouseholdCreation: false,
-            caretIcon: (this.state.showHouseholdSelection)
-                ? <i className="fas fa-caret-down"></i> 
-                : <i className="fas fa-caret-up"></i>
+            showHouseholdCreation: false
         });
     };
 
@@ -76,6 +62,10 @@ class SideBarHeader extends Component {
             )
             : null;
 
+        const caretIcon = (this.state.showHouseholdSelection)
+            ? <i className="fas fa-caret-up"></i>
+            : <i className="fas fa-caret-down"></i>;
+
         const householdCreation = (this.state.showHouseholdCreation)
             ? (
                 <div className="side-bar__household-create-form-wrapper activated-form" ref={ this.createHouseholdFormWrapper }>
@@ -90,7 +80,7 @@ class SideBarHeader extends Component {
                     <button className="side-bar__household-select-trigger" onClick={ this.toggleHouseholdSelection }>
                         <SubHeading light={ true } button={ true }>
                             Household&nbsp;
-                            { this.state.caretIcon }
+                            { caretIcon }
                         </SubHeading>
                     </button>
                     { householdSelection }

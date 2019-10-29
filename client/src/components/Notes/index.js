@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { selectCurrentNote } from '../../reducers/selectors';
+import { editNote } from '../../actions/noteActions';
 
 import SectionHeader from '../Layout/SectionHeader';
 
 import NotesList from './NotesList';
 import NoteDetails from './NoteDetails';
-import ShowCreateNoteContainer from './CreateNoteFormContainer';
+import NoteFormContainer from './NoteFormContainer';
 
 class Notes extends Component {
     constructor(props) {
@@ -24,18 +27,30 @@ class Notes extends Component {
     }
 
     render() {
-        const detailsSection = (this.state.showCreateNote)
-            ? <ShowCreateNoteContainer toggleShowCreateNote={ this.toggleShowCreateNote } />
-            : <NoteDetails />;
+        let detailsSection = null;
+
+        if(this.props.currentNote && this.props.currentNote.isEditing) {
+            detailsSection = <NoteFormContainer form='Update Note' />
+        } else if(this.state.showCreateNote) {
+            detailsSection = <NoteFormContainer form='Create Note' toggleShowCreateNote={ this.toggleShowCreateNote } />
+        } else {
+            detailsSection = <NoteDetails toggleShowUpdateNote={ this.toggleShowUpdateNote } />;
+        }
 
         return (
             <section className="notes">
                 <SectionHeader title="Notes" />
-                <NotesList toggleShowCreateNote={ this.toggleShowCreateNote } />
+                <NotesList toggleShowCreateNote={ this.toggleShowCreateNote } allowCreateNote={ !this.state.showUpdateNote }/>
                 { detailsSection }
             </section>
         );
     }
 }
 
-export default Notes;
+const mapStateToProps = state => {
+    return {
+        currentNote: selectCurrentNote(state)
+    };
+}
+
+export default connect(mapStateToProps, { editNote })(Notes);

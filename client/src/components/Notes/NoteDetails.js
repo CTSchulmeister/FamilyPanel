@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { deleteNote } from '../../actions/noteActions';
+import { selectCurrentNote, selectCurrentHousehold } from '../../reducers/selectors'
+import { deleteNote, editNote } from '../../actions/noteActions';
 
-import StandardButton from '../Buttons/StandardButton';
+import CircleButton from '../Buttons/CircleButton';
 
 class NoteDetails extends Component {
     constructor(props) {
@@ -23,15 +24,19 @@ class NoteDetails extends Component {
                 return member._id === this.props.currentNote._creatorId;
             })[0];
 
+            let updatedText = (this.props.currentNote.updatedAt)
+                ? `, updated ${ new Date(this.props.currentNote.updatedAt).toLocaleString() }`
+                : '';
+
             return (
                 <div className="note-details note-details--active-note">
                     <h2 className="note-details__title">
                         { this.props.currentNote.title }
                         <div className="note-details__buttons">
-                            <StandardButton size="square" onClick={ () => alert('Updating note, coming soon!')}>
+                            <CircleButton size="medium" onClick={ this.props.editNote }>
                                 <i className="fas fa-edit"></i>
-                            </StandardButton>
-                            <StandardButton size="square" onClick= {
+                            </CircleButton>
+                            <CircleButton size="medium" onClick= {
                                 () => {
                                     if(window.confirm(`Are you sure you wanted to delete the note ${ this.props.title}?`)) {
                                         this.handleDelete();
@@ -39,7 +44,7 @@ class NoteDetails extends Component {
                                 }
                             }>
                                 <i className="fas fa-trash-alt"></i>
-                            </StandardButton>
+                            </CircleButton>
                         </div> 
                     </h2>
                     <div className="note-details__divider"></div>
@@ -52,7 +57,8 @@ class NoteDetails extends Component {
                         />
                         { 
                             `${ creator.firstName } ${ creator.lastName }\
-                             at ${ new Date(this.props.currentNote.createdAt).toLocaleString() }`
+                             at ${ new Date(this.props.currentNote.createdAt).toLocaleString() }\
+                             ${ updatedText }`    
                         }
                     </div>
                     <div className="note-details__body-label note-details__label">Body</div>
@@ -71,9 +77,9 @@ class NoteDetails extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        currentHousehold: state.households.currentHousehold,
-        currentNote: state.households.currentNote
+        currentHousehold: selectCurrentHousehold(state),
+        currentNote: selectCurrentNote(state)
     };
 }
 
-export default connect(mapStateToProps, { deleteNote })(NoteDetails);
+export default connect(mapStateToProps, { deleteNote, editNote })(NoteDetails);

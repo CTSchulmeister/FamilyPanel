@@ -69,12 +69,12 @@ module.exports.loginUser = async (email, password) => {
     let currentHousehold = null;
 
     if(user._householdIds.length !== 0) {
-        households = await HouseholdModel.find({ _id: { $in: user._householdIds } }).exec();
+        households = await getHouseholds(user._householdIds);
 
         for(let household = 0; household < households.length; household++) {
-            if(households[0]._id = user.currentHousehold) {
+            if(String(households[household]._id) === String(user.currentHousehold)) {
                 currentHousehold = {
-                    ...households[0]
+                    ...households[household]
                 };
                 break;
             }
@@ -241,8 +241,6 @@ module.exports.deleteUser = async (id) => {
  * Gets the member user documents of a household with personal data removed.
  * @param {String} householdId
  */
-const getHouseholdMembers = async householdId => {
-    const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+const getHouseholdMembers = async householdId => await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
 
-    return members;
-};
+const getHouseholds = async householdIds => await HouseholdModel.find({ _id: householdIds }).exec();

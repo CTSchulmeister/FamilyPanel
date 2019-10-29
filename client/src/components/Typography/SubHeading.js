@@ -5,6 +5,7 @@ class SubHeading extends Component {
     static BASE_CLASS = `typography__subheading`;
     static LIGHT_CLASS = `${ SubHeading.BASE_CLASS }--light`;
     static DARK_CLASS = `${ SubHeading.BASE_CLASS }--dark`;
+    static BUTTON_CLASS = `${ SubHeading.BASE_CLASS }--button`;
 
     constructor(props) {
         super(props);
@@ -13,7 +14,7 @@ class SubHeading extends Component {
             ? SubHeading.LIGHT_CLASS
             : SubHeading.DARK_CLASS;
 
-        if(props.button) this.className += ` ${ this.className}--button`;
+        if(props.button) this.className += ` ${ SubHeading.BUTTON_CLASS }`;
     }
 
     render() {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { selectLogInErrors } from '../reducers/selectors';
 import { logUserIn } from '../actions/userActions';
 
 import FormErrorBoundary from './Form/FormErrorBoundary';
@@ -13,11 +13,8 @@ class LogInForm extends Component {
         super(props);
 
         this.state = {
-            isAuthenticated: false,
-            loginData: {
-                email: '',
-                password: ''
-            }
+            email: '',
+            password: ''
         };
 
         this.handleChange.bind(this);
@@ -29,10 +26,7 @@ class LogInForm extends Component {
         let value = event.target.value;
 
         this.setState({
-            loginData: {
-                ...this.state.loginData,
-                [key]: value
-            }
+            [key]: value
         });
     };
 
@@ -40,19 +34,13 @@ class LogInForm extends Component {
         event.preventDefault();
 
         try {
-            this.props.logUserIn(this.state.loginData);
+            this.props.logUserIn(this.state);
         } catch (err) {
             alert(`Error encountered: ${ err }`);
         }
     };
 
     render() {
-        if(this.props.isAuthenticated) {
-            return (
-                <Redirect to="/profile" />
-            );
-        }
-
         let errors = null;
         if(this.props.logInErrors) {
             let errorsArray = this.props.logInErrors;
@@ -95,14 +83,14 @@ class LogInForm extends Component {
                     <TextInput
                         type="email"
                         name="email"
-                        value={ this.state.loginData.email }
+                        value={ this.state.email }
                         onChange={ this.handleChange }
                         label="Email"
                     />
                     <TextInput
                         type="password"
                         name="password"
-                        value={ this.state.loginData.password }
+                        value={ this.state.password }
                         onChange={ this.handleChange }
                         label="Password"
                     />
@@ -115,8 +103,7 @@ class LogInForm extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.user.authenticated,
-        logInErrors: state.user.logInErrors
+        logInErrors: selectLogInErrors(state)
     };
 }
 

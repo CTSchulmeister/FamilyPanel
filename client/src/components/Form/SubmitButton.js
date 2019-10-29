@@ -9,8 +9,9 @@ const SubmitButton = props => {
             <StandardButton
                 size="medium"
                 type="submit"
+                disabled={ props.disabled || false }
             >
-                Submit
+                { props.text || 'Submit' }
             </StandardButton>
         </div>
     );
@@ -18,7 +19,8 @@ const SubmitButton = props => {
 };
 
 SubmitButton.propTypes = {
-    text: PropTypes.string
+    text: PropTypes.string,
+    disabled: PropTypes.bool
 };
 
 export default SubmitButton;

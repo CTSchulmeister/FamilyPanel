@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { selectCurrentNote, selectCurrentHousehold } from '../../reducers/selectors';
 
-import StandardButton from '../Buttons/StandardButton';
+import CircleButton from '../Buttons/CircleButton';
 
 import NoteSummary from './NoteSummary';
 
@@ -15,16 +15,14 @@ const NotesList = (props) => {
         displayedNumberOfNotes = `${ props.currentHousehold.notes.length } Notes`;
     }
 
-    let notes = props.currentHousehold.notes.map((note, index, array) => {
-        let isActive = (props.currentNote && props.currentNote._id === note._id) ? true : false;
-
+    const notes = props.currentHousehold.notes.map(note => {
         return (
             <NoteSummary 
                 key={ note._id }
                 noteId={ note._id }
                 creatorId={ note._creatorId }
                 createdAt={ new Date(note.createdAt) }
-                isActive={ isActive }
+                isActive={ (props.currentNote && props.currentNote._id === note._id) ? true : false }
                 title={ note.title }
                 body={ note.body }
             />
@@ -35,9 +33,9 @@ const NotesList = (props) => {
         <div className="notes-list">
             <div className="notes-list__header">
                 { displayedNumberOfNotes }
-                <StandardButton size="square" onClick={ props.toggleShowCreateNote }>
+                <CircleButton size="medium" onClick={ props.toggleShowCreateNote } disabled={ props.currentNote && props.currentNote.isEditing }>
                     <i className="fas fa-edit"></i>
-                </StandardButton>
+                </CircleButton>
             </div>
             <div className="notes-list__list">
                 { notes }
@@ -48,8 +46,8 @@ const NotesList = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        currentHousehold: state.households.currentHousehold,
-        currentNote: state.households.currentNote
+        currentHousehold: selectCurrentHousehold(state),
+        currentNote: selectCurrentNote(state)
     };
 }
 

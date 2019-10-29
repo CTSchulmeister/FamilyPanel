@@ -42,7 +42,6 @@ export const createHousehold = (householdData) => async dispatch => {
         dispatch({
             type: HOUSEHOLD_CREATED,
             currentHousehold: createHouseholdResponse.currentHousehold,
-            households: createHouseholdResponse.households,
             user: createHouseholdResponse.user
         });
     } catch (error) {

@@ -35,14 +35,10 @@ const AppContainer = props => {
                 componentToShow = null;
         }
     }
-    
-    
-
-    
 
     return (
         <div className="app-container">
-            <TopBar />
+            <TopBar history={ props.history } />
             <SideBar activeLink={ props.activeLink } />
             <Main>
                 { componentToShow }

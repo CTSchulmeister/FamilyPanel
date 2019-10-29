@@ -44,7 +44,7 @@ router.post('/', auth, jsonParser, [
         try {
             let memberIds = req.body.memberIds.map(memberId => String(memberId));
 
-            const { newHousehold, households, updatedUser } = await HouseholdController.createHousehold(
+            const { newHousehold, updatedUser } = await HouseholdController.createHousehold(
                 String(req.body.ownerId),
                 memberIds,
                 req.body.name
@@ -53,7 +53,6 @@ router.post('/', auth, jsonParser, [
             res.status(200).json({
                 success: true,
                 currentHousehold: newHousehold,
-                households: households,
                 user: updatedUser
             });
         } catch (err) {
@@ -586,7 +585,7 @@ router.get('/:household/note/:note', async (req, res) => {
 });
 
 // UPDATE
-router.put('/:household/note/:note', auth, jsonParser, [
+router.patch('/:household/note/:note', auth, jsonParser, [
     check('title')
         .optional()
         .isString()

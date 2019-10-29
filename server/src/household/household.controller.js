@@ -46,9 +46,8 @@ module.exports.createHousehold = async (ownerId, memberIds, name) => {
     let updatedUser = await UserModel.findByIdAndUpdate(ownerId, {
         currentHousehold: newHousehold._id
     }, { new: true }).exec();
-    let households = await HouseholdModel.find({ _id: updatedUser._householdIds }).exec();
 
-    return { newHousehold, households, updatedUser };
+    return { newHousehold, updatedUser };
 };
 
 /**

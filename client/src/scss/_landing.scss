@@ -9,7 +9,7 @@
 
     &__main-container {
         display: grid;
-        grid-template-rows: auto 30rem auto;
+        grid-template-rows: 1fr 30rem 1fr;
         grid-template-columns: calc(45% - 2rem) calc(55% - 2rem) 4rem;
         grid-template-areas:
             "  .  form   .  "

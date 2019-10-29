@@ -28,6 +28,15 @@
 
             transition: all ease-in 0.3s;
         }
+
+        &:disabled {
+            background: $medium-light-gray-scale-gradient;
+            background-size: 200% auto;
+
+            &:hover {
+                cursor: default;
+            }
+        }
     }
 
     &--small {
@@ -57,5 +66,60 @@
         width: 2rem;
         height: 2rem;
         font-size: 1rem;
+    }
+}
+
+.circle-button {
+    &--small,
+    &--medium,
+    &--large {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 0.125rem solid $primary;
+        border-radius: 50%;
+        background: transparent;
+
+        transition: all ease-out 0.15s;
+
+        &:hover {
+            cursor: pointer;
+
+            transform: scale(1.1);
+
+            transition: all ease-in 0.15s;
+        }
+
+        &:disabled {
+            border: 0.125rem solid $gray;
+            
+            &:hover {
+                cursor: default;
+                transform: none;
+            }
+        }
+    }
+
+    &--medium {
+        height: 2rem;
+        width: 2rem;
+        font-size: 1rem;
+    }
+
+    &--light{
+        color: $extra-light-gray;
+
+        &:not([disabled]):hover { 
+            color: $white;
+        }
+    }
+
+    &--dark {
+        color: $gray;
+        
+        &:not([disabled]):hover {
+            color: $dark-gray;
+        }
     }
 }

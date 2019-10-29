@@ -36,12 +36,6 @@ describe('Household Controller', () => {
                 expect(updatedUser._householdIds[0]).toStrictEqual(newHousehold._id);
             });
 
-            test('Returns the new household in the user\'s list of households', async () => {
-                const user = await userFactory();
-                const { newHousehold, households } = await HouseholdController.createHousehold(user._id, [user._id], randomStringGenerator(15));
-                expect(households[0]._id).toStrictEqual(newHousehold._id);
-            });
-
             test('Returns the household with members', async () => {
                 const user = await userFactory();
                 const { newHousehold } = await HouseholdController.createHousehold(user._id, [user._id], 'Our Apartment');

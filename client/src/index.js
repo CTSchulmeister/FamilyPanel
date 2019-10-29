@@ -21,13 +21,13 @@ ReactDOM.render(
                 <Landing history={ history } />
             </Route>
             <Route path="/profile" exact>
-                <AppContainer activeLink='profile' />
+                <AppContainer activeLink='profile' history={ history } />
             </Route>
             <Route path="/home" exact>
-                <AppContainer activeLink='home' />
+                <AppContainer activeLink='home' history={ history } />
             </Route>
             <Route path="/notes" exact>
-                <AppContainer activeLink='notes' />
+                <AppContainer activeLink='notes' history={ history } />
             </Route>
         </Router>
     </Provider>,

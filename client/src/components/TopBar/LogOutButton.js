@@ -9,8 +9,14 @@ const LogOutButton = (props) => {
         text = 'Log Out'
     }
 
+    const handleLogOut = async () => {
+        await props.logUserOut();
+
+        props.history.push('/');
+    };
+
     return (
-        <Link to="/" className="top-bar-button" onClick={ () => props.logUserOut() } title="Log Out">
+        <Link to="/" className="top-bar-button" onClick={ handleLogOut } title="Log Out">
             <i className="fas fa-sign-out-alt"></i> { text }
         </Link>
     );

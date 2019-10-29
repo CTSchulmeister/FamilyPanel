@@ -1,4 +1,27 @@
-.profile__view {
+.profile {
+    display: grid;
+    grid-template-rows: auto 5rem 1fr;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "sectionHeader"
+        "greeting";
+
     height: 100%;
     width: 100%;
+}
+
+.greeting {
+    grid-area: greeting;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 2rem;
+
+    background: rgba($white, 0.6);
+
+    color: $dark-gray;
+    font-size: 1.25rem;
+    
 }

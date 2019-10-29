@@ -10,7 +10,8 @@ import {
     PENDING_HOUSEHOLD_UPDATE,
     HOUSEHOLD_UPDATED,
     HOUSEHOLD_UPDATE_ERROR,
-    CHANGE_CURRENT_NOTE
+    CHANGE_CURRENT_NOTE,
+    EDIT_CURRENT_NOTE
 } from '../actions/types';
 
 const initialState = {
@@ -46,13 +47,15 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                households: action.households,
-                currentHousehold: action.currentHousehold
+                households: state.households.concat(action.currentHousehold),
+                currentHousehold: action.currentHousehold,
+                currentNote: null
             };
         case HOUSEHOLD_CREATION_ERROR:
             return {
                 ...state,
-                loading: false
+                loading: false,
+                currentNote: null
             };
         case PENDING_CURRENT_HOUSEHOLD_CHANGE:
             return {
@@ -95,8 +98,19 @@ export default function(state = initialState, action) {
         case CHANGE_CURRENT_NOTE:
             return {
                 ...state,
-                currentNote: action.currentNote
+                currentNote: {
+                    ...action.currentNote,
+                    isEditing: false
+                }
             };
+        case EDIT_CURRENT_NOTE:
+            return {
+                ...state,
+                currentNote: {
+                    ...state.currentNote,
+                    isEditing: true,
+                }
+            }
 
         default:
             return state;

@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import { selectAuthenticationState } from '../../reducers/selectors';
 
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -13,16 +16,16 @@ class Landing extends Component {
         super(props);
 
         this.state = {
-            formToShow: 'Registration',
-            formComponent: <RegistrationForm />,
-            buttonIntro: 'Already have an account?',
-            buttonText: 'Log in!'
+            formToShow: 'Log In',
+            formComponent: <LogInForm history={ this.props.history } />,
+            buttonIntro: 'Don\'t have an account yet?',
+            buttonText: 'Register!'
         };
 
-        this.toggleForm = this.toggleForm.bind(this);
+        this.toggleForm.bind(this);
     }
 
-    toggleForm() {
+    toggleForm = () => {
         if(this.state.formToShow === 'Registration') {
             this.setState({
                 formToShow: 'Log In',
@@ -41,6 +44,12 @@ class Landing extends Component {
     }
 
     render() {
+        if(this.props.isAuthenticated) {
+            return (
+                <Redirect to="/profile" />
+            );
+        };
+
         return (
             <div className="landing">
                 <div className="landing__main-container">
@@ -75,4 +84,10 @@ class Landing extends Component {
     }
 }
 
-export default Landing;
+const mapStateToProps = state => {
+    return {
+        isAuthenticated: selectAuthenticationState(state)
+    };
+};
+
+export default connect(mapStateToProps)(Landing);

@@ -52,8 +52,6 @@ class CreateNoteForm extends Component {
             }
 
             this.props.createNote(noteBody);
-
-            this.props.history.push('/notes');
         } catch (err) {
             console.error(err);
         }
@@ -79,15 +77,14 @@ class CreateNoteForm extends Component {
                     />
                     <SubmitButton text="Create" />
                 </form>
-            </FormErrorBoundary>
-            
-        )
+            </FormErrorBoundary>   
+        );
     }
 }
 
 const mapStateToProps = (state) => {
     return {
-        householdId: state.households.currentHousehold._id
+        currentHouseholdId: state.households.currentHousehold._id
     };
 }
 

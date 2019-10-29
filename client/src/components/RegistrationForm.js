@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { selectRegistrationErrors } from '../reducers/selectors';
 import { registerUser } from '../actions/userActions';
 
 import FormHeader from './Form/FormHeader';
@@ -13,15 +13,12 @@ class RegistrationForm extends Component {
         super(props);
 
         this.state = {
-            isAuthenticated: false,
-            registrationData: {
-                firstName: '',
-                lastName: '',
-                email: '',
-                retypeEmail: '',
-                password: '',
-                retypePassword: ''
-            }
+            firstName: '',
+            lastName: '',
+            email: '',
+            retypeEmail: '',
+            password: '',
+            retypePassword: ''
         };
 
         this.handleChange.bind(this);
@@ -33,10 +30,7 @@ class RegistrationForm extends Component {
         let value = event.target.value;
 
         this.setState({
-            registrationData: {
-                ...this.state.registrationData,
-                [key]: value
-            }
+            [key]: value
         });
     };
 
@@ -44,19 +38,13 @@ class RegistrationForm extends Component {
         event.preventDefault();
 
         try {
-            this.props.registerUser(this.state.registrationData);
+            this.props.registerUser(this.state);
         } catch (err) {
             alert(`Error encountered: ${ err }`);
         }
     };
 
     render() {
-        if(this.props.isAuthenticated) {
-            return (
-                <Redirect to="/profile" />
-            );
-        }
-
         let errors = null;
         if(this.props.registrationErrors) {
             let errorsArray = this.props.registrationErrors;
@@ -110,7 +98,7 @@ class RegistrationForm extends Component {
                     <TextInput
                         type="text"
                         name="firstName"
-                        value={ this.state.registrationData.firstName }
+                        value={ this.state.firstName }
                         onChange={ this.handleChange }
                         label="First Name"
                         maxLength={ 30 }
@@ -118,7 +106,7 @@ class RegistrationForm extends Component {
                     <TextInput
                         type="text"
                         name="lastName"
-                        value={ this.state.registrationData.lastName }
+                        value={ this.state.lastName }
                         onChange={ this.handleChange }
                         label="Last Name"
                         maxLength={ 30 }
@@ -126,14 +114,14 @@ class RegistrationForm extends Component {
                     <TextInput
                         type="email"
                         name="email"
-                        value={ this.state.registrationData.email }
+                        value={ this.state.email }
                         onChange={ this.handleChange }
                         label="Email"
                     />
                     <TextInput
                         type="email"
                         name="retypeEmail"
-                        value={ this.state.registrationData.retypeEmail }
+                        value={ this.state.retypeEmail }
                         onChange={ this.handleChange }
                         label="Retype Email"
                     />
@@ -141,14 +129,14 @@ class RegistrationForm extends Component {
                         hint="A valid password must contain at least 8 characters, including letters, numbers, and special characters"
                         type="password"
                         name="password"
-                        value={ this.state.registrationData.password }
+                        value={ this.state.password }
                         onChange={ this.handleChange }
                         label="Password"
                     />
                     <TextInput
                         type="password"
                         name="retypePassword"
-                        value={ this.state.registrationData.retypePassword }
+                        value={ this.state.retypePassword }
                         onChange={ this.handleChange }
                         label="Retype Password"
                     />
@@ -161,8 +149,7 @@ class RegistrationForm extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.user.authenticated,
-        registrationErrors: state.user.registrationErrors
+        registrationErrors: selectRegistrationErrors(state)
     }
 }
 

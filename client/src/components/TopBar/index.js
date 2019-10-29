@@ -17,7 +17,7 @@ const TopBar = (props) => {
                 <TopBarButton type="notifications" />
                 <TopBarButton type="messages" />
                 <TopBarButton type="settings" />
-                <LogOutButton />
+                <LogOutButton history={ props.history } />
             </div>
 
             <hr className="top-bar__divider" />

@@ -12,37 +12,31 @@ class Divider extends Component {
     constructor(props) {
         super(props);
 
-        if(props.color) {
-            switch(props.color) {
-                case 'light':
-                    this.className = Divider.LIGHT_CLASS;
-                    break;
-                case 'colored':
-                    this.className = Divider.COLORED_CLASS;
-                    break;
-                case 'dark':
-                    this.className = Divider.DARK_CLASS;
-                    break;
-                default:
-                    this.className = Divider.DARK_CLASS;
-            }
-        } else {
-            this.className = Divider.DARK_CLASS;
+        switch(props.color) {
+            case 'light':
+                this.className = Divider.LIGHT_CLASS;
+                break;
+            case 'colored':
+                this.className = Divider.COLORED_CLASS;
+                break;
+            case 'dark':
+                this.className = Divider.DARK_CLASS;
+                break;
+            case undefined:
+            default:
+                this.className = Divider.DARK_CLASS;
         }
 
-        if(props.size) {
-            switch(props.size) {
-                case 'small':
-                    this.className += ` ${ Divider.SMALL_CLASS }`;
-                    break;
-                case 'large':
-                    this.className += ` ${ Divider.LARGE_CLASS }`;
-                    break;
-                default: 
-                    this.className += ` ${ Divider.SMALL_CLASS }`;
-            }
-        } else {
-            this.className += ` ${ Divider.SMALL_CLASS }`;
+        switch(props.size) {
+            case 'small':
+                this.className += ` ${ Divider.SMALL_CLASS }`;
+                break;
+            case 'large':
+                this.className += ` ${ Divider.LARGE_CLASS }`;
+                break;
+            case undefined:
+            default: 
+                this.className += ` ${ Divider.SMALL_CLASS }`;
         }
     }
 

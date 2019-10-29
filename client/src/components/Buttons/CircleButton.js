@@ -1,37 +1,35 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-class StandardButton extends Component {
-    static BASE_CLASS = `standard-button`;
-    static SMALL_CLASS = `${ StandardButton.BASE_CLASS }--small`;
-    static MEDIUM_CLASS = `${ StandardButton.BASE_CLASS }--medium`;
-    static LARGE_CLASS = `${ StandardButton.BASE_CLASS }--large`;
-    static WIDE_CLASS = `${ StandardButton.BASE_CLASS }--wide`;
-    static SQUARE_CLASS = `${ StandardButton.BASE_CLASS }--square`;
+class CircleButton extends Component {
+    static BASE_CLASS = `circle-button`;
+    static SMALL_CLASS = `${ CircleButton.BASE_CLASS }--small`;
+    static MEDIUM_CLASS = `${ CircleButton.BASE_CLASS }--medium`;
+    static LARGE_CLASS = `${ CircleButton.BASE_CLASS }--large`;
+    static LIGHT_CLASS = `${ CircleButton.BASE_CLASS }--light`;
+    static DARK_CLASS = `${ CircleButton.BASE_CLASS }--dark`;
 
     constructor(props) {
-        super(props)
+        super(props);
 
-        switch(props.size) {
+        const size = props.size;
+
+        switch(size) {
             case 'small':
-                this.className = StandardButton.SMALL_CLASS;
+                this.className = CircleButton.SMALL_CLASS;
                 break;
             case 'medium':
-                this.className = StandardButton.MEDIUM_CLASS;
+                this.className = CircleButton.MEDIUM_CLASS;
                 break;
             case 'large':
-                this.className = StandardButton.LARGE_CLASS;
-                break;
-            case 'wide':
-                this.className = StandardButton.WIDE_CLASS;
-                break;
-            case 'square':
-                this.className = StandardButton.SQUARE_CLASS;
+                this.className = CircleButton.LARGE_CLASS;
                 break;
             case undefined:
             default:
-                this.className = StandardButton.MEDIUM_CLASS;
+                this.className = CircleButton.MEDIUM_CLASS;
         }
+
+        this.className += (props.light) ? ` ${ CircleButton.LIGHT_CLASS }` : ` ${ CircleButton.DARK_CLASS }`;
     }
 
     render() {
@@ -51,14 +49,13 @@ class StandardButton extends Component {
     }
 }
 
-StandardButton.propTypes = {
+CircleButton.propTypes = {
     size: PropTypes.oneOf([
         'small',
         'medium',
-        'large',
-        'wide',
-        'square'
+        'large'
     ]),
+    light: PropTypes.bool,
     type: PropTypes.oneOf([
         'button',
         'submit',
@@ -71,4 +68,4 @@ StandardButton.propTypes = {
     onClick: PropTypes.func
 };
 
-export default StandardButton;
+export default CircleButton;

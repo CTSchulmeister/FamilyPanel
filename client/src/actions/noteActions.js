@@ -2,7 +2,8 @@ import {
     PENDING_HOUSEHOLD_UPDATE,
     HOUSEHOLD_UPDATED,
     HOUSEHOLD_UPDATE_ERROR,
-    CHANGE_CURRENT_NOTE
+    CHANGE_CURRENT_NOTE,
+    EDIT_CURRENT_NOTE
 } from './types';
 
 import store from '../store';
@@ -58,6 +59,56 @@ export const readNote = noteId => dispatch => {
         dispatch({
             type: CHANGE_CURRENT_NOTE,
             currentNote: noteToRead
+        });
+    }
+};
+
+export const editNote = () => dispatch => {
+    dispatch({
+        type: EDIT_CURRENT_NOTE
+    });
+};
+
+export const updateNote = noteData => async dispatch => {
+    try {
+        dispatch({
+            type: PENDING_HOUSEHOLD_UPDATE
+        });
+        
+        let updateNoteResponse = await fetch(`${ ROOT_URL }/api/household/${ noteData.householdId }/note/${ noteData.noteId }`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+            },
+            body: JSON.stringify(noteData)
+        });
+        updateNoteResponse = await updateNoteResponse.json();
+
+        if(!updateNoteResponse.success) throw updateNoteResponse.errors;
+
+        let currentNote = null;
+
+        for(let note of updateNoteResponse.household.notes) {
+            if(note._id === noteData.noteId) {
+                currentNote = note;
+            }
+        }
+
+        if(currentNote === null) {
+            throw new Error('The note could not be found in the updated household');
+        }
+
+        dispatch({
+            type: HOUSEHOLD_UPDATED,
+            household: updateNoteResponse.household,
+            currentNote: currentNote
+        });
+    } catch (errors) {
+        dispatch({
+            type: HOUSEHOLD_UPDATE_ERROR,
+            errors: errors
         });
     }
 };
