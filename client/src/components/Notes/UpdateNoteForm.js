@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { updateNote } from '../../actions/noteActions';
+import {
+    selectUser,
+    selectCurrentHousehold,
+    selectCurrentNote,
+} from '../../reducers/selectors';
 
 import FormErrorBoundary from '../Form/FormErrorBoundary';
 import FormHeader from '../Form/FormHeader';
@@ -14,7 +19,7 @@ class UpdateNoteForm extends Component {
     constructor(props) {
         super(props);
 
-        if(this.props.userId !== this.props.currentNote._creatorId) {
+        if(this.props.user._id !== this.props.currentNote._creatorId) {
             this.state = {
                 allowNoteUpdating: false
             };
@@ -22,7 +27,7 @@ class UpdateNoteForm extends Component {
             this.state = {
                 allowNoteUpdating: true,
                 noteData: {
-                    householdId: this.props.currentHouseholdId,
+                    householdId: this.props.currentHousehold._id,
                     noteId: this.props.currentNote._id,
                     title: this.props.currentNote.title,
                     body: this.props.currentNote.body
@@ -102,9 +107,9 @@ class UpdateNoteForm extends Component {
 
 const mapStateToProps = state => {
     return {
-        currentHouseholdId: state.households.currentHousehold._id,
-        currentNote: state.households.currentNote,
-        userId: state.user.user._id
+        currentHousehold: selectCurrentHousehold(state),
+        currentNote: selectCurrentNote(state),
+        user: selectUser(state)
     };
 }
 

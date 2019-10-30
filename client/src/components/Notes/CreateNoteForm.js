@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createNote } from '../../actions/noteActions';
+import { selectCurrentHousehold } from '../../reducers/selectors';
 
 import FormErrorBoundary from '../Form/FormErrorBoundary';
 import FormHeader from '../Form/FormHeader';
@@ -13,7 +14,7 @@ class CreateNoteForm extends Component {
         super(props);
 
         this.state = {
-            householdId: this.props.currentHouseholdId,
+            householdId: this.props.currentHousehold._id,
             title: '',
             body: ''
         };
@@ -84,7 +85,7 @@ class CreateNoteForm extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        currentHouseholdId: state.households.currentHousehold._id
+        currentHousehold: selectCurrentHousehold(state)
     };
 }
 

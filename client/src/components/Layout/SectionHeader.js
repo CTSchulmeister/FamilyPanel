@@ -9,6 +9,7 @@ const SectionHeader = (props) => {
             <Heading light={ true }>
                 { props.title }
             </Heading>
+            { props.children }
         </header>
     );
 };

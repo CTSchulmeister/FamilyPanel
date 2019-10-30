@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { selectUser } from '../../reducers/selectors';
 
 const UserHandle = (props) => {
     return (
@@ -18,7 +19,7 @@ const UserHandle = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        user: state.user.user
+        user: selectUser(state)
     };
 };
 

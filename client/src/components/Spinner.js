@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Spinner = (props) => {
+const Spinner = props => {
     return (
         <div className="spinner__wrapper">
             <div className="spinner__container">

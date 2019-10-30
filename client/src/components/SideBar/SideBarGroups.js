@@ -1,5 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {
+    selectHouseholds
+} from '../../reducers/selectors';
 
 import SideBarGroup from './SideBarGroup';
 
@@ -35,7 +38,7 @@ const SideBarGroups = props => {
 
 const mapStateToProps = state => {
     return {
-        households: state.households.households
+        households: selectHouseholds(state)
     };
 }
 

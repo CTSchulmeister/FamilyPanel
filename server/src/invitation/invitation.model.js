@@ -20,7 +20,8 @@ const InvitationSchema = new mongoose.Schema({
     sent: {
         type: Date,
         default: Date.now()
-    }
+    },
+    message: String
 }, {
     toObject: {
         virtuals: true

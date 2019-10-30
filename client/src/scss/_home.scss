@@ -1,0 +1,23 @@
+.home {
+    &__invite-member {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: row-reverse;
+        width: 50%;
+        padding-bottom: 0.5rem;
+
+        & button {
+            margin-left: 0.5rem;
+        }
+    }
+
+    & button ~ .typography__subheading--light {
+        transition: all ease-in 0.15s;
+    }
+
+    & button:hover ~ .typography__subheading--light {
+        transition: all ease-out 0.15s;
+        color: $white;
+    }
+}

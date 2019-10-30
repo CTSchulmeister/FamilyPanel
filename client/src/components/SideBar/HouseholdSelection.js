@@ -1,5 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {
+    selectUser,
+    selectHouseholds
+} from '../../reducers/selectors';
 import PropTypes from 'prop-types';
 
 import StandardButton from '../Buttons/StandardButton';
@@ -16,7 +20,7 @@ const HouseholdSelection = props => {
                 id={ household._id }
                 name={ household.name }
                 closeWindow={ props.handleHouseholdSelection }
-                isOwned={ household._ownerId === props.userId }
+                isOwned={ household._ownerId === props.user._id }
             />
         );
     });
@@ -40,8 +44,8 @@ HouseholdSelection.propTypes = {
 
 const mapStateToProps = state => {
     return {
-        userId: state.user.user._id,
-        households: state.households.households
+        user: selectUser(state),
+        households: selectHouseholds(state)
     };
 }
 

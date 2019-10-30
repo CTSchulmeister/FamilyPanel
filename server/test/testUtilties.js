@@ -29,7 +29,7 @@ module.exports.userFactory = async () => {
 };
 
 /**
- * @param {Document} [users] - Any number of user documents to be added to the household.
+ * @param {...Document} users - Any number of user documents to be added to the household.
  */
 module.exports.householdFactory = async (...users) => {
     let owner;

@@ -1,5 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { 
+    selectAuthenticationState, 
+    selectLoadingState 
+} from '../../reducers/selectors';
 
 import RequiresAuthentication from '../RequiresAuthentication';
 
@@ -49,8 +53,8 @@ const AppContainer = props => {
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.user.authenticated,
-        isLoading: state.user.loading || state.households.loading
+        isAuthenticated: selectAuthenticationState(state),
+        isLoading: selectLoadingState(state)
     };
 };
 

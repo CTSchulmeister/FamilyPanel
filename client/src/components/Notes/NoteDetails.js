@@ -32,7 +32,7 @@ class NoteDetails extends Component {
             })[0];
 
             const updatedText = (this.props.currentNote.updatedAt)
-                ? `, updated ${ new Date(this.props.currentNote.updatedAt).toLocaleString() }`
+                ? `| Updated ${ new Date(this.props.currentNote.updatedAt).toLocaleString(undefined, { month: 'numeric', year: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) }`
                 : '';
 
             const deleteModal = (this.state.showDeleteModal)
@@ -71,7 +71,7 @@ class NoteDetails extends Component {
                         />
                         { 
                             `${ creator.firstName } ${ creator.lastName }\
-                             at ${ new Date(this.props.currentNote.createdAt).toLocaleString() }\
+                             at ${ new Date(this.props.currentNote.createdAt).toLocaleString(undefined, { month: 'numeric', year: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) }\
                              ${ updatedText }`    
                         }
                     </div>

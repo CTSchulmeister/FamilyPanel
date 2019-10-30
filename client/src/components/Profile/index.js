@@ -1,5 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import {
+    selectAuthenticationState,
+    selectLoadingState
+} from '../../reducers/selectors';
 
 import SectionHeader from '../Layout/SectionHeader';
 import Greeting from './Greeting';
@@ -15,8 +19,8 @@ const Profile = props => {
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.user.authenticated,
-        isLoading: state.user.loading || state.households.loading
+        isAuthenticated: selectAuthenticationState(state),
+        isLoading: selectLoadingState(state)
     };
 }
 

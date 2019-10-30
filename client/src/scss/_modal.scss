@@ -14,7 +14,7 @@
 
         background: rgba(black, 0.75);
 
-        animation: modalAppear 0.3s linear;
+        animation: modalWrapperAppear 0.3s linear;
     }
 
     &__button-container {
@@ -27,7 +27,7 @@
         }
     }
 
-    @keyframes modalAppear {
+    @keyframes modalWrapperAppear {
         from {
             opacity: 0;
         } to {
@@ -35,8 +35,23 @@
         }
     }
 
-    &--delete {
-        background: white;
+    &--delete,
+    &--invite {
+        min-width: 500px;
         padding: 2rem;
+
+        background: white;
+
+        animation: modalAppear 0.3s;
+    }
+
+    @keyframes modalAppear {
+        0% {
+            opacity: 0;
+        } 50% {
+            opacity: 0;
+        } 100% {
+            opacity: 1;
+        }
     }
 }

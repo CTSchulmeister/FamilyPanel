@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import {
+    selectUser,
+    selectCurrentHousehold,
+    selectHouseholds
+} from '../../reducers/selectors';
 
 import CreateHouseholdForm from '../CreateHouseholdForm/CreateHouseholdForm';
 import HouseholdSelection from './HouseholdSelection';
@@ -111,9 +116,9 @@ class SideBarHeader extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        user: state.user.user,
-        households: state.households.households,
-        currentHousehold: state.households.currentHousehold
+        user: selectUser(state),
+        households: selectHouseholds(state),
+        currentHousehold: selectCurrentHousehold(state)
     };
 }
 

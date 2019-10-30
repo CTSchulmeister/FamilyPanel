@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { selectUser } from '../../reducers/selectors';
 
 const Greeting = props => {
     const today = new Date();
@@ -32,7 +33,7 @@ const Greeting = props => {
 
 const mapStateToProps = state => {
     return {
-        user: state.user.user
+        user: selectUser(state)
     };
 };
 
