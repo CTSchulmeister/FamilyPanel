@@ -3,7 +3,8 @@ import {
     HOUSEHOLD_UPDATED,
     HOUSEHOLD_UPDATE_ERROR,
     CHANGE_CURRENT_NOTE,
-    EDIT_CURRENT_NOTE
+    EDIT_CURRENT_NOTE,
+    CANCEL_EDIT_CURRENT_NOTE
 } from './types';
 
 import store from '../store';
@@ -66,6 +67,12 @@ export const readNote = noteId => dispatch => {
 export const editNote = () => dispatch => {
     dispatch({
         type: EDIT_CURRENT_NOTE
+    });
+};
+
+export const cancelEditNote = () => dispatch => {
+    dispatch({
+        type: CANCEL_EDIT_CURRENT_NOTE
     });
 };
 

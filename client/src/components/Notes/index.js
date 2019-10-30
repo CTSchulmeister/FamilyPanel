@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { selectCurrentNote } from '../../reducers/selectors';
-import { editNote } from '../../actions/noteActions';
+import { editNote, cancelEditNote } from '../../actions/noteActions';
 
 import SectionHeader from '../Layout/SectionHeader';
 
@@ -30,7 +30,7 @@ class Notes extends Component {
         let detailsSection = null;
 
         if(this.props.currentNote && this.props.currentNote.isEditing) {
-            detailsSection = <NoteFormContainer form='Update Note' />
+            detailsSection = <NoteFormContainer form='Update Note' toggleShowUpdateNote={ this.props.cancelEditNote } />
         } else if(this.state.showCreateNote) {
             detailsSection = <NoteFormContainer form='Create Note' toggleShowCreateNote={ this.toggleShowCreateNote } />
         } else {
@@ -53,4 +53,4 @@ const mapStateToProps = state => {
     };
 }
 
-export default connect(mapStateToProps, { editNote })(Notes);
+export default connect(mapStateToProps, { editNote, cancelEditNote })(Notes);

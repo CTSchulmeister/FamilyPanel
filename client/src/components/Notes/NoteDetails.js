@@ -4,45 +4,59 @@ import { selectCurrentNote, selectCurrentHousehold } from '../../reducers/select
 import { deleteNote, editNote } from '../../actions/noteActions';
 
 import CircleButton from '../Buttons/CircleButton';
+import DeleteModal from '../Modals/DeleteModal';
 
 class NoteDetails extends Component {
     constructor(props) {
         super(props);
 
-        this.handleDelete.bind(this);
+        this.state = {
+            showDeleteModal: false
+        };
+
+        this.toggleDeleteModal.bind(this);
     }
 
-    handleDelete() {
-        this.props.deleteNote(this.props.currentNote._id);
-    }
+    toggleDeleteModal = () => {
+        this.setState({
+            showDeleteModal: (this.state.showDeleteModal) ? false : true
+        });
+    };
 
     render() {
         if(this.props.currentNote !== null) {
-            let body = this.props.currentNote.body;
+            const body = this.props.currentNote.body;
 
-            let creator = this.props.currentHousehold.members.filter(member => {
+            const creator = this.props.currentHousehold.members.filter(member => {
                 return member._id === this.props.currentNote._creatorId;
             })[0];
 
-            let updatedText = (this.props.currentNote.updatedAt)
+            const updatedText = (this.props.currentNote.updatedAt)
                 ? `, updated ${ new Date(this.props.currentNote.updatedAt).toLocaleString() }`
                 : '';
 
+            const deleteModal = (this.state.showDeleteModal)
+                ? (
+                    <DeleteModal
+                        deleteItemName={ `the note '${ this.props.currentNote.title }'`}
+                        cancelHandler={ this.toggleDeleteModal }
+                        deleteHandler={ this.props.deleteNote }
+                        deleteItemId={ this.props.currentNote._id }
+                        cancelDelete={ this.toggleDeleteModal }
+                    />
+                )
+                : null;
+
             return (
                 <div className="note-details note-details--active-note">
+                    { deleteModal }
                     <h2 className="note-details__title">
                         { this.props.currentNote.title }
                         <div className="note-details__buttons">
                             <CircleButton size="medium" onClick={ this.props.editNote }>
                                 <i className="fas fa-edit"></i>
                             </CircleButton>
-                            <CircleButton size="medium" onClick= {
-                                () => {
-                                    if(window.confirm(`Are you sure you wanted to delete the note ${ this.props.title}?`)) {
-                                        this.handleDelete();
-                                    }
-                                }
-                            }>
+                            <CircleButton size="medium" onClick= { this.toggleDeleteModal }>
                                 <i className="fas fa-trash-alt"></i>
                             </CircleButton>
                         </div> 

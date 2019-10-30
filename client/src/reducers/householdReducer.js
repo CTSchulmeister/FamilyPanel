@@ -11,7 +11,8 @@ import {
     HOUSEHOLD_UPDATED,
     HOUSEHOLD_UPDATE_ERROR,
     CHANGE_CURRENT_NOTE,
-    EDIT_CURRENT_NOTE
+    EDIT_CURRENT_NOTE,
+    CANCEL_EDIT_CURRENT_NOTE
 } from '../actions/types';
 
 const initialState = {
@@ -110,7 +111,15 @@ export default function(state = initialState, action) {
                     ...state.currentNote,
                     isEditing: true,
                 }
-            }
+            };
+        case CANCEL_EDIT_CURRENT_NOTE:
+            return {
+                ...state,
+                currentNote: {
+                    ...state.currentNote,
+                    isEditing: false
+                }
+            };
 
         default:
             return state;
