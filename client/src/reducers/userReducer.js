@@ -1,4 +1,5 @@
 import {
+    SERVER_CONNECTION_ERROR,
     PENDING_AUTHORIZATION,
     USER_REGISTERED,
     REGISTRATION_ERROR,
@@ -94,6 +95,9 @@ export default function(state = initialState, action) {
                 ...state,
                 user: action.user
             };
+
+        case SERVER_CONNECTION_ERROR: 
+            return initialState;
 
         default:
             return state;

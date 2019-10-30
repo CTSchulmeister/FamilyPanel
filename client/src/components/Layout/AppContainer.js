@@ -2,10 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { 
     selectAuthenticationState, 
-    selectLoadingState 
+    selectLoadingState,
+    selectServerErrorStatus
 } from '../../reducers/selectors';
 
 import RequiresAuthentication from '../RequiresAuthentication';
+import NoServerConnection from '../Connection/NoServerConnection';
 
 import TopBar from '../TopBar';
 import SideBar from '../SideBar';
@@ -18,6 +20,12 @@ import Home from '../Home';
 import Notes from '../Notes';
 
 const AppContainer = props => {
+    if(props.serverIsDown) {
+        return (
+            <NoServerConnection history={ props.history } />
+        );
+    }
+
     if(!props.isAuthenticated) return <RequiresAuthentication />;
 
     let componentToShow;
@@ -54,7 +62,8 @@ const AppContainer = props => {
 const mapStateToProps = (state) => {
     return {
         isAuthenticated: selectAuthenticationState(state),
-        isLoading: selectLoadingState(state)
+        isLoading: selectLoadingState(state),
+        serverIsDown: selectServerErrorStatus(state)
     };
 };
 

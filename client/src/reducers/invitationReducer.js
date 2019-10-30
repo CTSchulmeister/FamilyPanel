@@ -1,4 +1,5 @@
 import {
+    SERVER_CONNECTION_ERROR,
     PENDING_GET_INVITATIONS,
     INVITATIONS_RECIEVED,
     ERROR_GETTING_INVITATIONS
@@ -27,6 +28,9 @@ export default function(state = initialState, action) {
                 loading: false,
                 errors: action.errors
             };
+
+        case SERVER_CONNECTION_ERROR: 
+            return initialState;
 
         default:
             return state;

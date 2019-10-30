@@ -1,4 +1,5 @@
 import {
+    SERVER_CONNECTION_ERROR,
     PENDING_AUTHORIZATION,
     USER_REGISTERED,
     REGISTRATION_ERROR,
@@ -29,7 +30,12 @@ export const registerUser = userData => async dispatch => {
         });
         registrationResponse = await registrationResponse.json();
 
-        if(!registrationResponse.success) throw registrationResponse.errors;
+        if(registrationResponse.success === false) {
+            dispatch({
+                type: REGISTRATION_ERROR,
+                errors: registrationResponse.errors
+            });
+        }
 
         localStorage.setItem('auth_jwt_token', registrationResponse.token);
 
@@ -38,10 +44,9 @@ export const registerUser = userData => async dispatch => {
             user: registrationResponse.user,
             token: registrationResponse.token
         });
-    } catch (errors) {
+    } catch (error) {
         dispatch({
-            type: REGISTRATION_ERROR,
-            errors: errors
+            type: SERVER_CONNECTION_ERROR
         });
     }
 };
@@ -60,9 +65,15 @@ export const logUserIn = userData => async dispatch => {
             },
             body: JSON.stringify(userData)
         });
+
         userResponse = await userResponse.json();
 
-        if(!userResponse.success) throw userResponse.errors;
+        if(userResponse.success === false) {
+            dispatch({
+                type: LOGIN_ERROR,
+                errors: userResponse.errors
+            })
+        }
 
         localStorage.setItem('auth_jwt_token', userResponse.token);
 
@@ -73,10 +84,9 @@ export const logUserIn = userData => async dispatch => {
             households: userResponse.households,
             currentHousehold: userResponse.currentHousehold
         });
-    } catch (errors) {
+    } catch (error) {
         dispatch({
-            type: LOGIN_ERROR,
-            errors: errors
+            type: SERVER_CONNECTION_ERROR
         });
     }
 };
@@ -96,15 +106,19 @@ export const logUserOut = () => async dispatch => {
         });
         logOutResponse = await logOutResponse.json();
 
-        if(!logOutResponse.success) throw logOutResponse.errors;
+        if(logOutResponse.success === false) {
+            dispatch({
+                type: LOG_OUT_ERROR,
+                errors: logOutResponse.errors
+            });
+        }
 
         dispatch({
             type: USER_LOGGED_OUT
         });
-    } catch (errors) {
+    } catch (error) {
         dispatch({
-            type: LOG_OUT_ERROR,
-            errors: errors
+            type: SERVER_CONNECTION_ERROR
         });
     }
 }

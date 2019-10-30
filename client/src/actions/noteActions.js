@@ -1,4 +1,5 @@
 import {
+    SERVER_CONNECTION_ERROR,
     PENDING_HOUSEHOLD_UPDATE,
     HOUSEHOLD_UPDATED,
     HOUSEHOLD_UPDATE_ERROR,
@@ -31,16 +32,20 @@ export const createNote = noteData => async dispatch => {
         })
         createNoteResponse = await createNoteResponse.json();
 
-        if(!createNoteResponse.success) throw createNoteResponse.errors();
+        if(createNoteResponse.success === false) {
+            dispatch({
+                type: HOUSEHOLD_UPDATE_ERROR,
+                errors: createNoteResponse.errors
+            });
+        }
         
         dispatch({
             type: HOUSEHOLD_UPDATED,
             household: createNoteResponse.household
         });
-    } catch (errors) {
+    } catch (error) {
         dispatch({
-            type: HOUSEHOLD_UPDATE_ERROR,
-            errors: errors
+            type: SERVER_CONNECTION_ERROR
         });
     }
 };
@@ -93,7 +98,12 @@ export const updateNote = noteData => async dispatch => {
         });
         updateNoteResponse = await updateNoteResponse.json();
 
-        if(!updateNoteResponse.success) throw updateNoteResponse.errors;
+        if(updateNoteResponse.success === false) {
+            dispatch({
+                type: HOUSEHOLD_UPDATE_ERROR,
+                errors: updateNoteResponse.errors
+            });
+        }
 
         let currentNote = null;
 
@@ -112,10 +122,9 @@ export const updateNote = noteData => async dispatch => {
             household: updateNoteResponse.household,
             currentNote: currentNote
         });
-    } catch (errors) {
+    } catch (error) {
         dispatch({
-            type: HOUSEHOLD_UPDATE_ERROR,
-            errors: errors
+            type: SERVER_CONNECTION_ERROR
         });
     }
 };
@@ -138,7 +147,12 @@ export const deleteNote = noteId => async dispatch => {
         });
         deleteNoteResponse = await deleteNoteResponse.json();
 
-        if(!deleteNoteResponse.success) throw deleteNoteResponse.errors;
+        if(deleteNoteResponse.success === false) {
+            dispatch({
+                type: HOUSEHOLD_UPDATE_ERROR,
+                errors: deleteNoteResponse.errors
+            });
+        }
 
         let currentNote = store.getState().households.currentNote;
         let newCurrentNote = currentNote;
@@ -150,10 +164,9 @@ export const deleteNote = noteId => async dispatch => {
             household: deleteNoteResponse.household,
             currentNote: newCurrentNote
         });
-    } catch (errors) {
+    } catch (error) {
         dispatch({
-            type: HOUSEHOLD_UPDATE_ERROR,
-            errors: errors
+            type: SERVER_CONNECTION_ERROR
         });
     }
 };

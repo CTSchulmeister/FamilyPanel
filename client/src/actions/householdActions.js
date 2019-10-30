@@ -1,4 +1,5 @@
 import {
+    SERVER_CONNECTION_ERROR,
     PENDING_HOUSEHOLD_CREATION,
     HOUSEHOLD_CREATED,
     HOUSEHOLD_CREATION_ERROR,
@@ -37,7 +38,12 @@ export const createHousehold = (householdData) => async dispatch => {
         });
         createHouseholdResponse = await createHouseholdResponse.json();
 
-        if(!createHouseholdResponse.success) throw createHouseholdResponse.errors;
+        if(createHouseholdResponse.success === false) {
+            dispatch({
+                type: HOUSEHOLD_CREATION_ERROR,
+                errors: createHouseholdResponse.errors
+            });
+        }
 
         dispatch({
             type: HOUSEHOLD_CREATED,
@@ -46,8 +52,7 @@ export const createHousehold = (householdData) => async dispatch => {
         });
     } catch (error) {
         dispatch({
-            type: HOUSEHOLD_CREATION_ERROR,
-            errors: error
+            type: SERVER_CONNECTION_ERROR
         });
     }
 };
@@ -71,7 +76,12 @@ export const changeCurrentHousehold = (householdId) => async dispatch => {
         });
         householdResponse = await householdResponse.json();
 
-        if(!householdResponse.success) throw householdResponse.errors;
+        if(householdResponse.success === false) {
+            dispatch({
+                type: CURRENT_HOUSEHOLD_CHANGE_ERROR,
+                errors: householdResponse.errors
+            });
+        }
 
         dispatch({
             type: CURRENT_HOUSEHOLD_CHANGED,
@@ -79,8 +89,7 @@ export const changeCurrentHousehold = (householdId) => async dispatch => {
         });
     } catch (error) {
         dispatch({
-            type: CURRENT_HOUSEHOLD_CHANGE_ERROR,
-            errors: error
+            type: SERVER_CONNECTION_ERROR
         });
     }
 };

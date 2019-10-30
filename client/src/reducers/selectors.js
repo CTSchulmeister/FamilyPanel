@@ -29,3 +29,7 @@ export const selectLogInErrors = state => {
 export const selectRegistrationErrors = state => {
     return state.user.registrationErrors;
 };
+
+export const selectServerErrorStatus = state => {
+    return state.server.connectionError;
+}

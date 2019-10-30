@@ -1,4 +1,5 @@
 import {
+    SERVER_CONNECTION_ERROR,
     USER_LOGGED_IN,
     USER_LOGGED_OUT,
     PENDING_HOUSEHOLD_CREATION,
@@ -120,6 +121,9 @@ export default function(state = initialState, action) {
                     isEditing: false
                 }
             };
+
+        case SERVER_CONNECTION_ERROR: 
+            return initialState;
 
         default:
             return state;

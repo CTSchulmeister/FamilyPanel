@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { selectAuthenticationState } from '../../reducers/selectors';
+import { 
+    selectAuthenticationState,
+    selectServerErrorStatus
+} from '../../reducers/selectors';
 
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -9,7 +12,7 @@ import StandardButton from '../Buttons/StandardButton';
 
 import LogInForm from '../LogInForm';
 import RegistrationForm from '../RegistrationForm';
-
+import NoServerConnection from '../Connection/NoServerConnection';
 
 class Landing extends Component {
     constructor(props) {
@@ -44,6 +47,12 @@ class Landing extends Component {
     }
 
     render() {
+        if(this.props.serverIsDown) {
+            return (
+                <NoServerConnection history={ this.props.history } />
+            );
+        };
+
         if(this.props.isAuthenticated) {
             return (
                 <Redirect to="/profile" />
@@ -86,7 +95,8 @@ class Landing extends Component {
 
 const mapStateToProps = state => {
     return {
-        isAuthenticated: selectAuthenticationState(state)
+        isAuthenticated: selectAuthenticationState(state),
+        serverIsDown: selectServerErrorStatus(state)
     };
 };
 
