@@ -96,3 +96,11 @@ module.exports.householdWithNotesFactory = async (user) => {
         } }
     }, { new: true }).exec();
 };
+
+module.exports.generateEmail = () => {
+    return `${ this.randomStringGenerator(15) }@test.com`;
+};
+
+module.exports.invitationFactory = async () => {
+
+};

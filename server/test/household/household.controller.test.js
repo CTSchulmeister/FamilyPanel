@@ -2,7 +2,6 @@
 
 // --- Modules
 const mongoose = require('mongoose');
-const { generateSalt, generateHash } = require('../../src/util');
 const { 
     randomStringGenerator, 
     userFactory, 
