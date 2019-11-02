@@ -22,7 +22,7 @@ const TopBar = (props) => {
 
             <hr className="top-bar__divider" />
 
-            <UserHandle />
+            <UserHandle history={ props.history } />
         </header>
     );
 }

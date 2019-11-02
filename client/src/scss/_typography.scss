@@ -4,18 +4,18 @@
         &--dark,
         &--light-small,
         &--dark-small {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
+            display: block;
 
             width: 100%;
             padding: 0.75rem 0rem;
             margin: 0rem 0rem 0.5rem;
             position: relative;
+            overflow: hidden;
 
             letter-spacing: 0.2rem;
             text-transform: uppercase;
-            white-space: pre-wrap;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         &--light,

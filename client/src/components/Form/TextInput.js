@@ -2,17 +2,29 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const TextInput = props => {
+    const inputClassName = (props.light)
+        ? 'form__text-input--light'
+        : 'form__text-input--dark';
+
+    const labelClassName = (props.light)
+        ? 'form__label--light'
+        : 'form__label--dark';
+
+    const inputGroupClassName = (props.light)
+        ? 'form__input-group--light'
+        : 'form__input-group--dark';
+
     const focusInput = event => {
-        if(event.target.classList.contains('form__input-group')) {
-            event.target.querySelector('.form__text-input').focus();
+        if(event.target.classList.contains(`.${ inputGroupClassName }`)) {
+            event.target.querySelector(`.${ inputClassName }`).focus();
         } else if(event.target.parentElement.classList.contains('form__hint')) {
-            event.target.parentElement.parentElement.querySelector('.form__text-input').focus();
+            event.target.parentElement.parentElement.querySelector(`.${ inputClassName }`).focus();
         } else {
-            event.target.parentElement.querySelector('.form__text-input').focus();
+            event.target.parentElement.querySelector(`.${ inputClassName }`).focus();
         }
     }
 
-    let hint = (props.hint)
+    const hint = (props.hint)
         ? (
             <div className="form__hint">
                 <i className="fas fa-info-circle"></i>
@@ -23,10 +35,10 @@ const TextInput = props => {
         : null;
 
     return (
-        <div className="form__input-group" onClick={ focusInput }>
+        <div className={ inputGroupClassName } onClick={ focusInput }>
             { hint }
             <input
-                className="form__text-input"
+                className={ inputClassName }
                 type={ props.type }
                 name={ props.name }
                 value={ props.value }
@@ -34,7 +46,7 @@ const TextInput = props => {
                 maxLength={ props.maxLength || null }
                 minLength={ props.minLength || null }
             />
-            <label className="form__label" htmlFor={ props.name }>
+            <label className={ labelClassName } htmlFor={ props.name }>
                 { props.label }
             </label>
         </div>
@@ -42,6 +54,7 @@ const TextInput = props => {
 };
 
 TextInput.propTypes = {
+    light: PropTypes.bool,
     hint: PropTypes.string,
     type: PropTypes.oneOf([
         'email',

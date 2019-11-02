@@ -38,7 +38,7 @@ class StandardButton extends Component {
         return (
             <button 
                 className={ this.className } 
-                onClick={ this.props.onClick }
+                onClick={ this.props.onClick || null}
                 disabled={ this.props.disabled || false }
                 type={ this.props.type || 'button' }
                 name={ this.props.name || null }

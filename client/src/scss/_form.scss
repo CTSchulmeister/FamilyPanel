@@ -31,57 +31,82 @@
     }
 
     &__input-group {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
+        &,
+        &--light,
+        &--dark,
+        &--text-area {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
 
-        width: 100%;
-        padding-bottom: 0.75rem;
+            width: 100%;
+            padding-bottom: 0.75rem;
 
-        position: relative;
+            position: relative;
 
-        &:hover {
-            cursor: text;
+            &:hover {
+                cursor: text;
+            }
+
+            &::after {
+                content: '';
+
+                position: absolute;
+                bottom: 0.25rem;
+                left: 0rem;
+                
+                height: 0.125rem;
+                width: 100%;
+            }
         }
 
-        &::after {
-            content: '';
+        &--light::after {
+            background-color: $extra-dark-gray;
+        }
 
-            position: absolute;
-            bottom: 0.25rem;
-            left: 0rem;
-            
-            height: 0.125rem;
-            width: 100%;
-
+        &--dark::after {
             background-color: $gray;
         }
 
         &--text-area {
             flex-direction: column-reverse;
             margin-top: 1.1rem;
+
+            &::after {
+                background-color: $gray;
+            }
         }
     }
 
     &__label {
-        display: inline-block;
+        &--light,
+        &--dark {
+            display: inline-block;
 
-        position: absolute;
-        bottom: 0.75rem;
-        left: 0rem;
+            position: absolute;
+            bottom: 0.75rem;
+            left: 0rem;
+            
+            font-size: 1rem;
+            text-transform: uppercase;
 
-        color: $dark-gray;
-        font-size: 1rem;
-        text-transform: uppercase;
+            transform: translateY(0rem) translateX(0rem) scale(1);
+            transform-origin: top left;
 
-        transform: translateY(0rem) translateX(0rem) scale(1);
-        transform-origin: top left;
+            transition: all ease-out 0.3s;
 
-        transition: all ease-out 0.3s;
+            &:hover {
+                cursor: text;
+            }
+        }
 
-        &:hover {
-            cursor: text;
+        &--light {
+            color: $white;
+        }
+        
+        &--dark {
+            color: $extra-dark-gray;
         }
 
         &--text-area {
@@ -130,22 +155,43 @@
     }
 
     &__text-input {
-        height: 1.5rem;
-        width: 100%;
-        margin-top: 0.75rem;
+        &--light,
+        &--dark {
+            height: 1.5rem;
+            width: 100%;
+            margin-top: 0.75rem;
 
-        background: transparent;
-        border: none;
+            background: transparent;
+            border: none;
 
-        font-size: 1rem;
+            font-size: 1rem;
 
-        &:focus + .form__label,
-        &:not([value='']) + .form__label {
-            transform: translateY(-1.1rem) translateX(0.05rem) scale(0.75);
-            color: $gray;
-            transform-origin: top left;
+            &:focus + .form__label--light,
+            &:focus + .form__label--dark,
+            &:not([value='']) + .form__label--light,
+            &:not([value='']) + .form__label--dark {
+                transform: translateY(-1.1rem) translateX(0.05rem) scale(0.75);
+                transform-origin: top left;
+                transition: all ease-out 0.3s;
+            }
+        }
 
-            transition: all ease-out 0.3s;
+        &--light {
+            color: $white;
+
+            &:focus + .form__label--light,
+            &:not([value='']) + .form__label--light {
+                color: $light-gray;
+            }
+        }
+
+        &--dark {
+            color: $extra-dark-gray;
+
+            &:focus + .form__label--dark,
+            &:not([value='']) + .form__label--dark {
+                color: $gray;
+            }
         }
     }
 
@@ -259,7 +305,9 @@
         animation: titleAppear 0.9s ease-out;
     }
 
-    &__input-group, &__submit-group {
+    &__input-group--light,
+    &__input-group--dark, 
+    &__submit-group {
         animation: inputAppear 1.2s ease-out;
     }
 }
@@ -346,5 +394,105 @@
     }
     100% {
         opacity: 0;
+    }
+}
+
+.user-select {
+    position: relative;
+
+    &__trigger {
+        padding: 0rem;
+
+        background: none;
+        border: none;
+        
+        color: $extra-light-gray;
+        font-size: 1rem;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+.user-options {
+    position: absolute;
+
+    height: auto;
+    max-height: 500px;
+    padding: 0.5rem 0rem;
+    overflow: auto;
+    background: $white;
+}
+
+.user-option,
+.user-option--active {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    grid-template-areas:
+        "picture name";
+
+    height: 3rem;
+    width: 100%;
+    padding: 0rem 0rem 0rem 1rem;
+    position: relative;
+
+    border-bottom: 0.125rem solid $primary;
+
+    transition: all ease-out 0.15s;
+
+    &:hover {
+        cursor: pointer;
+
+        background: $extra-light-gray;
+
+        transition: all ease-in 0.15s;
+    }
+
+    &__picture-wrapper {
+        grid-area: picture;
+
+        padding: 0.25rem;
+    }
+
+    &__picture {
+        height: 2.5rem;
+        width: 2.5rem;
+
+        border-radius: 50%;
+        border: 0.125rem solid $primary;
+    }
+
+    &__name {
+        grid-area: name;
+
+        padding: 1rem 0rem 0rem 0.5rem;
+
+        color: $dark-gray;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
+
+.user-option {
+    background: $white;
+}
+
+.user-option--active {
+    background: $extra-light-gray;
+
+    &::after {
+        content: '';
+
+        height: 100%;
+        width: 1rem;
+        position: absolute;
+        top: 0rem;
+        left: 0rem;
+
+        background: $primary;
     }
 }

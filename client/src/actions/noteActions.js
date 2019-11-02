@@ -37,6 +37,7 @@ export const createNote = noteData => async dispatch => {
                 type: HOUSEHOLD_UPDATE_ERROR,
                 errors: createNoteResponse.errors
             });
+            return;
         }
         
         dispatch({
@@ -103,6 +104,7 @@ export const updateNote = noteData => async dispatch => {
                 type: HOUSEHOLD_UPDATE_ERROR,
                 errors: updateNoteResponse.errors
             });
+            return;
         }
 
         let currentNote = null;
@@ -152,6 +154,7 @@ export const deleteNote = noteId => async dispatch => {
                 type: HOUSEHOLD_UPDATE_ERROR,
                 errors: deleteNoteResponse.errors
             });
+            return;
         }
 
         let currentNote = store.getState().households.currentNote;

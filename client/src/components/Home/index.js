@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { selectCurrentHousehold, selectUser } from '../../reducers/selectors';
 
 import InvitationModal from '../Modals/InvitationModal';
+import HomeSettings from './HomeSettings';
 
 import SectionHeader from '../Layout/SectionHeader';
 import CircleButton from '../Buttons/CircleButton';
@@ -51,6 +52,7 @@ class Home extends Component {
                         { invitationModal }
                     </div>
                 </SectionHeader>
+                <HomeSettings />
             </section>
         );
     }

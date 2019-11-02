@@ -35,6 +35,7 @@ export const registerUser = userData => async dispatch => {
                 type: REGISTRATION_ERROR,
                 errors: registrationResponse.errors
             });
+            return;
         }
 
         localStorage.setItem('auth_jwt_token', registrationResponse.token);
@@ -73,6 +74,7 @@ export const logUserIn = userData => async dispatch => {
                 type: LOGIN_ERROR,
                 errors: userResponse.errors
             })
+            return;
         }
 
         localStorage.setItem('auth_jwt_token', userResponse.token);
@@ -111,6 +113,7 @@ export const logUserOut = () => async dispatch => {
                 type: LOG_OUT_ERROR,
                 errors: logOutResponse.errors
             });
+            return;
         }
 
         dispatch({

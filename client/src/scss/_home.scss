@@ -1,4 +1,14 @@
 .home {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr 20rem;
+    grid-template-areas:
+        "sectionHeader sectionHeader"
+        "mainSection   sideBar      ";
+
+    height: 100%;
+    width: 100%;
+
     &__invite-member {
         display: flex;
         align-items: center;
@@ -19,5 +29,56 @@
     & button:hover ~ .typography__subheading--light {
         transition: all ease-out 0.15s;
         color: $white;
+    }
+}
+
+.home-settings {
+    grid-area: sideBar;
+
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "header"
+        "list";
+
+    background: rgba($dark-gray, 0.7);
+    border-bottom-right-radius: 1rem;
+
+    &__header {
+        grid-area: header;
+
+        padding: 1rem;
+    }
+
+    &__list {
+        grid-area: list;
+        padding: 0rem 1rem;
+        border-bottom-right-radius: 1rem;
+    }
+
+    &__group {
+        margin-bottom: 1.5rem;
+
+        &-label {
+            margin: 0rem 0rem 0.5rem;
+
+            font-size: 1rem;
+
+            color: $white;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+        }
+    }
+}
+
+.home-setting {
+    display: grid;
+    grid-template-columns: 1fr 3rem;
+    margin-bottom: 0.5rem;
+
+    &__label {
+        display: flex;
+        align-items: center;
+        color: $extra-light-gray;
     }
 }

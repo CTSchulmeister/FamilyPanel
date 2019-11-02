@@ -112,6 +112,18 @@ const HouseholdSchema = new mongoose.Schema({
         allMembersCanInvite: {
             type: Boolean,
             default: false
+        },
+        allMembersCanCreateEvents: {
+            type: Boolean,
+            default: true
+        },
+        allMembersCanCreateTasks: {
+            type: Boolean,
+            default: true
+        },
+        allMembersCanCreateNotes: {
+            type: Boolean,
+            default: true
         }
     }
 });

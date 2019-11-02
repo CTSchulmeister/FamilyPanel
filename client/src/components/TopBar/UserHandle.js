@@ -4,7 +4,9 @@ import { selectUser } from '../../reducers/selectors';
 
 const UserHandle = (props) => {
     return (
-        <button className="user-handle">
+        <button className="user-handle" onClick={ () => {
+            props.history.push('/profile');
+        }}>
             <span className="user-handle__name">
                 { props.user.firstName } { props.user.lastName }
             </span>

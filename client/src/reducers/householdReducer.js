@@ -23,6 +23,16 @@ const initialState = {
     currentNote: null
 };
 
+const updateHouseholdInHouseholdsArray = (state, household) => {
+    return state.households.map(storedHousehold => {
+        if(storedHousehold._id === household._id) {
+            return household
+        } else {
+            return storedHousehold;
+        }
+    });
+};
+
 export default function(state = initialState, action) {
     switch(action.type) {
         // Logging In / Out
@@ -85,6 +95,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
+                households: updateHouseholdInHouseholdsArray(state, action.household),
                 currentHousehold: action.household,
                 currentNote: (action.currentNote || action.currentNote === null)
                     ? action.currentNote

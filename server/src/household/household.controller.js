@@ -115,6 +115,41 @@ module.exports.updateHousehold = async (id, ownerId = null, memberIds = null, na
     return updatedHousehold;
 };
 
+module.exports.changeSettings = async (
+    householdId,
+    userId,
+    allMembersCanInvite,
+    allMembersCanCreateEvents,
+    allMembersCanCreateTasks,
+    allMembersCanCreateNotes,
+    name,
+    ownerId
+) => {
+    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
+        { _id: householdId, _ownerId: userId },
+        { 
+            name: name,
+            _ownerId: ownerId,
+            settings: {
+                allMembersCanInvite: allMembersCanInvite,
+                allMembersCanCreateEvents: allMembersCanCreateEvents,
+                allMembersCanCreateTasks: allMembersCanCreateTasks,
+                allMembersCanCreateNotes: allMembersCanCreateNotes
+            }
+        },
+        { new: true }
+    );
+
+    if(!updatedHousehold) throw new Error(`...`);
+
+    updatedHousehold = {
+        ...updatedHousehold._doc,
+        members: await getHouseholdMembers(updatedHousehold._id)
+    };
+
+    return updatedHousehold;
+};
+
 /**
  * Deletes a household document by id.
  * @param {String} id - The household's id.

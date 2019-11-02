@@ -123,3 +123,74 @@
         }
     }
 }
+
+.switch-button {
+    &--on,
+    &--off {
+        position: relative;
+
+        height: 1rem;
+        width: 2rem;
+        border-radius: 0.5rem;
+        margin: 0.5rem 0.125rem;
+
+        border: none;
+        box-shadow: 0rem 0rem 0rem 0.125rem $white;
+
+        &::after {
+            content: '';
+
+            height: 0.8rem;
+            width: 0.8rem;
+            border-radius: 50%;
+            position: absolute;
+            background: $dark-gray;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    &--on {
+        background: $primary;
+
+        &::after {
+            top: 0.1rem;
+            left: 1.1rem;
+        }
+
+        &.switch-button--animate::after {
+            animation: turnOn 0.15s;
+        }
+    }
+
+    @keyframes turnOn {
+        from {
+            transform: translateX(-1rem);
+        } to {
+            transform: translateX(0rem);
+        }
+    }
+
+    &--off {
+        background: $light-gray;
+
+        &::after {
+            top: 0.1rem;
+            left: 0.1rem;
+        }
+
+        &.switch-button--animate::after {
+            animation: turnOff 0.15s;
+        }
+    }
+
+    @keyframes turnOff {
+        from {
+            transform: translateX(1rem);
+        } to {
+            transform: translateX(0rem);
+        }
+    }
+}

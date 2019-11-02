@@ -30,13 +30,20 @@ class CircleButton extends Component {
         }
 
         this.className += (props.light) ? ` ${ CircleButton.LIGHT_CLASS }` : ` ${ CircleButton.DARK_CLASS }`;
+        this.handleClick.bind(this);
     }
+
+    handleClick = event => {
+        event.preventDefault();
+
+        this.props.onClick();
+    };
 
     render() {
         return (
             <button 
                 className={ this.className } 
-                onClick={ this.props.onClick }
+                onClick={ this.handleClick }
                 disabled={ this.props.disabled || false }
                 type={ this.props.type || 'button' }
                 name={ this.props.name || null }

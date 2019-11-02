@@ -2,13 +2,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const TextInputWithRef = React.forwardRef((props, ref) => {
+    const inputClassName = (props.light)
+        ? 'form__text-input--light'
+        : 'form__text-input--dark';
+
+    const labelClassName = (props.light)
+        ? 'form__label--light'
+        : 'form__label--dark';
+
+    const inputGroupClassName = (props.light)
+        ? 'form__input-group--light'
+        : 'form__input-group--dark';
+
     const focusInput = event => {
-        if(event.target.classList.contains('form__input-group')) {
-            event.target.querySelector('.form__text-input').focus();
+        if(event.target.classList.contains(`.${ inputGroupClassName }`)) {
+            event.target.querySelector(`.${ inputClassName }`).focus();
         } else if(event.target.parentElement.classList.contains('form__hint')) {
-            event.target.parentElement.parentElement.querySelector('.form__text-input').focus();
+            event.target.parentElement.parentElement.querySelector(`.${ inputClassName }`).focus();
         } else {
-            event.target.parentElement.querySelector('.form__text-input').focus();
+            event.target.parentElement.querySelector(`.${ inputClassName }`).focus();
         }
     }
 
@@ -23,10 +35,10 @@ const TextInputWithRef = React.forwardRef((props, ref) => {
         : null;
 
     return (
-        <div className="form__input-group" onClick={ focusInput }>
+        <div className={ inputGroupClassName } onClick={ focusInput }>
             { hint }
             <input
-                className="form__text-input"
+                className={ inputClassName }
                 type={ props.type }
                 name={ props.name }
                 value={ props.value }
@@ -35,7 +47,7 @@ const TextInputWithRef = React.forwardRef((props, ref) => {
                 minLength={ props.minLength || null }
                 ref={ ref }
             />
-            <label className="form__label" htmlFor={ props.name }>
+            <label className={ labelClassName } htmlFor={ props.name }>
                 { props.label }
             </label>
         </div>

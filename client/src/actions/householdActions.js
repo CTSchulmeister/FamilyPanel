@@ -5,8 +5,15 @@ import {
     HOUSEHOLD_CREATION_ERROR,
     PENDING_CURRENT_HOUSEHOLD_CHANGE,
     CURRENT_HOUSEHOLD_CHANGED,
-    CURRENT_HOUSEHOLD_CHANGE_ERROR
+    CURRENT_HOUSEHOLD_CHANGE_ERROR,
+    PENDING_HOUSEHOLD_UPDATE,
+    HOUSEHOLD_UPDATED,
+    HOUSEHOLD_UPDATE_ERROR
 } from './types';
+
+import { 
+    selectCurrentHousehold
+} from '../reducers/selectors';
 
 import store from '../store';
 import config from '../config';
@@ -43,6 +50,7 @@ export const createHousehold = (householdData) => async dispatch => {
                 type: HOUSEHOLD_CREATION_ERROR,
                 errors: createHouseholdResponse.errors
             });
+            return;
         }
 
         dispatch({
@@ -81,6 +89,7 @@ export const changeCurrentHousehold = (householdId) => async dispatch => {
                 type: CURRENT_HOUSEHOLD_CHANGE_ERROR,
                 errors: householdResponse.errors
             });
+            return;
         }
 
         dispatch({
@@ -93,3 +102,41 @@ export const changeCurrentHousehold = (householdId) => async dispatch => {
         });
     }
 };
+
+export const changeHouseholdSettings = (settingsData) => async dispatch => {
+    try {
+        dispatch({
+            type: PENDING_HOUSEHOLD_UPDATE
+        });
+
+        let currentHousehold = selectCurrentHousehold(store.getState());
+
+        let householdResponse = await fetch(`${ ROOT_URL }/api/household/${ currentHousehold._id }/settings`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+            },
+            body: JSON.stringify(settingsData)
+        });
+        householdResponse = await householdResponse.json();
+
+        if(householdResponse.success === false) {
+            dispatch({
+                type: HOUSEHOLD_UPDATE_ERROR,
+                errors: householdResponse.errors
+            });
+            return;
+        }
+
+        dispatch({
+            type: HOUSEHOLD_UPDATED,
+            household: householdResponse.household
+        });
+    } catch (error) {
+        dispatch({
+            type: SERVER_CONNECTION_ERROR
+        });
+    }
+}

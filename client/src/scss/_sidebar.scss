@@ -43,7 +43,7 @@
     }
 
     &__header {
-        width: 100%;
+        width: 16rem;
         position: relative;
         margin-bottom: 3rem;
     }
@@ -67,9 +67,7 @@
     }
 
     &__household-option {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: block;
 
         width: 100%;
         height: 2rem;
@@ -84,12 +82,13 @@
             white);
         background-size: 200% auto;
         background-position: right;
+        overflow: hidden;
     
         font-size: 1rem;
         text-transform: uppercase;
         color: $dark-gray;
         letter-spacing: 0.1rem;
-        text-align: right;
+        text-align: center;
         text-overflow: ellipsis;
         white-space: nowrap;
 

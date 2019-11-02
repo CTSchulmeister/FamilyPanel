@@ -168,6 +168,66 @@ router.patch('/:household', auth, jsonParser, [
     }
 });
 
+router.patch('/:household/settings', auth, jsonParser, [
+    check('householdId')
+        .exists({ checkFalsy: true, checkNull: true })
+        .isString()
+        .trim(),
+    check('allMembersCanInvite')
+        .exists({ checkNull: true })
+        .isBoolean(),
+    check('allMembersCanCreateEvents')
+        .exists({ checkNull: true })
+        .isBoolean(),
+    check('allMembersCanCreateTasks')
+        .exists({ checkNull: true })
+        .isBoolean(),
+    check('allMembersCanCreateNotes')
+        .exists({ checkNull: true })
+        .isBoolean(),
+    check('name')
+        .exists({ checkFalsy: true, checkNull: true })
+        .isString()
+        .trim()
+        .escape(),
+    check('ownerId')
+        .exists({ checkFalsy: true, checkNull: true })
+        .isString()
+        .trim()
+], async (req, res) => {
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        res.status(400).json({
+            success: false,
+            errors: errors
+        });
+    } else {
+        try {
+            const household = await HouseholdController.changeSettings(
+                String(req.body.householdId),
+                String(req.user._id),
+                req.body.allMembersCanInvite,
+                req.body.allMembersCanCreateEvents,
+                req.body.allMembersCanCreateTasks,
+                req.body.allMembersCanCreateNotes,
+                req.body.name,
+                String(req.body.ownerId)
+            );
+    
+            res.status(200).json({
+                success: true,
+                household: household
+            });
+        } catch (err) {
+            res.status(500).json({
+                success: false,
+                errors: [err]
+            });
+        }
+    }    
+});
+
 // DELETE
 router.delete('/:household', async (req, res) => {
     try {
