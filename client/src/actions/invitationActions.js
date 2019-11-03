@@ -18,6 +18,13 @@ import {
     GET_INVITATIONS_ERROR,
 } from './types';
 
+import {
+    selectUser
+} from '../reducers/selectors';
+
+import store from '../store';
+import config from '../config';
+
 const ROOT_URL = process.env.REACT_APP_API_URL || `http://localhost:${ config.PORT }`;
 
 export const createInvitation = invitationData => async dispatch => {
@@ -91,8 +98,41 @@ export const deleteInvitation = invitationId => async dispatch => {
     }
 };
 
-export const getInvitations = () => async dispatch => {
+export const getInvitationsByEmail = () => async dispatch => {
+    try {
+        dispatch({
+            type: PENDING_GET_INVITATIONS
+        });
 
+        const user = selectUser(store.getState());
+
+        let invitationsResponse = await fetch(`${ ROOT_URL }/api/invitations/email/${ user.email }`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+            }
+        });
+        invitationsResponse = await invitationsResponse.json();
+
+        if(invitationsResponse.success === false) {
+            dispatch({
+                type: GET_INVITATIONS_ERROR,
+                errors: invitationsResponse.errors
+            });
+            return;
+        }
+
+        dispatch({
+            type: INVITATIONS_RECIEVED,
+            invitations: invitationsResponse.invitations
+        });
+    } catch (e) {
+        dispatch({
+            type: SERVER_CONNECTION_ERROR
+        });
+    }
 };
 
 export const acceptInvitation = () => async dispatch => {
