@@ -36,6 +36,7 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
             throw new Error(`The user ${ senderId } is not allowed to create invitations for household ${ householdId }`);
         }
 
+        // Invitation creation
         const invitation = await new InvitationModel({
             _householdId: householdId,
             _senderId: senderId,

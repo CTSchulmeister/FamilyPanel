@@ -158,4 +158,99 @@ describe('Invitation Controller', () => {
             expect(error).not.toBeNull();
         });
     });
+
+    describe('deleteInvitation()', () => {
+        test('Can delete an invitation', async () => {
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
+
+            await InvitationController.deleteInvitation(invitation._id, user._id);
+
+            const queryResult = InvitationModel.findById(invitation._id);
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Throws an error if the invitation doesn\'t exist', async () => {
+            let error = null;
+
+            const user = await userFactory();
+
+            try {
+                await InvitationController.deleteInvitation(new mongoose.Types.ObjectId(), user._id);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the user doesn\'t belong to the household', async () => {
+            let error = null;
+
+            const nonMemberUser = await userFactory();
+            const memberUser = await userFactory();
+            const household = await householdFactory(memberUser);
+            const invitation = await invitationFactory(household);
+
+            try {
+                await InvitationController.deleteInvitation(invitation._id, nonMemberUser._id);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the user requesting the deletion didn\'t create the invitation', async () => {
+            let error = null;
+
+            const userOne = await userFactory();
+            const userTwo = await userFactory();
+            const household = await householdFactory(userOne, userTwo);
+            const recieverEmail = generateEmail();
+            const invitation = await new InvitationModel({
+                _householdId: household._id,
+                _senderId: userOne._id,
+                recieverEmail: recieverEmail
+            }).save();
+
+            try {
+                await InvitationController.deleteInvitation(invitation._id, userTwo._id);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the invitationId argument is null', async () => {
+            let error = null;
+
+            const user = await userFactory();
+
+            try {
+                await InvitationController.deleteInvitation(null, user._id);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the userId argument is null', async () => {
+            let error = null;
+
+            const invitation = await invitationFactory();
+
+            try {
+                await InvitationController.deleteInvitation(invitation._id, null);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+    });
 });
