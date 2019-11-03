@@ -4,32 +4,38 @@
 const mongoose = require('mongoose');
 
 const InvitationModel = require('../../src/invitation/invitation.model');
+const {
+    userFactory,
+    householdFactory,
+    generateEmail,
+    invitationFactory
+} = require('../testUtilties');
 
 process.env.TEST_SUITE = 'familypanel-invitation-model-test';
 
 describe('Invitation Model', () => {
     describe('CREATE', () => {
         test('Can create an invitation', async () => {
-            let mockHousehold = new mongoose.Types.ObjectId();
-            let mockSender = new mongoose.Types.ObjectId();
-            let mockReciever = new mongoose.Types.ObjectId();
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const recieverEmail = generateEmail();
 
             const invitation = await new InvitationModel({
-                _householdId: mockHousehold,
-                _senderId: mockSender,
-                _recieverId: mockReciever
+                _householdId: household._id,
+                _senderId: user._id,
+                recieverEmail: recieverEmail
             }).save();
 
-            expect(invitation._householdId).toEqual(mockHousehold);
+            expect(invitation._householdId).toEqual(household._id);
         });
 
         test('Does not create an invitation if missing householdId', async () => {
-            let mockSender = new mongoose.Types.ObjectId();
-            let mockReciever = new mongoose.Types.ObjectId();
+            const user = await userFactory();
+            const recieverEmail = generateEmail();
 
             const invitation = await new InvitationModel({
-                _senderId: mockSender,
-                _recieverId: mockReciever
+                _senderId: user._id,
+                recieverEmail: recieverEmail
             });
 
             invitation.validate((error) => {
@@ -38,12 +44,12 @@ describe('Invitation Model', () => {
         });
 
         test('Does not create an invitation if missing senderId', async () => {
-            let mockHousehold = new mongoose.Types.ObjectId();
-            let mockReciever = new mongoose.Types.ObjectId();
+            const household = await householdFactory();
+            const recieverEmail = generateEmail();
 
             const invitation = await new InvitationModel({
-                _householdId: mockHousehold,
-                _recieverId: mockReciever
+                _householdId: household._id,
+                recieverEmail: recieverEmail
             });
 
             invitation.validate((error) => {
@@ -51,13 +57,13 @@ describe('Invitation Model', () => {
             });
         });
 
-        test('Does not create an invitation if missing recieverId', async () => {
-            let mockSender = new mongoose.Types.ObjectId();
-            let mockHousehold = new mongoose.Types.ObjectId();
+        test('Does not create an invitation if missing recieverEmail', async () => {
+            const user = await userFactory();
+            const household = await householdFactory(user);
 
             const invitation = await new InvitationModel({
-                _senderId: mockSender,
-                _householdId: mockHousehold
+                _senderId: user._id,
+                _householdId: household._id
             });
 
             invitation.validate((error) => {
@@ -68,19 +74,13 @@ describe('Invitation Model', () => {
 
     describe('READ', () => {
         test('Can retrieve an invitation', async () => {
-            let mockHousehold = new mongoose.Types.ObjectId();
-            let mockSender = new mongoose.Types.ObjectId();
-            let mockReciever = new mongoose.Types.ObjectId();
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
 
-            let invitation = await new InvitationModel({
-                _householdId: mockHousehold,
-                _senderId: mockSender,
-                _recieverId: mockReciever
-            }).save();
+            const foundInvitation = await InvitationModel.findById(invitation._id).exec();
 
-            invitation = await InvitationModel.findById(invitation._id).exec();
-
-            expect(invitation._householdId).toEqual(mockHousehold);
+            expect(foundInvitation._householdId).not.toBeNull();
         });
 
         test('Doesn\'t find an invitation if that invitation doesn\'t exist', async () => {
@@ -92,41 +92,29 @@ describe('Invitation Model', () => {
 
     describe('UPDATE', () => {
         test('Can update an invitation', async () => {
-            let mockHousehold = new mongoose.Types.ObjectId();
-            let mockSender = new mongoose.Types.ObjectId();
-            let mockReciever = new mongoose.Types.ObjectId();
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
 
-            let invitation = await new InvitationModel({
-                _householdId: mockHousehold,
-                _senderId: mockSender,
-                _recieverId: mockReciever
-            }).save();
-
-            invitation = await InvitationModel.findByIdAndUpdate(
+            const updatedInvitation = await InvitationModel.findByIdAndUpdate(
                 invitation._id,
                 { _householdId: new mongoose.Types.ObjectId() },
                 { new: true }
             ).exec();
 
-            expect(invitation._householdId).not.toEqual(mockHousehold);
+            expect(updatedInvitation._householdId).not.toEqual(household._id);
         });
     });
 
     describe('DELETE', () => {
         test('Can delete an invitation', async () => {
-            let mockHousehold = new mongoose.Types.ObjectId();
-            let mockSender = new mongoose.Types.ObjectId();
-            let mockReciever = new mongoose.Types.ObjectId();
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
 
-            let invitation = await new InvitationModel({
-                _householdId: mockHousehold,
-                _senderId: mockSender,
-                _recieverId: mockReciever
-            }).save();
+            const deletedInvitation = await InvitationModel.findByIdAndDelete(invitation._id).exec();
 
-            invitation = await InvitationModel.findByIdAndDelete(invitation._id).exec();
-
-            expect(invitation._householdId).toEqual(mockHousehold);
+            expect(deletedInvitation._householdId).toEqual(household._id);
         });
     });
 });

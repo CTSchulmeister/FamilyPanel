@@ -23,7 +23,7 @@ describe('Invitation Controller', () => {
             const recieverEmail = generateEmail();
             const household = await householdFactory(sender);
 
-            const invitation = await InvitationController.createInvitiation(
+            const invitation = await InvitationController.createInvitation(
                 household._id,
                 sender._id,
                 recieverEmail

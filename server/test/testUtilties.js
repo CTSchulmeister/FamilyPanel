@@ -1,5 +1,6 @@
 const HouseholdModel = require('../src/household/household.model');
 const UserModel = require('../src/user/user.model');
+const InvitationModel = require('../src/invitation/invitation.model');
 
 const { generateSalt, generateHash } = require('../src/util');
 
@@ -98,9 +99,26 @@ module.exports.householdWithNotesFactory = async (user) => {
 };
 
 module.exports.generateEmail = () => {
-    return `${ this.randomStringGenerator(15) }@test.com`;
+    return `${ this.randomStringGenerator(10) }@test.com`;
 };
 
-module.exports.invitationFactory = async () => {
+module.exports.invitationFactory = async (household = null) => {
+    let workingHousehold;
+    let user;
 
+    if(household === null) {
+        user = await this.userFactory();
+        workingHousehold = await this.householdFactory(user);
+    } else {
+        workingHousehold = household;
+        user = await UserModel.findOne({ _householdIds: household._id }).exec();
+    }
+
+    return await new InvitationModel({
+        _householdId: workingHousehold._id,
+        _senderId: user._id,
+        recieverEmail: this.generateEmail(),
+        sent: Date.now(),
+        message: this.randomStringGenerator(30)
+    }).save();
 };
