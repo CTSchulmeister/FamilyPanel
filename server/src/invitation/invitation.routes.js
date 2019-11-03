@@ -13,7 +13,7 @@ const jsonParser = bodyParser.json();
 // --- Routes
 
 // Create invitation
-router.post('/invitation', auth, jsonParser, [
+router.post('/', auth, jsonParser, [
     check('householdId')
         .exists({ checkFalsy: true, checkNull: true })
         .withMessage('householdId must exist'),
@@ -67,7 +67,7 @@ router.post('/invitation', auth, jsonParser, [
 });
 
 // Delete invitation
-router.delete('/invitation/:id', auth, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
         const deletedInvitation = await InvitationController.deleteInvitation(
             String(req.params.id),
@@ -80,6 +80,37 @@ router.delete('/invitation/:id', auth, async (req, res) => {
         });
     } catch (e) {
         console.error(`Error deleting invitation ${ invitationId }: ${ e }`);
+        res.status(500).json({
+            success: false,
+            errors: [{
+                msg: e.toString()
+            }]
+        });
+    }
+});
+
+// Get invitations by reciever email
+router.get('/email/:email', auth, async (req, res) => {
+    if(req.params.email !== req.user.email) {
+        console.error(`Restricted access: ${ req.user.email } tried to access invitations for ${ req.params.email }.`);
+        res.status(500).json({
+            success: false,
+            errors: [{
+                msg: `You are not allowed to access invitations for ${ req.params.email }.`
+            }]
+        });
+        return;
+    }
+
+    try {
+        const invitations = await InvitationController.getInvitationsByRecieverEmail(req.params.email);
+        
+        res.status(200).json({
+            success: true,
+            invitations: invitations
+        });
+    } catch (e) {
+        console.error(`Error retrieving invitations for ${ req.params.email }: ${ e }`);
         res.status(500).json({
             success: false,
             errors: [{
