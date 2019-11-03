@@ -135,6 +135,36 @@ export const getInvitationsByEmail = () => async dispatch => {
     }
 };
 
-export const acceptInvitation = () => async dispatch => {
+export const acceptInvitation = invitationId => async dispatch => {
+    try {
+        dispatch({
+            type: PENDING_ACCEPT_INVITATION
+        });
 
+        let acceptInvitationResponse = await fetch(`${ ROOT_URL }/api/invitations/${ invitationId }/accept`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+            }
+        });
+        acceptInvitationResponse = await acceptInvitationResponse.json();
+
+        if(acceptInvitationResponse.success === false) {
+            dispatch({
+                type: ACCEPT_INVITATION_ERROR
+            });
+            return;
+        }
+
+        dispatch({
+            type: INVITATION_ACCEPTED,
+            user: acceptInvitationResponse.updatedUser
+        });
+    } catch (e) {
+        dispatch({
+            type: SERVER_CONNECTION_ERROR
+        });
+    }
 };

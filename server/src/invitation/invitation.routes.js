@@ -121,7 +121,7 @@ router.get('/email/:email', auth, async (req, res) => {
 });
 
 // Accept invitation
-router.get('/:id/accept', auth, async (req, res) => {
+router.post('/:id/accept', auth, async (req, res) => {
     try {
         const updatedUser = await InvitationController.acceptInvitation(req.params.id, req.user._id);
 
