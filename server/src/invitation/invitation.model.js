@@ -13,8 +13,8 @@ const InvitationSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         required: true
     },
-    _recieverId: {
-        type: mongoose.Types.ObjectId,
+    recieverEmail: {
+        type: String,
         required: true
     },
     sent: {
