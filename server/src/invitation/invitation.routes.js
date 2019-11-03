@@ -59,7 +59,7 @@ router.post('/', auth, jsonParser, [
             res.status(500).json({
                 success: false,
                 errors: [{
-                    msg: e.toString()
+                    msg: String(e)
                 }]
             });
         }
@@ -83,7 +83,7 @@ router.delete('/:id', auth, async (req, res) => {
         res.status(500).json({
             success: false,
             errors: [{
-                msg: e.toString()
+                msg: String(e)
             }]
         });
     }
@@ -114,7 +114,27 @@ router.get('/email/:email', auth, async (req, res) => {
         res.status(500).json({
             success: false,
             errors: [{
-                msg: e.toString()
+                msg: String(e)
+            }]
+        });
+    }
+});
+
+// Accept invitation
+router.get('/:id/accept', auth, async (req, res) => {
+    try {
+        const updatedUser = await InvitationController.acceptInvitation(req.params.id, req.user._id);
+
+        res.status(200).json({
+            success: true,
+            user: updatedUser
+        });
+    } catch (e) {
+        console.error(`Error accepting invitation ${ req.params.id }: ${ e }`);
+        res.status(500).json({
+            success: false,
+            errors: [{
+                msg: String(e)
             }]
         });
     }
