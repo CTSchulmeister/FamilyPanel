@@ -333,4 +333,70 @@ describe('Invitation Controller', () => {
             expect(error).not.toBeNull();
         });
     });
+
+    describe('acceptInvitation()', () => {
+        test('Deletes the invitation', async () => {
+            const sender = await userFactory();
+            const reciever = await userFactory();
+            const household = await householdFactory(sender);
+            const invitation = await invitationFactory(household, reciever.email);
+
+            await InvitationController.acceptInvitation(invitation._id);
+
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Adds the reciever to the household', async () => {
+            const sender = await userFactory();
+            const reciever = await userFactory();
+            const household = await householdFactory(sender);
+            const invitation = await invitationFactory(household, reciever.email);
+
+            await InvitationController.acceptInvitation(invitation._id);
+
+            const updatedHousehold = await HouseholdModel.findById(household._id).exec();
+
+            expect(updatedHousehold._memberIds.includes(reciever._id)).toStrictEqual(true);
+        });
+
+        test('Throws an error if no user has the reciever email', async () => {
+            let error = null;
+
+            const invitation = await invitationFactory();
+
+            try {
+                await InvitationController.acceptInvitation(invitation._id);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the invitationId is null', async () => {
+            let error = null;
+
+            try {
+                await InvitationController.acceptInvitation(null);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if no invitation with the passed id is found', async () => {
+            let error = null;
+
+            try {
+                await InvitationController.acceptInvitation(new mongoose.Types.ObjectId());
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+    });
 });

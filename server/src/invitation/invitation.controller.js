@@ -109,3 +109,7 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
         throw e;
     }
 };
+
+module.exports.acceptInvitation = async (invitationId) => {
+
+};
