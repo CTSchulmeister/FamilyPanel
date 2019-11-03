@@ -56,8 +56,39 @@ export const createInvitation = invitationData => async dispatch => {
     }
 };
 
-export const deleteInvitation = () => async dispatch => {
+export const deleteInvitation = invitationId => async dispatch => {
+    try {
+        dispatch({
+            type: PENDING_DELETE_INVITATION
+        });
 
+        let deleteInvitationResponse = await fetch(`${ ROOT_URL }/api/invitation/${ invitationId }`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+            }
+        });
+        deleteInvitationResponse = await deleteInvitationResponse.json();
+
+        if(deleteInvitationResponse.success === false) {
+            dispatch({
+                type: INVITATION_DELETION_ERROR,
+                errors: deleteInvitationResponse.errors
+            });
+            return;
+        }
+
+        dispatch({
+            type: INVITATION_DELETED,
+            invitation: deleteInvitationResponse.invitation
+        });
+    } catch (e) {
+        dispatch({
+            type: SERVER_CONNECTION_ERROR
+        });
+    }
 };
 
 export const getInvitations = () => async dispatch => {
