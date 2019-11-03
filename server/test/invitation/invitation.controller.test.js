@@ -81,6 +81,25 @@ describe('Invitation Controller', () => {
             expect(error).not.toBeNull();
         });
 
+        test('Throws an error if the household doesn\'t exist', async () => {
+            let error = null;
+
+            const sender = await userFactory();
+            const recieverEmail = generateEmail();
+
+            try {
+                await InvitationController.createInvitation(
+                    new mongoose.Types.ObjectId(),
+                    sender._id,
+                    recieverEmail
+                );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
         test('Throws an error if the senderId argument is null', async () => {
             let error = null;
 
@@ -167,9 +186,19 @@ describe('Invitation Controller', () => {
 
             await InvitationController.deleteInvitation(invitation._id, user._id);
 
-            const queryResult = InvitationModel.findById(invitation._id);
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
 
             expect(queryResult).toBeNull();
+        });
+
+        test('Returns the deleted invitation', async () => {
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
+
+            const returnedValue = await InvitationController.deleteInvitation(invitation._id, user._id);
+
+            expect(returnedValue._id).toStrictEqual(invitation._id);
         });
 
         test('Throws an error if the invitation doesn\'t exist', async () => {

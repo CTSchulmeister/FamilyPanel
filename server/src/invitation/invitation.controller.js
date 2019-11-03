@@ -10,8 +10,9 @@ const UserModel = require('../user/user.model');
 // --- Invitation Controller Logic
 
 /**
- * @param {String} householdId
- * @param {String} senderId
+ * @description Creates an invitation document
+ * @param {String | mongoose.Types.ObjectId} householdId
+ * @param {String | mongoose.Types.ObjectId} senderId
  * @param {String} recieverEmail
  * @param {String} [message]
  */
@@ -23,17 +24,21 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
         }
 
         if(householdId == null) {
-            throw new Error(`The householdId argument must be a string representation of an objectId.  Recieved: ${ householdId }`);
+            throw new Error(`The householdId argument must be a string representation of an objectId or an objectId.  Recieved: ${ householdId } (Type of ${ typeof householdId }).`);
         }
 
         if(senderId == null) {
-            throw new Error(`The senderId argument must be a string represntation of an objectId.  Recieved: ${ senderId }`);
+            throw new Error(`The senderId argument must be a string represntation of an objectId or an objectId.  Recieved: ${ senderId } (Tyep of ${ typeof senderId }).`);
         }
 
         const household = await HouseholdModel.findById(householdId).exec();
 
+        if(household === null) {
+            throw new Error(`No household with the id ${ householdId } could be found.`);
+        }
+
         if(household.settings.allMembersCanInvite === false && String(household._ownerId) !== String(senderId)) {
-            throw new Error(`The user ${ senderId } is not allowed to create invitations for household ${ householdId }`);
+            throw new Error(`The user ${ senderId } is not allowed to create invitations for household ${ householdId }.`);
         }
 
         // Invitation creation
@@ -46,6 +51,37 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
         }).save();
 
         return invitation;
+    } catch (e) {
+        throw e;
+    }
+};
+
+/**
+ * @description Deletes an invitation document
+ * @param {String | mongoose.Types.ObjectId} invitationId
+ * @param {String | mongoose.Types.ObjectId} senderId
+ */
+module.exports.deleteInvitation = async (invitationId, senderId) => {
+    try {
+        // Input validation
+        if(invitationId === null) {
+            throw new Error(`The invitationId argument must be a string representation of an objectId or an objectId.  Recieved ${ invitationId } (Type of ${ typeof invitationId }).`)
+        }
+
+        if(senderId === null) {
+            throw new Error(`The senderId argument must be a string representation of an objectId or an objectId.  Recieved ${ senderId } (Type of ${ typeof senderId }).`);
+        }
+
+        const deletedInvitation = await InvitationModel.findOneAndDelete({
+            _id: invitationId,
+            _senderId: senderId
+        });
+
+        if(deletedInvitation === null) {
+            throw new Error(`No invitation could be found with the id ${ invitationId } from a sender with the id ${ senderId }.`);
+        }
+
+        return deletedInvitation;
     } catch (e) {
         throw e;
     }
