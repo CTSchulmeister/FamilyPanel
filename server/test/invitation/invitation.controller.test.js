@@ -282,4 +282,55 @@ describe('Invitation Controller', () => {
             expect(error).not.toBeNull();
         });
     });
+
+    describe('getInvitationsByRecieverEmail()', () => {
+        test('Returns an array of invitation documents', async () => {
+            const recieverEmail = generateEmail();
+            const invitationOne = await invitationFactory(null, recieverEmail);
+            const invitationTwo = await invitationFactory(null, recieverEmail);
+
+            const invitations = await InvitationController.getInvitationsByRecieverEmail(recieverEmail);
+
+            expect(invitations).toStrictEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        _id: invitationOne._id
+                    }),
+                    expect.objectContaining({
+                        _id: invitationTwo._id
+                    })
+                ])
+            );
+        });
+
+        test('Returns an empty array if no invitation documents were found', async () => {
+            const recieverEmail = generateEmail();
+            const invitations = await InvitationController.getInvitationsByRecieverEmail(recieverEmail);
+            expect(invitations.length).toStrictEqual(0);
+        });
+
+        test('Throws an error if the recieverEmail argument is null', async () => {
+            let error = null;
+
+            try {
+                await InvitationController.getInvitationsByRecieverEmail(null);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the recieverEmail argument is not an email', async () => {
+            let error = null;
+
+            try {
+                await InvitationController.getInvitationsByRecieverEmail(randomStringGenerator(15));
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+    });
 });

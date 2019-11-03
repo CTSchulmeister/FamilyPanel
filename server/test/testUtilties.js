@@ -1,9 +1,16 @@
+const mongoose = require('mongoose');
+
 const HouseholdModel = require('../src/household/household.model');
 const UserModel = require('../src/user/user.model');
 const InvitationModel = require('../src/invitation/invitation.model');
 
 const { generateSalt, generateHash } = require('../src/util');
 
+/**
+ * @description Generates a random alphabetic string
+ * @param {Number} [length]
+ * @returns {String}
+ */
 module.exports.randomStringGenerator = (length = 5) => {
     let string = '';
     let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -16,6 +23,10 @@ module.exports.randomStringGenerator = (length = 5) => {
     return string;
 };
 
+/**
+ * @description Creates a user document
+ * @returns { Promise<mongoose.Document> }
+ */
 module.exports.userFactory = async () => {
     const salt = generateSalt();
     const password = generateHash(this.randomStringGenerator(15), salt);
@@ -30,7 +41,9 @@ module.exports.userFactory = async () => {
 };
 
 /**
- * @param {...Document} users - Any number of user documents to be added to the household.
+ * @description Creates a household document
+ * @param {mongoose.Document} [users] - Any number of user documents to be added to the household.
+ * @returns {Promise<mongoose.Document>}
  */
 module.exports.householdFactory = async (...users) => {
     let owner;
@@ -98,11 +111,21 @@ module.exports.householdWithNotesFactory = async (user) => {
     }, { new: true }).exec();
 };
 
+/**
+ * @description Generates an email
+ * @returns {String}
+ */
 module.exports.generateEmail = () => {
     return `${ this.randomStringGenerator(10) }@test.com`;
 };
 
-module.exports.invitationFactory = async (household = null) => {
+/**
+ * @description Generates an invitation document
+ * @param {mongoose.Document} [household]
+ * @param {String} recieverEmail
+ * @returns {Promise<mongoose.Document>}
+ */
+module.exports.invitationFactory = async (household = null, recieverEmail = null) => {
     let workingHousehold;
     let user;
 
@@ -117,7 +140,7 @@ module.exports.invitationFactory = async (household = null) => {
     return await new InvitationModel({
         _householdId: workingHousehold._id,
         _senderId: user._id,
-        recieverEmail: this.generateEmail(),
+        recieverEmail: recieverEmail || this.generateEmail(),
         sent: Date.now(),
         message: this.randomStringGenerator(30)
     }).save();
