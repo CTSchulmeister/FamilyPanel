@@ -65,3 +65,26 @@ router.post('/invitation', auth, jsonParser, [
         }
     }
 });
+
+// Delete invitation
+router.delete('/invitation/:id', auth, async (req, res) => {
+    try {
+        const deletedInvitation = await InvitationController.deleteInvitation(
+            String(req.params.id),
+            String(req.user._id)
+        );
+
+        res.status(200).json({
+            success: true,
+            invitation: deletedInvitation
+        });
+    } catch (e) {
+        console.error(`Error deleting invitation ${ invitationId }: ${ e }`);
+        res.status(500).json({
+            success: false,
+            errors: [{
+                msg: e.toString()
+            }]
+        });
+    }
+});
