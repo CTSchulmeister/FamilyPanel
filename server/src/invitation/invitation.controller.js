@@ -15,6 +15,7 @@ const UserModel = require('../user/user.model');
  * @param {String | mongoose.Types.ObjectId} senderId
  * @param {String} recieverEmail
  * @param {String} [message]
+ * @return {Promise<mongoose.Document>}
  */
 module.exports.createInvitation = async (householdId, senderId, recieverEmail, message = null) => {
     try {
@@ -60,6 +61,7 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
  * @description Deletes an invitation document
  * @param {String | mongoose.Types.ObjectId} invitationId
  * @param {String | mongoose.Types.ObjectId} senderId
+ * @return {Promise<mongoose.Document>}
  */
 module.exports.deleteInvitation = async (invitationId, senderId) => {
     try {
@@ -75,13 +77,34 @@ module.exports.deleteInvitation = async (invitationId, senderId) => {
         const deletedInvitation = await InvitationModel.findOneAndDelete({
             _id: invitationId,
             _senderId: senderId
-        });
+        }).exec();
 
         if(deletedInvitation === null) {
             throw new Error(`No invitation could be found with the id ${ invitationId } from a sender with the id ${ senderId }.`);
         }
 
         return deletedInvitation;
+    } catch (e) {
+        throw e;
+    }
+};
+
+/**
+ * @description Gets all invitations related to the passed recieverEmail
+ * @param {String} recieverEmail
+ * @returns {Promise<Array<mongoose.Document>>}
+ */
+module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
+    try {
+        if(!validator.isEmail(recieverEmail)) {
+            throw new Error(`${ recieverEmail } is not an email.`);
+        }
+
+        const invitations = await InvitationModel.find({
+            recieverEmail: recieverEmail
+        }).exec();
+
+        return invitations;
     } catch (e) {
         throw e;
     }
