@@ -341,7 +341,7 @@ describe('Invitation Controller', () => {
             const household = await householdFactory(sender);
             const invitation = await invitationFactory(household, reciever.email);
 
-            await InvitationController.acceptInvitation(invitation._id);
+            await InvitationController.acceptInvitation(invitation._id, reciever._id);
 
             const queryResult = await InvitationModel.findById(invitation._id).exec();
 
@@ -354,20 +354,31 @@ describe('Invitation Controller', () => {
             const household = await householdFactory(sender);
             const invitation = await invitationFactory(household, reciever.email);
 
-            await InvitationController.acceptInvitation(invitation._id);
+            await InvitationController.acceptInvitation(invitation._id, reciever._id);
 
             const updatedHousehold = await HouseholdModel.findById(household._id).exec();
 
             expect(updatedHousehold._memberIds.includes(reciever._id)).toStrictEqual(true);
         });
 
-        test('Throws an error if no user has the reciever email', async () => {
+        test('Returns the updated user', async () => {
+            const sender = await userFactory();
+            const reciever = await userFactory();
+            const household = await householdFactory(sender);
+            const invitation = await invitationFactory(household, reciever.email);
+
+            const returnedUser = await InvitationController.acceptInvitation(invitation._id, reciever._id);
+
+            expect(returnedUser._id).toStrictEqual(reciever._id);
+        });
+
+        test('Throws an error if the recieverId does not match the invitation\'s recieverId', async () => {
+            const user = await userFactory();
+            const invitation = await invitationFactory();
             let error = null;
 
-            const invitation = await invitationFactory();
-
             try {
-                await InvitationController.acceptInvitation(invitation._id);
+                await InvitationController.acceptInvitation(invitation._id, user._id);
             } catch (e) {
                 error = e;
             }
@@ -375,11 +386,25 @@ describe('Invitation Controller', () => {
             expect(error).not.toBeNull();
         });
 
-        test('Throws an error if the invitationId is null', async () => {
+        test('Throws an error if the invitationId argument is null', async () => {
             let error = null;
+            const reciever = await userFactory();
 
             try {
-                await InvitationController.acceptInvitation(null);
+                await InvitationController.acceptInvitation(null, reciever._id);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the recieverId argument is null', async () => {
+            let error = null;
+            const invitation = await invitationFactory();
+
+            try {
+                await InvitationController.acceptInvitation(invitation._id, null);
             } catch (e) {
                 error = e;
             }
@@ -389,9 +414,23 @@ describe('Invitation Controller', () => {
 
         test('Throws an error if no invitation with the passed id is found', async () => {
             let error = null;
+            const reciever = await userFactory();
 
             try {
-                await InvitationController.acceptInvitation(new mongoose.Types.ObjectId());
+                await InvitationController.acceptInvitation(new mongoose.Types.ObjectId(), reciever._id);
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if no user with the passed id is found', async () => {
+            let error = null;
+            const invitation = await invitationFactory();
+
+            try {
+                await InvitationController.acceptInvitation(invitation._id, new mongoose.Types.ObjectId());
             } catch (e) {
                 error = e;
             }

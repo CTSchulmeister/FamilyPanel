@@ -74,6 +74,7 @@ module.exports.deleteInvitation = async (invitationId, senderId) => {
             throw new Error(`The senderId argument must be a string representation of an objectId or an objectId.  Recieved ${ senderId } (Type of ${ typeof senderId }).`);
         }
 
+        // Invitation deletion
         const deletedInvitation = await InvitationModel.findOneAndDelete({
             _id: invitationId,
             _senderId: senderId
@@ -96,10 +97,12 @@ module.exports.deleteInvitation = async (invitationId, senderId) => {
  */
 module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
     try {
+        // Input validation
         if(!validator.isEmail(recieverEmail)) {
             throw new Error(`${ recieverEmail } is not an email.`);
         }
 
+        // Invitation querying
         const invitations = await InvitationModel.find({
             recieverEmail: recieverEmail
         }).exec();
@@ -110,6 +113,49 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
     }
 };
 
-module.exports.acceptInvitation = async (invitationId) => {
+/**
+ * @description Accepts an invitation, adding the reciever to a household
+ * @param {String | mongoose.Types.ObjectId} invitationId
+ * @param {String | mongoose.Types.ObjectId} recieverId
+ */
+module.exports.acceptInvitation = async (invitationId, recieverId) => {
+    try {
+        // Input validation
+        if(invitationId == null) {
+            throw new Error(`The invitationId argument must be a string representation of an objectId or an objectId.  Recieved: ${ invitationId } (Type of ${ typeof invitationId }).`);
+        }
 
+        if(recieverId == null) {
+            throw new Error(`The recieverId argument must be a string representation of an objectId or an objectId.  Recieved: ${ recieverId } (Type of ${ typeof recieverId }).`);
+        }
+
+        // Invitation acceptance
+        const user = await UserModel.findById(recieverId).exec();
+
+        if(!user) {
+            throw new Error(`No user with the id ${ recieverId } could be found.`);
+        }
+
+        const invitation = await InvitationModel.findById(invitationId).exec();
+
+        if(!invitation) {
+            throw new Error(`No invitation with the id ${ invitationId } could be found.`);
+        }
+
+        if(invitation.recieverEmail !== user.email) {
+            throw new Error(`The invitation with the id ${ invitationId } does not match the user with the id ${ recieverId }.`);
+        }
+
+        await InvitationModel.findByIdAndDelete(invitationId).exec();
+        await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
+            $push: { _memberIds: user._id }
+        }).exec();
+        const updatedUser = await UserModel.findByIdAndUpdate(user._id, {
+            $push: { _householdIds: invitation._householdId }
+        }).exec();
+
+        return updatedUser;
+    } catch (e) {
+        throw e;
+    }
 };
