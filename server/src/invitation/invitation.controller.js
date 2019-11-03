@@ -32,7 +32,10 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
             throw new Error(`The senderId argument must be a string represntation of an objectId or an objectId.  Recieved: ${ senderId } (Tyep of ${ typeof senderId }).`);
         }
 
-        const household = await HouseholdModel.findById(householdId).exec();
+        const household = await HouseholdModel.findOne({
+            _id: householdId,
+            _memberIds: senderId
+        }).exec();
 
         if(household === null) {
             throw new Error(`No household with the id ${ householdId } could be found.`);
