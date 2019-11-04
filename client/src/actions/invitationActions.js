@@ -16,6 +16,8 @@ import {
     PENDING_GET_INVITATIONS,
     INVITATIONS_RECIEVED,
     GET_INVITATIONS_ERROR,
+
+    CLEAR_INVITATION_ERRORS
 } from './types';
 
 import {
@@ -160,11 +162,19 @@ export const acceptInvitation = invitationId => async dispatch => {
 
         dispatch({
             type: INVITATION_ACCEPTED,
-            user: acceptInvitationResponse.updatedUser
+            user: acceptInvitationResponse.updatedUser,
+            invitationId: invitationId,
+            household: acceptInvitationResponse.household
         });
     } catch (e) {
         dispatch({
             type: SERVER_CONNECTION_ERROR
         });
     }
+};
+
+export const clearInvitationErrors = () => async dispatch => {
+    dispatch({
+        type: CLEAR_INVITATION_ERRORS
+    });
 };

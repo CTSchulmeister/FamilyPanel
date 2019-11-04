@@ -367,9 +367,20 @@ describe('Invitation Controller', () => {
             const household = await householdFactory(sender);
             const invitation = await invitationFactory(household, reciever.email);
 
-            const returnedUser = await InvitationController.acceptInvitation(invitation._id, reciever._id);
+            const { updatedUser } = await InvitationController.acceptInvitation(invitation._id, reciever._id);
 
-            expect(returnedUser._id).toStrictEqual(reciever._id);
+            expect(updatedUser._id).toStrictEqual(reciever._id);
+        });
+
+        test('Returns the joined household', async () => {
+            const sender = await userFactory();
+            const reciever = await userFactory();
+            const newHousehold = await householdFactory(sender);
+            const invitation = await invitationFactory(newHousehold, reciever.email);
+
+            const { household } = await InvitationController.acceptInvitation(invitation._id, reciever._id);
+
+            expect(household._id).toStrictEqual(newHousehold._id);
         });
 
         test('Throws an error if the recieverId does not match the invitation\'s recieverId', async () => {

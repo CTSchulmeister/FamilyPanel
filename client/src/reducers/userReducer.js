@@ -9,6 +9,10 @@ import {
     USER_LOGGED_OUT,
     LOG_OUT_ERROR,
     HOUSEHOLD_CREATED,
+
+    PENDING_ACCEPT_INVITATION,
+    INVITATION_ACCEPTED,
+    ACCEPT_INVITATION_ERROR
 } from '../actions/types';
 
 const initialState = {
@@ -94,6 +98,24 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 user: action.user
+            };
+
+        // Invitation
+        case PENDING_ACCEPT_INVITATION:
+            return {
+                ...state,
+                loading: true
+            };
+        case INVITATION_ACCEPTED:
+            return {
+                ...state,
+                loading: false,
+                user: action.user
+            };
+        case ACCEPT_INVITATION_ERROR:
+            return {
+                ...state,
+                loading: false
             };
 
         case SERVER_CONNECTION_ERROR: 

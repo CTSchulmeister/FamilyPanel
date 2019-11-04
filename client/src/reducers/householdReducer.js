@@ -13,7 +13,11 @@ import {
     HOUSEHOLD_UPDATE_ERROR,
     CHANGE_CURRENT_NOTE,
     EDIT_CURRENT_NOTE,
-    CANCEL_EDIT_CURRENT_NOTE
+    CANCEL_EDIT_CURRENT_NOTE,
+    
+    PENDING_ACCEPT_INVITATION,
+    INVITATION_ACCEPTED,
+    ACCEPT_INVITATION_ERROR
 } from '../actions/types';
 
 const initialState = {
@@ -131,6 +135,24 @@ export default function(state = initialState, action) {
                     ...state.currentNote,
                     isEditing: false
                 }
+            };
+
+        // Invitations
+        case PENDING_ACCEPT_INVITATION:
+            return {
+                ...state,
+                loading: true
+            };
+        case INVITATION_ACCEPTED:
+            return {
+                ...state,
+                loading: false,
+                households: state.households.push(action.household)
+            };
+        case ACCEPT_INVITATION_ERROR:
+            return {
+                ...state,
+                loading: false
             };
 
         case SERVER_CONNECTION_ERROR: 

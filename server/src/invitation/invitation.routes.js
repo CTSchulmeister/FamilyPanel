@@ -123,11 +123,15 @@ router.get('/email/:email', auth, async (req, res) => {
 // Accept invitation
 router.post('/:id/accept', auth, async (req, res) => {
     try {
-        const updatedUser = await InvitationController.acceptInvitation(req.params.id, req.user._id);
+        const { 
+            updatedUser,
+            household
+         } = await InvitationController.acceptInvitation(req.params.id, req.user._id);
 
         res.status(200).json({
             success: true,
-            user: updatedUser
+            user: updatedUser,
+            household: household
         });
     } catch (e) {
         console.error(`Error accepting invitation ${ req.params.id }: ${ e }`);

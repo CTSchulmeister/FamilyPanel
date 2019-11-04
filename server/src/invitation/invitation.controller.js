@@ -150,14 +150,17 @@ module.exports.acceptInvitation = async (invitationId, recieverId) => {
         }
 
         await InvitationModel.findByIdAndDelete(invitationId).exec();
-        await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
+        const household = await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
             $push: { _memberIds: user._id }
         }).exec();
         const updatedUser = await UserModel.findByIdAndUpdate(user._id, {
             $push: { _householdIds: invitation._householdId }
         }).exec();
 
-        return updatedUser;
+        return {
+            updatedUser,
+            household
+        };
     } catch (e) {
         throw e;
     }
