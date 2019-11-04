@@ -3,6 +3,7 @@
 // --- Modules
 const UserModel = require('./user.model');
 const HouseholdModel = require('../household/household.model');
+const InvitationModel = require('../invitation/invitation.model');
 const { generateSalt, generateHash, nonPersonalUserData } = require('../util');
 const mongoose = require('mongoose');
 
@@ -42,7 +43,9 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
     user.password = undefined;
     user.salt = undefined;
 
-    return { user, token };
+    const invitations = await InvitationModel.find({ recieverEmail: email }).exec();
+
+    return { user, token, invitations };
 };
 
 /**
@@ -88,7 +91,9 @@ module.exports.loginUser = async (email, password) => {
         };
     }
 
-    return { user, token, households, currentHousehold };
+    const invitations = await InvitationModel.find({ recieverEmail: email }).exec();
+
+    return { user, token, households, currentHousehold, invitations };
 };
 
 /**
