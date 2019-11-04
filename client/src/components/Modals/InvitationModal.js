@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { createInvitation } from '../../actions/invitationActions';
+import { 
+    selectCurrentHousehold, 
+    selectUser 
+} from '../../reducers/selectors';
 
 import ModalWrapper from './ModalWrapper';
 
@@ -15,7 +20,9 @@ class InvitationModal extends Component {
         super(props);
 
         this.state = {
-            email: '',
+            householdId: props.currentHousehold._id,
+            senderId: props.user._id,
+            recieverEmail: '',
             message: ''
         };
 
@@ -34,6 +41,12 @@ class InvitationModal extends Component {
 
     handleSubmit = event => {
         event.preventDefault();
+
+        try {
+            this.props.createInvitation(this.state);
+        } catch (e) {
+            alert(`Error encountered: ${ e }`);
+        }
     };
 
     render() {
@@ -41,12 +54,12 @@ class InvitationModal extends Component {
             <ModalWrapper closeModalHandler={ this.props.toggleInvitationModal }>
                 <div className="modal--invite">
                     <FormErrorBoundary formName="Invite User">
-                        <form>
+                        <form onSubmit={ this.handleSubmit }>
                             <FormHeader text="Invite User" />
                             <TextInput
                                 type="email"
-                                name="email"
-                                value={ this.state.email }
+                                name="recieverEmail"
+                                value={ this.state.recieverEmail }
                                 onChange={ this.handleChange }
                                 label="User's Email"
                             />
@@ -73,4 +86,11 @@ class InvitationModal extends Component {
     }
 }
 
-export default connect()(InvitationModal);
+const mapStateToProps = state => {
+    return {
+        currentHousehold: selectCurrentHousehold(state),
+        user: selectUser(state)
+    };
+};
+
+export default connect(mapStateToProps, { createInvitation })(InvitationModal);

@@ -34,6 +34,32 @@ describe('Invitation Controller', () => {
             expect(foundInvitation).not.toBeNull();
         });
 
+        test('Throws an error if an invitation to this household already exists for the reciever', async () => {
+            let error = null;
+
+            const sender = await userFactory();
+            const recieverEmail = generateEmail();
+            const household = await householdFactory(sender);
+
+            try {
+                await InvitationController.createInvitation(
+                    household._id,
+                    sender._id,
+                    recieverEmail
+                );
+
+                await InvitationController.createInvitation(
+                    household._id,
+                    sender._id,
+                    recieverEmail
+                );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
         test('Throws an error if the sender does not belong to the household', async () => {
             let error = null;
 
@@ -42,7 +68,7 @@ describe('Invitation Controller', () => {
             const household = await householdFactory();
 
             try {
-                await InvitationController.createInvitiation(
+                await InvitationController.createInvitation(
                     household._id,
                     sender._id,
                     recieverEmail

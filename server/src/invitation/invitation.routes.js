@@ -20,7 +20,7 @@ router.post('/', auth, jsonParser, [
     check('senderId')
         .exists({ checkFalsy: true, checkNull: true })
         .withMessage('senderId must exist')
-        .custom((value, { req }) => value === req.user._id)
+        .custom((value, { req }) => String(value) === String(req.user._id))
         .withMessage('You are not authorized to make an invitation on this sender\'s behalf'),
     check('recieverEmail')
         .exists({ checkFalsy: true, checkNull: true })

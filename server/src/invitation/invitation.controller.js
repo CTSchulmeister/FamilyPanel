@@ -32,6 +32,15 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
             throw new Error(`The senderId argument must be a string represntation of an objectId or an objectId.  Recieved: ${ senderId } (Tyep of ${ typeof senderId }).`);
         }
 
+        const duplicateInvitation = await InvitationModel.findOne({
+            _householdId: householdId,
+            recieverEmail: recieverEmail
+        }).exec();
+
+        if(duplicateInvitation !== null) {
+            throw new Error(`An invitation like this already exists.`);
+        }
+
         const household = await HouseholdModel.findOne({
             _id: householdId,
             _memberIds: senderId
