@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { createInvitation } from '../../actions/invitationActions';
+import { 
+    createInvitation,
+    clearInvitationErrors 
+} from '../../actions/invitationActions';
 import { 
     selectCurrentHousehold, 
-    selectUser 
+    selectUser,
+    selectInvitationCreationError
 } from '../../reducers/selectors';
 
 import ModalWrapper from './ModalWrapper';
@@ -15,15 +19,21 @@ import TextArea from '../Form/TextArea';
 import SubmitButton from '../Form/SubmitButton';
 import StandardButton from '../Buttons/StandardButton';
 
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
+
 class InvitationModal extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            householdId: props.currentHousehold._id,
-            senderId: props.user._id,
-            recieverEmail: '',
-            message: ''
+            invitationCreatedSuccesfully: false,
+            invitationData: {
+                householdId: props.currentHousehold._id,
+                senderId: props.user._id,
+                recieverEmail: '',
+                message: ''
+            }
         };
 
         this.handleChange.bind(this);
@@ -35,37 +45,68 @@ class InvitationModal extends Component {
         let value = event.target.value;
 
         this.setState({
-            [key]: value
+            invitationData: {
+                ...this.state.invitationData,
+                [key]: value
+            }
         });
     };
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
         event.preventDefault();
 
         try {
-            this.props.createInvitation(this.state);
+            await this.props.clearInvitationErrors();
+            await this.props.createInvitation(this.state.invitationData);
         } catch (e) {
             alert(`Error encountered: ${ e }`);
+        }
+
+        if(this.props.invitationCreationError === null) {
+            this.setState({
+                invitationCreatedSuccesfully: true
+            });
         }
     };
 
     render() {
-        return (
-            <ModalWrapper closeModalHandler={ this.props.toggleInvitationModal }>
-                <div className="modal--invite">
-                    <FormErrorBoundary formName="Invite User">
+        let errors = null;
+
+        if(this.props.invitationCreationError !== null) {
+            const errorItems = this.props.invitationCreationError.map(error => {
+                return (
+                    <li className="form__error">
+                        { error.msg }
+                    </li>
+                );
+            });
+
+            errors = (
+                <div className="form__errors">
+                    <span className="form__errors-header">Errors:</span>
+                    <ul className="form__errors-list">
+                        { errorItems }
+                    </ul>
+                </div>
+            );
+        }
+
+        const modalContent = (!this.state.invitationCreatedSuccesfully)
+            ? (
+                <FormErrorBoundary formName="Invite User">
+                    { errors }
                         <form onSubmit={ this.handleSubmit }>
                             <FormHeader text="Invite User" />
                             <TextInput
                                 type="email"
                                 name="recieverEmail"
-                                value={ this.state.recieverEmail }
+                                value={ this.state.invitationData.recieverEmail }
                                 onChange={ this.handleChange }
                                 label="User's Email"
                             />
                             <TextArea
                                 name="message"
-                                value={ this.state.message }
+                                value={ this.state.invitationData.message }
                                 onChange={ this.handleChange }
                                 label="Leave a message?"
                             />
@@ -79,7 +120,33 @@ class InvitationModal extends Component {
                                 <SubmitButton text="Invite" />
                             </div>
                         </form>
-                    </FormErrorBoundary>
+                </FormErrorBoundary>
+            )
+            : (
+                <React.Fragment>
+                    <Heading
+                        light={ false }
+                        divider="colored"
+                    >
+                        Woo!
+                    </Heading>
+                    <Paragraph>
+                        Invitation created succesfully.
+                        { ` ${ this.state.invitationData.recieverEmail }` } will recieve your invitation.
+                    </Paragraph>
+                    <StandardButton 
+                        size="medium"
+                        onClick={ this.props.toggleInvitationModal }
+                    >
+                        Close
+                    </StandardButton>
+                </React.Fragment>
+            );
+
+        return (
+            <ModalWrapper closeModalHandler={ this.props.toggleInvitationModal }>
+                <div className="modal--invite">
+                    { modalContent }
                 </div>
             </ModalWrapper>
         );
@@ -89,8 +156,9 @@ class InvitationModal extends Component {
 const mapStateToProps = state => {
     return {
         currentHousehold: selectCurrentHousehold(state),
-        user: selectUser(state)
+        user: selectUser(state),
+        invitationCreationError: selectInvitationCreationError(state)
     };
 };
 
-export default connect(mapStateToProps, { createInvitation })(InvitationModal);
+export default connect(mapStateToProps, { createInvitation, clearInvitationErrors })(InvitationModal);

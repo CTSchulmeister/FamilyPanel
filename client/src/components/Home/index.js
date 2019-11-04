@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { selectCurrentHousehold, selectUser } from '../../reducers/selectors';
+import { 
+    selectCurrentHousehold, 
+    selectUser,
+    selectInvitationCreationError
+} from '../../reducers/selectors';
+import { clearInvitationErrors } from '../../actions/invitationActions';
 
 import InvitationModal from '../Modals/InvitationModal';
 import HomeSettings from './HomeSettings';
@@ -14,13 +19,14 @@ class Home extends Component {
         super(props);
 
         this.state = {
-            showInvitationModal: false
+            showInvitationModal: false || (props.invitationCreationError !== null)
         };
 
         this.toggleInvitationModal.bind(this);
     }
 
     toggleInvitationModal = () => {
+        this.props.clearInvitationErrors();
         this.setState({
             showInvitationModal: (this.state.showInvitationModal) ? false : true
         });
@@ -61,8 +67,9 @@ class Home extends Component {
 const mapStateToProps = state => {
     return {
         currentHousehold: selectCurrentHousehold(state),
-        user: selectUser(state)
+        user: selectUser(state),
+        invitationCreationError: selectInvitationCreationError(state)
     };
 };
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps, { clearInvitationErrors })(Home);
