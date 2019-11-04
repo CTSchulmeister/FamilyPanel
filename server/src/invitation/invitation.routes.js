@@ -143,3 +143,5 @@ router.post('/:id/accept', auth, async (req, res) => {
         });
     }
 });
+
+module.exports = router;
