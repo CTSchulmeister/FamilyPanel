@@ -7,7 +7,8 @@ import {
     LOGIN_ERROR,
     PENDING_LOG_OUT,
     USER_LOGGED_OUT,
-    LOG_OUT_ERROR
+    LOG_OUT_ERROR,
+    INVITATIONS_RECIEVED
 } from './types';
 
 import config from '../config';
@@ -44,6 +45,11 @@ export const registerUser = userData => async dispatch => {
             type: USER_REGISTERED,
             user: registrationResponse.user,
             token: registrationResponse.token
+        });
+
+        dispatch({
+            type: INVITATIONS_RECIEVED,
+            invitations: registrationResponse.invitations
         });
     } catch (error) {
         dispatch({
@@ -85,6 +91,11 @@ export const logUserIn = userData => async dispatch => {
             token: userResponse.token,
             households: userResponse.households,
             currentHousehold: userResponse.currentHousehold
+        });
+
+        dispatch({
+            type: INVITATIONS_RECIEVED,
+            invitations: userResponse.invitations
         });
     } catch (error) {
         dispatch({
