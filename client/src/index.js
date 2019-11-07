@@ -6,7 +6,7 @@ import store from './store';
 import history from './history';
 
 import Landing from './components/Landing';
-import AppContainer from './components/Layout/AppContainer';
+import App from './containers/App';
 
 import './index.scss';
 
@@ -21,13 +21,13 @@ ReactDOM.render(
                 <Landing history={ history } />
             </Route>
             <Route path="/profile" exact>
-                <AppContainer activeLink='profile' history={ history } />
+                <App activeLink='profile' history={ history } />
             </Route>
             <Route path="/home" exact>
-                <AppContainer activeLink='home' history={ history } />
+                <App activeLink='home' history={ history } />
             </Route>
             <Route path="/notes" exact>
-                <AppContainer activeLink='notes' history={ history } />
+                <App activeLink='notes' history={ history } />
             </Route>
         </Router>
     </Provider>,

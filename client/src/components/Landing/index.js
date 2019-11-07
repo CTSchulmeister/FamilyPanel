@@ -12,7 +12,7 @@ import StandardButton from '../Buttons/StandardButton';
 
 import LogIn from '../../containers/LogIn';
 import Register from '../../containers/Register';
-import NoServerConnection from '../Connection/NoServerConnection';
+import NoServerConnection from '../NoServerConnection';
 
 class Landing extends Component {
     constructor(props) {

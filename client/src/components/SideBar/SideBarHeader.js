@@ -6,7 +6,7 @@ import {
     selectHouseholds
 } from '../../reducers/selectors';
 
-import CreateHouseholdForm from '../CreateHouseholdForm/CreateHouseholdForm';
+import CreateHouseholdForm from '../CreateHouseholdForm';
 import HouseholdSelection from './HouseholdSelection';
 
 import Heading from '../Typography/Heading';

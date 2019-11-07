@@ -23,7 +23,7 @@ class ModalContent extends Component {
         const { tagName } = target;
         const role = target.getAttribute('role');
 
-        const outsideClick = !this.node.contains(target);
+        const outsideClick = target === document.getElementById('modal__wrapper');
         const targetIsButton = role === 'button';
         const targetIsLink = role === 'link' || tagName === 'A';
 
@@ -34,14 +34,14 @@ class ModalContent extends Component {
     };
 
     render() {
-        const { children } = this.props;
+        const { children, toggleIsShown } = this.props;
     
         return ReactDOM.createPortal(
-            <div className="modal__wrapper" ref={ node => this.node = node }>
+            <div className="modal__wrapper" id="modal__wrapper">
                 { 
                     React.cloneElement(children, { 
-                        toggleIsShown: this.toggleIsShown, 
-                        className: 'modal' 
+                        toggleIsShown: toggleIsShown, 
+                        className: 'modal'
                     }) 
                 }
             </div>,

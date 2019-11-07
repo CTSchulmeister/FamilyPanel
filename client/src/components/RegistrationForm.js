@@ -128,7 +128,7 @@ const RegistrationForm = ({
 RegistrationForm.propTypes = {
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
-    registrationErrors: PropTypes.array.isRequired,
+    registrationErrors: PropTypes.array,
     firstName: PropTypes.string.isRequired,
     lastName: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import StandardButton from './Buttons/StandardButton';
 
-const RequiresAuthentication = props => {
+const RequiresAuthentication = () => {
     return (
         <div className="req-auth__wrapper">
             <main className="req-auth">

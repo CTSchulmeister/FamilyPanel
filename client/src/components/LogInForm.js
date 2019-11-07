@@ -81,7 +81,7 @@ const LogInForm = ({
 LogInForm.propTypes = {
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
-    logInErrors: PropTypes.array.isRequired,
+    logInErrors: PropTypes.array,
     email: PropTypes.string.isRequired,
     password: PropTypes.string.isRequired
 };

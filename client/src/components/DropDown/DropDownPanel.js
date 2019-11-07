@@ -4,10 +4,7 @@ import PropTypes from 'prop-types';
 class DropDownPanel extends Component {
     constructor(props) {
         super(props);
-
         this.onClick.bind(this);
-        this.removeDropDownEventListener.bind(this);
-        this.addDropDownEventListener.bind(this);
         this.node = null;
     }
 
