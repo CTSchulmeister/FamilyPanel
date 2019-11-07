@@ -5,7 +5,7 @@ import {
 } from '../../reducers/selectors';
 
 import TopBarButton from './TopBarButton';
-import LogOutButton from './LogOutButton';
+import LogOut from '../../containers/LogOut';
 import NotificationsDropDown from './NotificationsDropDown';
 
 import DropDown from '../DropDown';
@@ -38,7 +38,7 @@ class TopBarButtons extends Component {
                         invitations={ this.props.invitations}
                     />
                 </DropDown>
-                <LogOutButton history={ this.props.history } />
+                <LogOut history={ this.props.history } />
             </div>
         );
     }
