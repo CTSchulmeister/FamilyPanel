@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { logUserOut } from '../actions/userActions';
 
-import LogOutButton from '../components/LogOutButton';
+import LogOutButton from '../components/Buttons/LogOutButton';
 
 const handleLogOut = async props => {
     try {

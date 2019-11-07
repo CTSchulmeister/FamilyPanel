@@ -13,3 +13,7 @@ export const selectLogInErrors = state => {
 export const selectRegistrationErrors = state => {
     return state.user.registrationErrors;
 };
+
+export const selectUserLoadingState = state => {
+    return state.user.loading;
+};
