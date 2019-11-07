@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { clearServerErrors } from '../../actions/serverActions';
+import { clearServerErrors } from '../actions/serverActions';
 
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
-import StandardButton from '../Buttons/StandardButton';
+import Heading from './Typography/Heading';
+import Paragraph from './Typography/Paragraph';
+import StandardButton from './Buttons/StandardButton';
 
 const NoServerConnection = props => {
     const clearErrors = () => {
