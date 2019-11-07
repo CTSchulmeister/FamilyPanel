@@ -20,7 +20,7 @@ const formatErrors = errors => {
                 param = 'Password:';
                 break;
             default:
-                param = ''
+                param = '';
         }
 
         incrementedKey++;

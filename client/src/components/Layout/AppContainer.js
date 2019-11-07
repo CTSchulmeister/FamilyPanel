@@ -43,9 +43,6 @@ const AppContainer = props => {
             case 'notes':
                 componentToShow = <Notes />;
                 break;
-            case 'invitation':
-                componentToShow = <Invitation />;
-                break;
             default:
                 componentToShow = null;
         }

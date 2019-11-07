@@ -10,8 +10,8 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import StandardButton from '../Buttons/StandardButton';
 
-import LogInForm from '../LogInForm';
-import RegistrationForm from '../RegistrationForm';
+import LogIn from '../../containers/LogIn';
+import Register from '../../containers/Register';
 import NoServerConnection from '../Connection/NoServerConnection';
 
 class Landing extends Component {
@@ -20,7 +20,7 @@ class Landing extends Component {
 
         this.state = {
             formToShow: 'Log In',
-            formComponent: <LogInForm history={ this.props.history } />,
+            formComponent: <LogIn history={ this.props.history } />,
             buttonIntro: 'Don\'t have an account yet?',
             buttonText: 'Register!'
         };
@@ -32,14 +32,14 @@ class Landing extends Component {
         if(this.state.formToShow === 'Registration') {
             this.setState({
                 formToShow: 'Log In',
-                formComponent: <LogInForm history={ this.props.history } />,
+                formComponent: <LogIn history={ this.props.history } />,
                 buttonIntro: 'Don\'t have an account yet?',
                 buttonText: 'Register!'
             });
         } else {
             this.setState({
                 formToShow: 'Registration',
-                formComponent: <RegistrationForm history={ this.props.history } />,
+                formComponent: <Register history={ this.props.history } />,
                 buttonIntro: 'Already have an account?',
                 buttonText: 'Log in!'
             });

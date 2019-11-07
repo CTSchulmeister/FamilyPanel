@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { selectLogInErrors } from '../selectors/userSelectors';
-import { logUserIn } from '../actions/userActions';
+import { selectRegistrationErrors } from '../selectors/userSelectors';
+import { registerUser } from '../actions/userActions';
 
-import LogInForm from '../components/LogInFormDep';
+import RegistrationForm from '../components/RegistrationForm';
 
-class LogInFormContainer extends Component {
+class Register extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            firstName: '',
+            lastName: '',
             email: '',
-            password: ''
+            retypeEmail: '',
+            password: '',
+            retypePassword: ''
         };
 
         this.handleChange.bind(this);
@@ -33,7 +37,7 @@ class LogInFormContainer extends Component {
         event.preventDefault();
 
         try {
-            this.props.logUserIn(this.state);
+            this.props.registerUser(this.state);
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered: ${ error }`);
@@ -42,20 +46,20 @@ class LogInFormContainer extends Component {
 
     render() {
         const props = {
-            logInErrors: this.props.logInErrors,
+            registrationErrors: this.props.registrationErrors,
             handleChange: this.handleChange,
-            handleSubmit: this.handleSubmit,
+            handleSubmit: this.hanldeSubmit,
             ...this.state
         };
 
-        return <LogInForm {...props} />;
+        return <RegistrationForm {...props} />;
     }
 }
 
 const mapStateToProps = state => ({
-    logInErrors: selectLogInErrors(state)
+    registrationErrors: selectRegistrationErrors(state)
 });
 
 export default connect(mapStateToProps, {
-    logUserIn
-})(LogInFormContainer);
+    registerUser
+})(Register)
