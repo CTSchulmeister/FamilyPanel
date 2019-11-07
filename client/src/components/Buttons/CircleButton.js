@@ -3,55 +3,47 @@ import PropTypes from 'prop-types';
 
 class CircleButton extends Component {
     static BASE_CLASS = `circle-button`;
-    static SMALL_CLASS = `${ CircleButton.BASE_CLASS }--small`;
-    static MEDIUM_CLASS = `${ CircleButton.BASE_CLASS }--medium`;
-    static LARGE_CLASS = `${ CircleButton.BASE_CLASS }--large`;
+    static CONTAINER_CLASS = `${ CircleButton.BASE_CLASS }__container`;
+    static TOOLTIP_CLASS = `${ CircleButton.BASE_CLASS }__tooltip`;
     static LIGHT_CLASS = `${ CircleButton.BASE_CLASS }--light`;
     static DARK_CLASS = `${ CircleButton.BASE_CLASS }--dark`;
 
     constructor(props) {
         super(props);
 
-        const size = props.size;
-
-        switch(size) {
-            case 'small':
-                this.className = CircleButton.SMALL_CLASS;
-                break;
-            case 'medium':
-                this.className = CircleButton.MEDIUM_CLASS;
-                break;
-            case 'large':
-                this.className = CircleButton.LARGE_CLASS;
-                break;
-            case undefined:
-            default:
-                this.className = CircleButton.MEDIUM_CLASS;
-        }
-
+        this.className = `${ CircleButton.BASE_CLASS }`;
         this.className += (props.light) ? ` ${ CircleButton.LIGHT_CLASS }` : ` ${ CircleButton.DARK_CLASS }`;
+        
         this.handleClick.bind(this);
     }
 
     handleClick = event => {
         event.preventDefault();
 
-        this.props.onClick();
+        if(this.props.onClick) {
+            this.props.onClick();
+        }
     };
 
     render() {
         return (
-            <button 
-                className={ this.className } 
-                onClick={ this.handleClick }
-                disabled={ this.props.disabled || false }
-                type={ this.props.type || 'button' }
-                name={ this.props.name || null }
-                value={ this.props.value || null }
-                autoFocus={ this.props.autoFocus || false }
-            >
-                { this.props.children }
-            </button>
+            <div className={ CircleButton.CONTAINER_CLASS }>
+                <button 
+                    className={ this.className } 
+                    onClick={ this.handleClick }
+                    disabled={ this.props.disabled || false }
+                    type={ this.props.type || 'button' }
+                    name={ this.props.name || null }
+                    value={ this.props.value || null }
+                    autoFocus={ this.props.autoFocus || false }
+                >
+                    { this.props.children }
+                </button>
+                <div className={ CircleButton.TOOLTIP_CLASS }>
+                    { this.props.tooltipText }
+                </div>
+            </div>
+            
         );
     }
 }
@@ -72,7 +64,8 @@ CircleButton.propTypes = {
     autoFocus: PropTypes.bool,
     name: PropTypes.string,
     value: PropTypes.any,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
+    tooltipText: PropTypes.string.isRequired
 };
 
 export default CircleButton;

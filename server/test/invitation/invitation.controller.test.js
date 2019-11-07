@@ -335,6 +335,16 @@ describe('Invitation Controller', () => {
             expect(invitations.length).toStrictEqual(0);
         });
 
+        test('Returns the name of the household in the invitation document', async () => {
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
+
+            const returnedInvitations = await InvitationController.getInvitationsByRecieverEmail(invitation.recieverEmail);
+
+            expect(returnedInvitations[0].householdName).toStrictEqual(household.name);
+        });
+
         test('Throws an error if the recieverEmail argument is null', async () => {
             let error = null;
 

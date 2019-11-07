@@ -16,7 +16,7 @@ const LogOutButton = (props) => {
     };
 
     return (
-        <Link to="/" className="top-bar-button" onClick={ handleLogOut } title="Log Out">
+        <Link to="/" className="top-bar__button" onClick={ handleLogOut } title="Log Out">
             <i className="fas fa-sign-out-alt"></i> { text }
         </Link>
     );

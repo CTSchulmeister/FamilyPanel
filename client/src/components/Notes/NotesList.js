@@ -33,7 +33,12 @@ const NotesList = (props) => {
         <div className="notes-list">
             <div className="notes-list__header">
                 { displayedNumberOfNotes }
-                <CircleButton size="medium" onClick={ props.toggleShowCreateNote } disabled={ props.currentNote && props.currentNote.isEditing }>
+                <CircleButton 
+                    light={ false }
+                    onClick={ props.toggleShowCreateNote } 
+                    disabled={ props.currentNote && props.currentNote.isEditing }
+                    tooltipText="Create Note"
+                >
                     <i className="fas fa-edit"></i>
                 </CircleButton>
             </div>

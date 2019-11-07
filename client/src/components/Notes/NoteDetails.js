@@ -53,10 +53,18 @@ class NoteDetails extends Component {
                     <h2 className="note-details__title">
                         { this.props.currentNote.title }
                         <div className="note-details__buttons">
-                            <CircleButton size="medium" onClick={ this.props.editNote }>
+                            <CircleButton 
+                                light={ false }
+                                onClick={ this.props.editNote }
+                                tooltipText="Edit"
+                            >
                                 <i className="fas fa-edit"></i>
                             </CircleButton>
-                            <CircleButton size="medium" onClick= { this.toggleDeleteModal }>
+                            <CircleButton 
+                                light={ false }
+                                onClick= { this.toggleDeleteModal }
+                                tooltipText="Delete"
+                            >
                                 <i className="fas fa-trash-alt"></i>
                             </CircleButton>
                         </div> 

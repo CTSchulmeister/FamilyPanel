@@ -115,9 +115,27 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
         }
 
         // Invitation querying
-        const invitations = await InvitationModel.find({
+        let invitations = await InvitationModel.find({
             recieverEmail: recieverEmail
-        }).exec();
+        }).lean().exec();
+
+        const householdIds = invitations.map(invitation => invitation._householdId);
+
+        const householdNames = await HouseholdModel.find({
+            _id: householdIds
+        }, '_id name').lean().exec();
+
+        for(let i = 0; i < invitations.length; i++) {
+            for(let household of householdNames) {
+                if(invitations[i]._householdId = household._id) {
+                    invitations[i] = {
+                        ...invitations[i],
+                        householdName: household.name
+                    };
+                    break;
+                }
+            }
+        }
 
         return invitations;
     } catch (e) {

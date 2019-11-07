@@ -43,7 +43,29 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
     user.password = undefined;
     user.salt = undefined;
 
-    const invitations = await InvitationModel.find({ recieverEmail: email }).exec();
+    const invitations = await InvitationModel.find({ 
+        recieverEmail: email 
+    }).lean().exec();
+
+    if(invitations.length > 0) {
+        const householdIds = invitations.map(invitation => invitation._householdId);
+
+        const householdNames = await HouseholdModel.find({
+            _id: householdIds
+        }, '_id name').lean().exec();
+
+        for(let i = 0; i < invitations.length; i++) {
+            for(let household of householdNames) {
+                if(invitations[i]._householdId = household._id) {
+                    invitations[i] = {
+                        ...invitations[i],
+                        householdName: household.name
+                    };
+                    break;
+                }
+            }
+        }
+    }
 
     return { user, token, invitations };
 };
@@ -91,7 +113,29 @@ module.exports.loginUser = async (email, password) => {
         };
     }
 
-    const invitations = await InvitationModel.find({ recieverEmail: email }).exec();
+    const invitations = await InvitationModel.find({ 
+        recieverEmail: email 
+    }).lean().exec();
+
+    if(invitations.length > 0) {
+        const householdIds = invitations.map(invitation => invitation._householdId);
+
+        const householdNames = await HouseholdModel.find({
+            _id: householdIds
+        }, '_id name').lean().exec();
+
+        for(let i = 0; i < invitations.length; i++) {
+            for(let household of householdNames) {
+                if(invitations[i]._householdId = household._id) {
+                    invitations[i] = {
+                        ...invitations[i],
+                        householdName: household.name
+                    };
+                    break;
+                }
+            }
+        }
+    }
 
     return { user, token, households, currentHousehold, invitations };
 };

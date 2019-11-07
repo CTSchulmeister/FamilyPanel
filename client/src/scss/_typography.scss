@@ -107,4 +107,22 @@
             color: $dark-gray;
         }
     }
+
+    &__quotation {
+        &--light,
+        &--dark {
+            margin: 1rem 0rem;
+            padding: 1rem 2rem;
+        }
+
+        &--light {
+            color: $white;
+            background: $dark-gray;
+        }
+
+        &--dark {
+            color: $dark-gray;
+            background: $extra-light-gray;
+        }
+    }
 }

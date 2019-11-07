@@ -70,41 +70,79 @@
 }
 
 .circle-button {
-    &--small,
-    &--medium,
-    &--large {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        border: 0.125rem solid $primary;
-        border-radius: 50%;
-        background: transparent;
+    height: 2rem;
+    width: 2rem;
 
-        transition: all ease-out 0.15s;
+    border: 0.125rem solid $primary;
+    border-radius: 50%;
+    background: transparent;
 
+    font-size: 1rem;
+
+    transition: all ease-out 0.15s;
+
+    &:hover {
+        cursor: pointer;
+
+        transform: scale(1.1);
+
+        transition: all ease-in 0.15s;
+    }
+
+    &:disabled {
+        border: 0.125rem solid $gray;
+        
         &:hover {
-            cursor: pointer;
-
-            transform: scale(1.1);
-
-            transition: all ease-in 0.15s;
-        }
-
-        &:disabled {
-            border: 0.125rem solid $gray;
-            
-            &:hover {
-                cursor: default;
-                transform: none;
-            }
+            cursor: default;
+            transform: none;
         }
     }
 
-    &--medium {
+    &__container {
+        position: relative;
         height: 2rem;
         width: 2rem;
-        font-size: 1rem;
+    }
+
+    &__container &__tooltip {
+        position: absolute;
+        bottom: calc(100% + 0.5rem);
+        right: 0rem;
+        z-index: 5;
+        color: $white;
+        white-space: nowrap;
+        background: $dark-gray;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        font-size: 0.5rem;
+        visibility: hidden;
+        opacity: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        font-weight: $bold;
+
+        transition: 0.15s;
+
+        &::after {
+            content: '';
+            position: absolute;
+            height: 0.5rem;
+            width: 0.5rem;
+            bottom: -0.25rem;
+            right: 0.75rem;
+            transform: rotate(45deg);
+            background: $dark-gray;
+        }
+    }
+
+    &:hover ~ &__tooltip {
+        opacity: 1;
+        visibility: visible;
+        transition: 0.15s 0.15s;
     }
 
     &--light{

@@ -12,7 +12,6 @@ import HomeSettings from './HomeSettings';
 
 import SectionHeader from '../Layout/SectionHeader';
 import CircleButton from '../Buttons/CircleButton';
-import SubHeading from '../Typography/SubHeading';
 
 class Home extends Component {
     constructor(props) {
@@ -39,24 +38,18 @@ class Home extends Component {
 
         const canInvite = this.props.currentHousehold.settings.allMembersCanInvite || this.props.currentHousehold._ownerId === this.props.user._id;
 
-        const button = (canInvite)
-            ? (
-                <SubHeading light={ true }>
-                    Invite User
-                </SubHeading>
-            )
-            : null;
-
         return (
             <section className="home">
                 <SectionHeader title="Home">
-                    <div className="home__invite-member">
-                        <CircleButton light={ true } onClick={ this.toggleInvitationModal }>
-                            <i className="fas fa-user-plus"></i>
-                        </CircleButton>
-                        { button }
-                        { invitationModal }
-                    </div>
+                    <CircleButton
+                        light={ true } 
+                        onClick={ this.toggleInvitationModal }
+                        disabled={ !canInvite }
+                        tooltipText="Invite Member"
+                    >
+                        <i className="fas fa-user-plus"></i>
+                    </CircleButton>
+                    { invitationModal }
                 </SectionHeader>
                 <HomeSettings />
             </section>

@@ -30,6 +30,8 @@ export const createHousehold = (householdData) => async dispatch => {
             name: householdData.name
         };
 
+        alert(`1: \nSubmission Data: ${ JSON.stringify(submissionData) }`);
+
         dispatch({
             type: PENDING_HOUSEHOLD_CREATION
         });
@@ -43,7 +45,12 @@ export const createHousehold = (householdData) => async dispatch => {
             },
             body: JSON.stringify(submissionData)
         });
+
+        alert(`2: \nResponse: ${ JSON.stringify(createHouseholdResponse) }`);
+
         createHouseholdResponse = await createHouseholdResponse.json();
+
+        alert(`3: \nJSONResponse: ${ JSON.stringify(createHouseholdResponse) }`);
 
         if(createHouseholdResponse.success === false) {
             dispatch({
@@ -53,12 +60,15 @@ export const createHousehold = (householdData) => async dispatch => {
             return;
         }
 
+        alert('4: Was a success.');
+
         dispatch({
             type: HOUSEHOLD_CREATED,
             currentHousehold: createHouseholdResponse.currentHousehold,
             user: createHouseholdResponse.user
         });
     } catch (error) {
+        alert(`Error: ${ JSON.stringify(error) }`);
         dispatch({
             type: SERVER_CONNECTION_ERROR
         });

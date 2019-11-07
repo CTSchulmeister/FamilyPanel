@@ -2,7 +2,7 @@
     grid-area: topbar;
 
     display: grid;
-    grid-template-columns: 1fr 3.125rem 9rem 3.125rem auto;
+    grid-template-columns: 1fr 3.125rem 6rem 3.125rem auto;
     grid-template-rows: 4rem;
 
     position: relative;
@@ -24,13 +24,25 @@
     }
 }
 
-.top-bar-button {
+.top-bar__button-group {
+    position: relative;
+
+    width: 3rem;
+    height: 4rem;
+}
+
+.top-bar__button,
+.top-bar__button--notifications {
     display: flex;
     align-items: center;
     justify-content: center;
 
     height: 4rem;
     width: 3rem;
+    position: relative;
+
+    border: none;
+    background: none;
 
     font-size: 1.5rem;
     color: $gray;
@@ -43,6 +55,19 @@
         color: $extra-dark-gray;
 
         transition: all ease-out 0.3s;
+    }
+}
+
+.top-bar__button--notifications {
+    &::before {
+        content: '';
+        height: 0.75rem;
+        width: 0.75rem;
+        border-radius: 50%;
+        background: $primary;
+        position: absolute;
+        top: 0.8rem;
+        right: 0.5rem;
     }
 }
 
@@ -83,5 +108,35 @@
         width: 3rem;
         border-radius: 50%;
         border: 0.125rem solid $primary;
+    }
+}
+
+.invitation-notification {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 0.25rem 0.5rem;
+
+    &:hover {
+        background: $extra-light-gray;
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__subheading {
+        text-transform: uppercase;
+        color: $gray;
+        font-weight: $bold;
+        letter-spacing: 0.1rem;
+        font-size: 0.5rem;
+    }
+
+    &__buttons {
+        display: grid;
+        grid-gap: 0.5rem;
+        grid-template-columns: 1fr 1fr;
     }
 }

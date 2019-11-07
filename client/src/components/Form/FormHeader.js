@@ -11,14 +11,13 @@ const FormHeader = props => {
                 divider='colored' 
                 small={ props.small || false }
             >
-                { props.text }
+                { props.children }
             </Heading>
         </div>
     );
 };
 
 FormHeader.propTypes = {
-    text: PropTypes.string.isRequired,
     small: PropTypes.bool
 };
 

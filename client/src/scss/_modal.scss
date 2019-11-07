@@ -1,4 +1,11 @@
 .modal {
+    min-width: 500px;
+    padding: 2rem;
+
+    background: white;
+
+    animation: modalAppear 0.3s;
+
     &__wrapper {
         display: flex;
         align-items: center;
@@ -33,16 +40,6 @@
         } to {
             opacity: 1;
         }
-    }
-
-    &--delete,
-    &--invite {
-        min-width: 500px;
-        padding: 2rem;
-
-        background: white;
-
-        animation: modalAppear 0.3s;
     }
 
     @keyframes modalAppear {

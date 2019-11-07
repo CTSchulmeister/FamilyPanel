@@ -156,6 +156,8 @@
     height: 100%;
     width: 100%;
     padding: 1rem;
+    position: relative;
+    z-index: 2;
 
     background: rgba(white, 0.7);
     border-bottom-right-radius: 1rem;
@@ -179,7 +181,6 @@
 
         margin: 0rem;
         position: relative;
-        overflow: hidden;
 
         text-transform: uppercase;
         font-size: 2rem;
@@ -202,15 +203,16 @@
     }
 
     &__buttons {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        display: grid;
+        grid-gap: 0.5rem;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
 
-        padding-right: 0.125rem;
+        position: relative;
+        z-index: 2;
 
-        & button {
-            margin-left: 0.5rem;
-        }
+        height: 100%;
+        padding: 0.5rem;
     }
 
     &__label {
