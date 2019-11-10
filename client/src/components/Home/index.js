@@ -8,7 +8,7 @@ import {
 import { clearInvitationErrors } from '../../actions/invitationActions';
 
 import InvitationModal from '../../containers/InvitationModal';
-import HomeSettings from './HomeSettings';
+import HomeSettingsContainer from '../../containers/HomeSettingsContainer';
 import Modal from '../Modals';
 
 import SectionHeader from '../Layout/SectionHeader';
@@ -40,7 +40,7 @@ class Home extends Component {
                         <InvitationModal />
                     </Modal>
                 </SectionHeader>
-                <HomeSettings />
+                <HomeSettingsContainer />
             </section>
         );
     }

@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import store from './store';
 import history from './history';
 
-import Landing from './components/Landing';
+import LandingContainer from './containers/LandingContainer';
 import App from './containers/App';
 
 import './index.scss';
@@ -18,7 +18,7 @@ ReactDOM.render(
     <Provider store={ store }>
         <Router history={ history }>
             <Route path="/" exact>
-                <Landing history={ history } />
+                <LandingContainer history={ history } />
             </Route>
             <Route path="/profile" exact>
                 <App activeLink='profile' history={ history } />

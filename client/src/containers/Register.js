@@ -48,7 +48,7 @@ class Register extends Component {
         const props = {
             registrationErrors: this.props.registrationErrors,
             handleChange: this.handleChange,
-            handleSubmit: this.hanldeSubmit,
+            handleSubmit: this.handleSubmit,
             ...this.state
         };
 
