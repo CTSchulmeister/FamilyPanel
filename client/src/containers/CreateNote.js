@@ -42,6 +42,7 @@ class CreateNote extends Component {
 
         try {
             await this.props.createNote(this.state.noteData);
+            this.props.toggleShowCreateNote();
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered: ${ error }`);

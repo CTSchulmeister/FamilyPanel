@@ -5,16 +5,20 @@ import StandardButton from '../Buttons/StandardButton';
 import CreateNote from '../../containers/CreateNote';
 import UpdateNote from '../../containers/UpdateNote';
 
-const NoteFormContainer = props => {
+const NoteFormContainer = ({
+    toggleShowCreateNote,
+    toggleShowUpdateNote,
+    form
+}) => {
     let formToShow = null;
-    let backButtonHandle;
+    let backButtonHandle = null;
 
-    if(props.form === 'Create Note') {
-        formToShow = <CreateNote />
-        backButtonHandle = props.toggleShowCreateNote
-    } else if(props.form === 'Update Note') {
+    if(form === 'Create Note') {
+        formToShow = <CreateNote toggleShowCreateNote={ toggleShowCreateNote } />
+        backButtonHandle = toggleShowCreateNote
+    } else if(form === 'Update Note') {
         formToShow = <UpdateNote />
-        backButtonHandle = props.toggleShowUpdateNote
+        backButtonHandle = toggleShowUpdateNote
     }
 
     return (
