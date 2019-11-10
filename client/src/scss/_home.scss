@@ -1,6 +1,6 @@
 .home {
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 5.5rem calc(100% - 5.5rem);
     grid-template-columns: 1fr 20rem;
     grid-template-areas:
         "sectionHeader sectionHeader"

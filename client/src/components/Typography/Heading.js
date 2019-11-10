@@ -36,10 +36,16 @@ class Heading extends Component {
     }
 
     render() {
+        const children = React.Children.toArray(this.props.children);
+
+
         return (
-            <h2 className={ this.className }>
-                { this.props.children }
-            </h2>
+            <div className={ this.className }>
+                <h1>
+                    { children[0] }
+                </h1>
+                { children.slice(1) }
+            </div>
         );
     }
 }

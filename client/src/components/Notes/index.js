@@ -6,7 +6,7 @@ import { editNote, cancelEditNote } from '../../actions/noteActions';
 import SectionHeader from '../Layout/SectionHeader';
 
 import NotesList from './NotesList';
-import NoteDetails from './NoteDetails';
+import NoteDetailsContainer from '../../containers/NoteDetailsContainer';
 import NoteFormContainer from './NoteFormContainer';
 
 class Notes extends Component {
@@ -34,7 +34,7 @@ class Notes extends Component {
         } else if(this.state.showCreateNote) {
             detailsSection = <NoteFormContainer form='Create Note' toggleShowCreateNote={ this.toggleShowCreateNote } />
         } else {
-            detailsSection = <NoteDetails toggleShowUpdateNote={ this.toggleShowUpdateNote } />;
+            detailsSection = <NoteDetailsContainer />;
         }
 
         return (

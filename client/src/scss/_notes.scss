@@ -1,6 +1,6 @@
 .notes {
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 5.5rem calc(100% - 5.5rem);
     grid-template-columns: 20rem 1fr;
     grid-template-areas:
         "sectionHeader sectionHeader"
@@ -151,190 +151,58 @@
 }
 
 .note-details {
-    grid-area: noteDetails;
+    &__wrapper {
+        grid-area: noteDetails;
+
+        padding: 1rem;
+
+        background: rgba($white, 0.7);
+    }
+
+    display: grid;
+    grid-template-rows: 3.5rem 1.875rem calc(100% - 5.375rem);
 
     height: 100%;
     width: 100%;
-    padding: 1rem;
-    position: relative;
-    z-index: 2;
+    background: $white;
+    padding: 2rem;
 
-    background: rgba(white, 0.7);
-    border-bottom-right-radius: 1rem;
-
-    &--active-note {
-        display: grid;
-        grid-template-rows: 4rem 4rem 1fr;
-        grid-template-columns: 6rem 0.125rem 1fr;
-        grid-template-areas:
-            "  title     title  title "
-            "from-label divider author"
-            "body-label divider body  ";
-    }
-
-    &__title {
-        grid-area: title;
-
+    &__buttons {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: space-around;
+        
+        height: 1.5rem;
+        width: 5rem;
+    }
 
-        margin: 0rem;
+    &__author-container {
         position: relative;
 
-        text-transform: uppercase;
-        font-size: 2rem;
-        color: $dark-gray;
-        letter-spacing: 0.2rem;
+        display: block;
+        overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
 
-        &::after {
-            content: '';
-
-            position: absolute;
-            bottom: 0rem;
-            left: 0rem;
-            width: 100%;
-            height: 0.125rem;
-            
-            background: $color-gradient;
-        }
-    }
-
-    &__buttons {
-        display: grid;
-        grid-gap: 0.5rem;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr;
-
-        position: relative;
-        z-index: 2;
-
-        height: 100%;
-        padding: 0.5rem;
-    }
-
-    &__label {
-        padding-top: 1.5rem;
-        padding-right: 1rem;
-
-        text-align: right;
-        text-transform: uppercase;
-        color: $dark-gray;
-        letter-spacing: 0.1rem;
-    }
-
-    &__divider {
-        grid-area: divider;
-
-        background: rgba(black, 0.2);
-    }
-
-    &__from-label {
-        grid-area: from-label;
-
-        position: relative;
-
-        &::after {
-            content: '';
-
-            position: absolute;
-            bottom: 0rem;
-            left: 0rem;
-            width: 100%;
-            height: 0.125rem;
-            
-            background: rgba(black, 0.2);
-        }
-    }
-
-    &__note-author {
-        grid-area: author;
-
-        display: flex;
-        align-items: center;
-        padding-left: 1rem;
-
-        position: relative;
+        height: 1.875rem;
+        margin: 0.5rem 0rem;
 
         color: $dark-gray;
 
         &::after {
             content: '';
-
             position: absolute;
             bottom: 0rem;
             left: 0rem;
-            width: 100%;
             height: 0.125rem;
-            
-            background: rgba(black, 0.2);
+            width: 100%;
+            background: $light-gray-scale-gradient;
+
         }
-    }
-
-    &__photo {
-        height: 3rem;
-        width: 3rem;
-        border-radius: 50%;
-        border: 0.125rem solid $primary;
-        margin-right: 1rem;
-    }
-
-    &__body-label {
-        grid-area: body-label;
     }
 
     &__body {
-        grid-area: body;
-
-        padding: 1.5rem 0rem 0rem 1rem;
-
-        color: $dark-gray;
-    }
-
-    &--no-notes {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        width: 100%;
-
-        & h3 {
-            margin: 0.5rem 0rem;
-
-            font-size: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2rem;
-            margin: 0.5rem 0rem;
-        }
-
-        & span {
-            display: inline-block;
-
-            width: 100%;
-            margin-bottom: 2rem;
-            position: relative;
-
-            text-align: center;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1rem;
-            color: $gray;
-
-            &::after {
-                content: '';
-
-                height: 0.25rem;
-                width: 60%;
-                position: absolute;
-                top: 2.5rem;
-                left: 20%;
-
-                background: $gray;
-            }
-        }
+        overflow: auto;
     }
 }
 

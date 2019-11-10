@@ -1,107 +1,121 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { selectCurrentNote, selectCurrentHousehold } from '../../reducers/selectors'
-import { deleteNote, editNote } from '../../actions/noteActions';
+import React from 'react';
+import PropTypes from 'prop-types';
 
+import Modal from '../Modals';
 import CircleButton from '../Buttons/CircleButton';
 import DeleteModal from '../Modals/DeleteModal';
 
-class NoteDetails extends Component {
-    constructor(props) {
-        super(props);
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
-        this.state = {
-            showDeleteModal: false
-        };
+const formatBody = body => {
+    let keyIncrementer = 0;
 
-        this.toggleDeleteModal.bind(this);
-    }
+    const formattedBody = body.split('\n').map(paragraph => {
+        keyIncrementer++;
 
-    toggleDeleteModal = () => {
-        this.setState({
-            showDeleteModal: (this.state.showDeleteModal) ? false : true
-        });
+        return (
+            <Paragraph
+                light={ false }
+                key={ keyIncrementer }
+            >
+                { paragraph }
+            </Paragraph>
+        );
+    });
+
+    return formattedBody;
+};
+
+const formatDate = date => {
+    date = new Date(date);
+
+    const dateOptions = {
+        month: 'numeric', 
+        year: 'numeric', 
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: '2-digit'
     };
 
-    render() {
-        if(this.props.currentNote !== null) {
-            const body = this.props.currentNote.body;
+    return date.toLocaleString(undefined, dateOptions);
+};
 
-            const creator = this.props.currentHousehold.members.filter(member => {
-                return member._id === this.props.currentNote._creatorId;
-            })[0];
+const NoteDetails = ({
+    currentNote,
+    currentHousehold,
+    user,
+    deleteNote,
+    editNote
+}) => {
+    if(!currentNote) return <div className="note-details__wrapper"></div>;
+    
+    const body = currentNote.body;
+    const creator = currentHousehold.members.filter(member => {
+        return member._id === currentNote._creatorId;
+    })[0];
 
-            const updatedText = (this.props.currentNote.updatedAt)
-                ? `| Updated ${ new Date(this.props.currentNote.updatedAt).toLocaleString(undefined, { month: 'numeric', year: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) }`
-                : '';
+    const updatedText = (currentNote.updatedAt)
+        ? `, Updated ${ formatDate(currentNote.updatedAt) }`
+        : '';
 
-            const deleteModal = (this.state.showDeleteModal)
-                ? (
+    const buttons = (user._id === currentNote._creatorId)
+        ? (
+            <div className="note-details__buttons">
+                <CircleButton 
+                    light={ false }
+                    onClick={ editNote }
+                    tooltipText="Edit"
+                >
+                    <i className="fas fa-edit"></i>
+                </CircleButton>
+                <Modal>
+                    <CircleButton 
+                        light={ false }
+                        tooltipText="Delete"
+                    >
+                        <i className="fas fa-trash-alt"></i>
+                    </CircleButton>
                     <DeleteModal
-                        deleteItemName={ `the note '${ this.props.currentNote.title }'`}
-                        cancelHandler={ this.toggleDeleteModal }
-                        deleteHandler={ this.props.deleteNote }
-                        deleteItemId={ this.props.currentNote._id }
-                        cancelDelete={ this.toggleDeleteModal }
+                        deleteItemName={ `the note '${ currentNote.title }'`}
+                        deleteHandler={ deleteNote }
+                        deleteItemId={ currentNote._id }
                     />
-                )
-                : null;
+                </Modal>
+            </div>
+        )
+        : null;
 
-            return (
-                <div className="note-details note-details--active-note">
-                    { deleteModal }
-                    <h2 className="note-details__title">
-                        { this.props.currentNote.title }
-                        <div className="note-details__buttons">
-                            <CircleButton 
-                                light={ false }
-                                onClick={ this.props.editNote }
-                                tooltipText="Edit"
-                            >
-                                <i className="fas fa-edit"></i>
-                            </CircleButton>
-                            <CircleButton 
-                                light={ false }
-                                onClick= { this.toggleDeleteModal }
-                                tooltipText="Delete"
-                            >
-                                <i className="fas fa-trash-alt"></i>
-                            </CircleButton>
-                        </div> 
-                    </h2>
-                    <div className="note-details__divider"></div>
-                    <div className="note-details__from-label note-details__label">From</div>
-                    <div className="note-details__note-author">
-                        <img 
-                            className="note-details__photo" 
-                            src={ process.env.PUBLIC_URL + '/anonymousProfilePicture.png ' }
-                            alt={ creator.firstName + ' ' + creator.lastName }
-                        />
-                        { 
-                            `${ creator.firstName } ${ creator.lastName }\
-                             at ${ new Date(this.props.currentNote.createdAt).toLocaleString(undefined, { month: 'numeric', year: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) }\
-                             ${ updatedText }`    
-                        }
-                    </div>
-                    <div className="note-details__body-label note-details__label">Body</div>
-                    <div className="note-details__body">{ body }</div>
+    const formattedBody = formatBody(body);
+
+    return (
+        <div className="note-details__wrapper">
+            <div className="note-details">
+                <Heading
+                    light={ false }
+                    divider="colored"
+                >
+                    { currentNote.title }
+                    { buttons }
+                </Heading>
+                <div className="note-details__author-container">
+                    Created By: { `${ creator.firstName } ${ creator.lastName } at ${ formatDate(currentNote.createdAt) }`}
+                    { updatedText }
                 </div>
-            );
-        } else {
-            return (
-                <div className="note-details">
-
+                <div className="note-details__body">
+                    { formattedBody }
                 </div>
-            );
-        }
-    }
-}
+            </div>
+        </div>
+    );
+};
 
-const mapStateToProps = (state) => {
-    return {
-        currentHousehold: selectCurrentHousehold(state),
-        currentNote: selectCurrentNote(state)
-    };
-}
+NoteDetails.propTypes = {
+    currentNote: PropTypes.object,
+    currentHousehold: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
+    deleteNote: PropTypes.func.isRequired,
+    editNote: PropTypes.func.isRequired
+};
 
-export default connect(mapStateToProps, { deleteNote, editNote })(NoteDetails);
+export default NoteDetails;

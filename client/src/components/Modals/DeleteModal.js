@@ -5,9 +5,14 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import StandardButton from '../Buttons/StandardButton';
 
-const DeleteModal = props => {
+const DeleteModal = ({
+    deleteHandler,
+    deleteItemName,
+    deleteItemId,
+    toggleIsShown
+}) => {
     const deleteItem = () => {
-        props.deleteHandler(props.deleteItemId);
+        deleteHandler(deleteItemId);
     };
 
     return (
@@ -16,10 +21,10 @@ const DeleteModal = props => {
                 Just to be sure...
             </Heading>
             <Paragraph>
-                You are about to delete { props.deleteItemName }.  Do you want to continue?
+                You are about to delete { deleteItemName }.  Do you want to continue?
             </Paragraph>
             <div className="modal__button-container">
-                <StandardButton size="medium" onClick={ props.cancelHandler }>
+                <StandardButton size="medium" onClick={ toggleIsShown }>
                     Cancel
                 </StandardButton>
                 <StandardButton size="medium" onClick={ deleteItem }>
