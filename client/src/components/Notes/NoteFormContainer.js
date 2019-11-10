@@ -2,18 +2,18 @@ import React from 'react';
 
 import StandardButton from '../Buttons/StandardButton';
 
-import CreateNoteForm from './CreateNoteForm';
-import UpdateNoteForm from './UpdateNoteForm';
+import CreateNote from '../../containers/CreateNote';
+import UpdateNote from '../../containers/UpdateNote';
 
 const NoteFormContainer = props => {
     let formToShow = null;
     let backButtonHandle;
 
     if(props.form === 'Create Note') {
-        formToShow = <CreateNoteForm />
+        formToShow = <CreateNote />
         backButtonHandle = props.toggleShowCreateNote
     } else if(props.form === 'Update Note') {
-        formToShow = <UpdateNoteForm />
+        formToShow = <UpdateNote />
         backButtonHandle = props.toggleShowUpdateNote
     }
 
