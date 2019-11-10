@@ -10,9 +10,12 @@ class CreateNote extends Component {
         super(props);
 
         this.state = {
-            householdId: this.props.currentHousehold._id,
-            title: '',
-            body: ''
+            canSubmit: false,
+            noteData: {
+                householdId: this.props.currentHousehold._id,
+                title: '',
+                body: ''
+            }
         };
 
         this.handleChange.bind(this);
@@ -26,7 +29,11 @@ class CreateNote extends Component {
         } = event.target;
 
         this.setState({
-            [key]: value
+            noteData: {
+                ...this.state.noteData,
+                [key]: value
+            },
+            canSubmit: true
         });
     };
 
@@ -34,7 +41,7 @@ class CreateNote extends Component {
         event.preventDefault();
 
         try {
-            await this.props.createNote(this.state);
+            await this.props.createNote(this.state.noteData);
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered: ${ error }`);
@@ -43,7 +50,8 @@ class CreateNote extends Component {
 
     render() {
         const props = {
-            ...this.state,
+            canSubmit: this.state.canSubmit,
+            ...this.state.noteData,
             handleChange: this.handleChange,
             handleSubmit: this.handleSubmit
         };

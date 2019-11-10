@@ -8,6 +8,7 @@ import TextArea from '../Form/TextArea';
 import SubmitButton from '../Form/SubmitButton';
 
 const CreateNoteForm = ({
+    canSubmit,
     title,
     body,
     handleChange,
@@ -32,7 +33,10 @@ const CreateNoteForm = ({
                     onChange={ handleChange }
                     label="Body"
                 />
-                <SubmitButton text="Create" />
+                <SubmitButton 
+                    text="Create" 
+                    disabled={ !canSubmit }
+                />
             </form>
         </FormErrorBoundary>   
     );
@@ -42,7 +46,8 @@ CreateNoteForm.propTypes = {
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    body: PropTypes.string.isRequired
+    body: PropTypes.string.isRequired,
+    canSubmit: PropTypes.bool.isRequired
 };
 
 export default CreateNoteForm;
