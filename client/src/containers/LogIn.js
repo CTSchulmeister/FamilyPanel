@@ -33,7 +33,7 @@ class LogIn extends Component {
         event.preventDefault();
 
         try {
-            this.props.logUserIn(this.state);
+            await this.props.logUserIn(this.state);
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered: ${ error }`);

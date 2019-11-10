@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { selectRegistrationErrors } from '../selectors/userSelectors';
-import { registerUser } from '../actions/userActions';
+import { createNote } from '../actions/noteActions';
+import { selectCurrentHousehold } from '../selectors/householdSelectors';
 
-import RegistrationForm from '../components/RegistrationForm';
+import CreateNoteForm from '../components/Notes/CreateNoteForm';
 
-class Register extends Component {
+class CreateNote extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            firstName: '',
-            lastName: '',
-            email: '',
-            retypeEmail: '',
-            password: '',
-            retypePassword: ''
+            householdId: this.props.currentHousehold._id,
+            title: '',
+            body: ''
         };
 
         this.handleChange.bind(this);
@@ -23,7 +20,7 @@ class Register extends Component {
     }
 
     handleChange = event => {
-        const {
+        const { 
             name: key,
             value
         } = event.target;
@@ -37,7 +34,7 @@ class Register extends Component {
         event.preventDefault();
 
         try {
-            await this.props.registerUser(this.state);
+            await this.props.createNote(this.state);
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered: ${ error }`);
@@ -46,20 +43,19 @@ class Register extends Component {
 
     render() {
         const props = {
-            registrationErrors: this.props.registrationErrors,
+            ...this.state,
             handleChange: this.handleChange,
-            handleSubmit: this.hanldeSubmit,
-            ...this.state
+            handleSubmit: this.handleSubmit
         };
 
-        return <RegistrationForm {...props} />;
+        return <CreateNoteForm {...props} />;
     }
 }
 
 const mapStateToProps = state => ({
-    registrationErrors: selectRegistrationErrors(state)
+    currentHousehold: selectCurrentHousehold(state)
 });
 
 export default connect(mapStateToProps, {
-    registerUser
-})(Register);
+    createNote
+})(CreateNote);

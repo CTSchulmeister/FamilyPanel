@@ -1,26 +1,24 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { changeCurrentHousehold } from '../../actions/householdActions';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-class HouseholdOption extends Component {
-    constructor(props) {
-        super(props);
+const HouseholdOption = ({
+    id,
+    name,
+    changeCurrentHousehold
+}) => {
+    return (
+        <button className="side-bar__household-option" onClick={
+            () => changeCurrentHousehold(id)
+        }>
+            { name }
+        </button>
+    );
+};
 
-        this.handleClick.bind(this);
-    }
+HouseholdOption.propTypes = {
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    changeCurrentHousehold: PropTypes.func.isRequired
+};
 
-    handleClick = () => {
-        this.props.closeWindow();
-        this.props.changeCurrentHousehold(this.props.id);
-    };
-
-    render() {
-        return (
-            <button className="side-bar__household-option" onClick={ this.handleClick }>
-                { this.props.name }
-            </button>
-        );
-    }
-}
-
-export default connect(null, { changeCurrentHousehold })(HouseholdOption);
+export default HouseholdOption;

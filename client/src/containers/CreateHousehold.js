@@ -31,7 +31,8 @@ class CreateHousehold extends Component {
         event.preventDefault();
 
         try {
-            this.props.createHousehold(this.state);
+            this.props.toggleHouseholdCreationForm();
+            await this.props.createHousehold(this.state);
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered creating household: ${ error }`);
@@ -42,6 +43,7 @@ class CreateHousehold extends Component {
         const props = {
             handleChange: this.handleChange,
             handleSubmit: this.handleSubmit,
+            className: this.props.className,
             ...this.state
         };
 

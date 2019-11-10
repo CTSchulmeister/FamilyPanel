@@ -5,10 +5,11 @@
         padding: 1rem 0rem;
         border-radius: 1rem;
         position: absolute;
-        left: calc(50% - 7.5rem);
+        left: calc(50% - 8rem);
         top: calc(100% + 1rem);
-        width: 15rem;
+        width: 16rem;
         max-height: 500px;
+        z-index: 5;
 
         background: $white;
         box-shadow: $large-shadow;

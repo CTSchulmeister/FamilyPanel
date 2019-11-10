@@ -1,76 +1,54 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
-class SideBarGroup extends Component {
-    constructor(props) {
-        super(props);
+const SideBarGroup = ({
+    type,
+    active
+}) => {
+    let title, icon, route;
 
-        switch(this.props.type) {
-            case 'profile':
-                this.title = 'Profile';
-                this.icon = <i className="fas fa-user"></i>;
-                this.view = 'profile';
-                this.route = '/profile';
-                break;
-            case 'home':
-                this.title = 'Home';
-                this.icon = <i className="fas fa-home"></i>;
-                this.view = 'home';
-                this.route = '/home';
-                break;
-            case 'members':
-                this.title = 'Members';
-                this.icon = <i className="fas fa-user-friends"></i>;
-                this.view = 'members';
-                this.route = '/members';
-                break;
-            case 'events':
-                this.title = 'Events';
-                this.icon = <i className="fas fa-calendar"></i>;
-                this.view = 'events';
-                this.route = '/events';
-                break;
-            case 'tasks':
-                this.title = 'Tasks';
-                this.icon = <i className="fas fa-tasks"></i>;
-                this.view = 'tasks';
-                this.route = '/tasks';
-                break;
-            case 'notes':
-                this.title = 'Notes';
-                this.icon = <i className="fas fa-sticky-note"></i>;
-                this.view = 'notes';
-                this.route = '/notes';
-                break;
-            default:
-                throw new Error(`Invalid type value given.  Must be 'profile', 'home', 'members', 'events', tasks', or 'notes'`);
-        }
+    switch(type) {
+        case 'profile':
+            title = 'Profile';
+            icon = <i className="fas fa-user"></i>;
+            route = '/profile';
+            break;
+        case 'home':
+            title = 'Home';
+            icon = <i className="fas fa-home"></i>;
+            route = '/home';
+            break;
+        case 'notes':
+            title = 'Notes';
+            icon = <i className="fas fa-sticky-note"></i>;
+            route = '/notes';
+            break;
+        default:
+            throw new Error(`Invalid type prop given to SideBarGroup.  Recieved ${ type }`);
     }
 
-    render() {
-        let className = (this.props.active) ? 'side-bar-group--active' : 'side-bar-group';
+    const className = (active)
+        ? 'side-bar-group--active'
+        : 'side-bar-group';
 
-        return (
-            <Link to={ this.route } className={ className } aria-label={ this.title }>
-                <div className="side-bar-group__icon">
-                    { this.icon }
-                </div>
-                { this.title }
-            </Link>
-        );   
-    }
+    return (
+        <Link to={ route } className={ className } aria-label={ title }>
+            <div className="side-bar-group__icon">
+                { icon }
+            </div>
+            { title }
+        </Link>
+    );
 };
 
 SideBarGroup.propTypes = {
+    active: PropTypes.bool.isRequired,
     type: PropTypes.oneOf([
         'profile',
         'home',
-        'members',
-        'events',
-        'tasks',
         'notes'
-    ])
-}
+    ]).isRequired
+};
 
 export default SideBarGroup;

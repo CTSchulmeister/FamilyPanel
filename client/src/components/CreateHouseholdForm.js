@@ -19,12 +19,13 @@ class CreateHouseholdForm extends Component {
         const { 
             handleChange,
             handleSubmit,
+            className,
             name
         } = this.props;
 
         return (
             <FormErrorBoundary formName="Create Household">
-                <form className="form" onSubmit={ handleSubmit }>
+                <form className={ `form ${ className }` } onSubmit={ handleSubmit }>
                     <FormHeader small={ true }>
                         Create Household
                     </FormHeader>
@@ -46,7 +47,8 @@ class CreateHouseholdForm extends Component {
 CreateHouseholdForm.propTypes = {
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
-    name: PropTypes.string.isRequired
+    name: PropTypes.string.isRequired,
+    className: PropTypes.string
 };
 
 export default CreateHouseholdForm;

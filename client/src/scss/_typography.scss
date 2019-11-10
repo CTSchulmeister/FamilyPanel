@@ -89,6 +89,11 @@
             color: $gray;
         }
 
+        &--button {
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     &__paragraph {

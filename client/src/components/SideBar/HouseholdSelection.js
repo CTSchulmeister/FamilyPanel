@@ -1,52 +1,56 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import {
-    selectUser,
-    selectHouseholds
-} from '../../reducers/selectors';
 import PropTypes from 'prop-types';
 
 import StandardButton from '../Buttons/StandardButton';
-
 import HouseholdOption from './HouseholdOption';
 
-const HouseholdSelection = props => {
-    let householdOptions = [];
+import CreateHousehold from '../../containers/CreateHousehold';
 
-    props.households.forEach(household => {
-        householdOptions.push(
+const HouseholdSelection = ({
+    households,
+    toggleHouseholdCreationForm,
+    changeCurrentHousehold,
+    showHouseholdCreation,
+    handleHouseholdCreation
+}) => {
+    const householdOptions = households.map(household => {
+        return (
             <HouseholdOption
                 key={ household._id }
                 id={ household._id }
                 name={ household.name }
-                closeWindow={ props.handleHouseholdSelection }
-                isOwned={ household._ownerId === props.user._id }
+                changeCurrentHousehold={ changeCurrentHousehold }
             />
         );
     });
 
+    const householdCreation = (showHouseholdCreation)
+        ? (
+            <CreateHousehold
+                toggleHouseholdCreationForm={ toggleHouseholdCreationForm }
+                handleHouseholdCreation={ handleHouseholdCreation }
+                className="fromSelection"
+            />
+        ) 
+        : null;
+
     return (
         <div className="household-selection">
-            <StandardButton size="wide" onClick={ props.toggleHouseholdCreationForm }>
+            <StandardButton size="wide" onClick={ toggleHouseholdCreationForm }>
                 Create Household
             </StandardButton>
             <div className="household-selection__list">
                 { householdOptions }
             </div>
+            { householdCreation }
         </div>
     );
 };
 
 HouseholdSelection.propTypes = {
-    handleHouseholdSelection: PropTypes.func.isRequired,
-    toggleHouseholdCreationForm: PropTypes.func.isRequired
+    toggleHouseholdCreationForm: PropTypes.func.isRequired,
+    changeCurrentHousehold: PropTypes.func.isRequired,
+    households: PropTypes.array.isRequired
 };
 
-const mapStateToProps = state => {
-    return {
-        user: selectUser(state),
-        households: selectHouseholds(state)
-    };
-}
-
-export default connect(mapStateToProps)(HouseholdSelection);
+export default HouseholdSelection;

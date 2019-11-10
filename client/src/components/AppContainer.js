@@ -5,7 +5,7 @@ import RequiresAuthentication from './RequiresAuthentication';
 import NoServerConnection from './NoServerConnection';
 
 import TopBar from './TopBar';
-import SideBar from './SideBar';
+import SideBar from '../containers/SideBar';
 import Main from './Layout/Main';
 
 import Spinner from './Spinner';

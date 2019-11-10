@@ -1,26 +1,26 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import {
-    selectHouseholds
-} from '../../reducers/selectors';
+import PropTypes from 'prop-types'
 
 import SideBarGroup from './SideBarGroup';
 
-const SideBarGroups = props => {
-    if(props.households && props.households.length > 0) {
+const SideBarGroups = ({
+    activeLink,
+    households
+}) => {
+    if(households && households.length > 0) {
         return (
             <nav className="side-bar__groups">
                 <SideBarGroup
                     type='profile'
-                    active={ props.activeLink === 'profile' }
+                    active={ activeLink === 'profile' }
                 />
                 <SideBarGroup
                     type='home'
-                    active={ props.activeLink === 'home' }
+                    active={ activeLink === 'home' }
                 />
                 <SideBarGroup
                     type='notes'
-                    active={ props.activeLink === 'notes' }
+                    active={ activeLink === 'notes' }
                 />
             </nav>
         );
@@ -29,17 +29,16 @@ const SideBarGroups = props => {
             <nav className="side-bar__groups">
                 <SideBarGroup
                     type='profile'
-                    active= { props.activeLink === 'profile' }
+                    active= { activeLink === 'profile' }
                 />
             </nav>
         );
     }
 };
 
-const mapStateToProps = state => {
-    return {
-        households: selectHouseholds(state)
-    };
-}
+SideBarGroups.propTypes = {
+    activeLink: PropTypes.string.isRequired,
+    households: PropTypes.array
+};
 
-export default connect(mapStateToProps)(SideBarGroups);
+export default SideBarGroups;
