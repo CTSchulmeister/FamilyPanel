@@ -63,7 +63,7 @@ router.post('/', jsonParser, [
         });
     } else {
         try {
-            const { user, token } = await UserController.createUser(
+            const { user, token, invitations } = await UserController.createUser(
                 req.body.firstName, 
                 req.body.lastName,
                 req.body.email,
@@ -73,7 +73,8 @@ router.post('/', jsonParser, [
             res.status(200).json({
                 success: true,
                 user: user,
-                token: token
+                token: token,
+                invitations: invitations
             });
         } catch (err) {
             console.error(`Error saving new user: ${ err }`);
@@ -102,14 +103,15 @@ router.post('/login', jsonParser, [
         .trim()
 ], async (req, res) => {
     try {
-        const { user, token, households, currentHousehold } = await UserController.loginUser(req.body.email, req.body.password);
+        const { user, token, households, currentHousehold, invitations } = await UserController.loginUser(req.body.email, req.body.password);
 
         res.status(200).json({
             success: true,
             user: user,
             token: token,
             households: households,
-            currentHousehold: currentHousehold
+            currentHousehold: currentHousehold,
+            invitations: invitations
         });
     } catch (err) {
         res.status(400).json({

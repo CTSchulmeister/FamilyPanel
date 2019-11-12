@@ -1,110 +1,89 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { selectLogInErrors } from '../reducers/selectors';
-import { logUserIn } from '../actions/userActions';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import FormErrorBoundary from './Form/FormErrorBoundary';
-import FormHeader from './Form/FormHeader';
-import TextInput from './Form/TextInput';
-import SubmitButton from './Form/SubmitButton';
+import FormErrorBoundary from './FormErrorBoundary';
+import FormHeader from './FormHeader';
+import TextInput from './TextInput';
+import SubmitButton from './SubmitButton';
 
-class LogInForm extends Component {
-    constructor(props) {
-        super(props);
+const formatErrors = errors => {
+    let incrementedKey = 0;
 
-        this.state = {
-            email: '',
-            password: ''
-        };
+    const formattedErrors = errors.map(error => {
+        let param;
 
-        this.handleChange.bind(this);
-        this.handleSubmit.bind(this);
-    }
-
-    handleChange = (event) => {
-        let key = event.target.name;
-        let value = event.target.value;
-
-        this.setState({
-            [key]: value
-        });
-    };
-
-    handleSubmit = async (event) => {
-        event.preventDefault();
-
-        try {
-            this.props.logUserIn(this.state);
-        } catch (err) {
-            alert(`Error encountered: ${ err }`);
+        switch(error.param) {
+            case 'email':
+                param = 'Email:';
+                break;
+            case 'password':
+                param = 'Password:';
+                break;
+            default:
+                param = '';
         }
-    };
 
-    render() {
-        let errors = null;
-        if(this.props.logInErrors) {
-            let errorsArray = this.props.logInErrors;
-
-            errors = errorsArray.map(error => {
-                let param;
-
-                switch(error.param) {
-                    case 'email':
-                        param = 'Email:';
-                        break;
-                    case 'password':
-                        param = 'Password:';
-                        break;
-                    default:
-                        param = '';
-                }
-
-                return (
-                    <li className="form__error">
-                        <span className="form__error-param">{ param }</span> { error.msg }
-                    </li>
-                );
-            });
-
-            errors = 
-                <div className="form__errors">
-                    <span className="form__errors-header">Registration Errors:</span>
-                    <ul className="form__errors-list">
-                        { errors }
-                    </ul>
-                </div>;
-        }
+        incrementedKey++;
 
         return (
-            <FormErrorBoundary formName="Log In">
-                <form className="form" onSubmit={ this.handleSubmit }>
-                    { errors }
-                    <FormHeader text="Log In" />
-                    <TextInput
-                        type="email"
-                        name="email"
-                        value={ this.state.email }
-                        onChange={ this.handleChange }
-                        label="Email"
-                    />
-                    <TextInput
-                        type="password"
-                        name="password"
-                        value={ this.state.password }
-                        onChange={ this.handleChange }
-                        label="Password"
-                    />
-                    <SubmitButton text="Log In" />
-                </form>
-            </FormErrorBoundary>
+            <li className="form__error" key={ incrementedKey }>
+                <span className="form__error-param">{ param }</span> { error.msg }
+            </li>
         );
-    }
+    });
+
+    return (
+        <div className="form__errors">
+            <span className="form__errors-header">Log In Errors:</span>
+            <ul className="form__errors-list">
+                { formattedErrors }
+            </ul>
+        </div>
+    );
+};
+
+const LogInForm = ({
+    handleChange,
+    handleSubmit,
+    logInErrors,
+    email,
+    password
+}) => {
+    const errors = logInErrors ? formatErrors(logInErrors) : null;
+
+    return (
+        <FormErrorBoundary formName="Log In">
+            <form className="form" onSubmit={ handleSubmit }>
+                { errors }
+                <FormHeader>
+                    Log In
+                </FormHeader>
+                <TextInput
+                    type="email"
+                    name="email"
+                    value={ email }
+                    onChange={ handleChange }
+                    label="Email"
+                />
+                <TextInput
+                    type="password"
+                    name="password"
+                    value={ password }
+                    onChange={ handleChange }
+                    label="Password"
+                />
+                <SubmitButton text="Log In" />
+            </form>
+        </FormErrorBoundary>
+    );
 }
 
-const mapStateToProps = (state) => {
-    return {
-        logInErrors: selectLogInErrors(state)
-    };
-}
+LogInForm.propTypes = {
+    handleChange: PropTypes.func.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+    logInErrors: PropTypes.array,
+    email: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired
+};
 
-export default connect(mapStateToProps, { logUserIn })(LogInForm);
+export default LogInForm;

@@ -423,6 +423,17 @@
     padding: 0.5rem 0rem;
     overflow: auto;
     background: $white;
+
+    transform-origin: top;
+    animation: appear-vertical 0.3s;
+}
+
+@keyframes appear-vertical {
+    from {
+        transform: scaleY(0);
+    } to {
+        transform: scaleY(1);
+    }
 }
 
 .user-option,

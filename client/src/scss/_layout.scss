@@ -38,6 +38,11 @@
     background: $dark-gray-scale-gradient;
     border-top-left-radius: 1rem;
     border-top-right-radius: 1rem;
+
+    & .circle-button__container {
+        margin-bottom: 0.5rem;
+        margin-right: 0.5rem;
+    }
 }
 
 .full-screen-wrapper {

@@ -34,6 +34,32 @@ describe('Invitation Controller', () => {
             expect(foundInvitation).not.toBeNull();
         });
 
+        test('Throws an error if an invitation to this household already exists for the reciever', async () => {
+            let error = null;
+
+            const sender = await userFactory();
+            const recieverEmail = generateEmail();
+            const household = await householdFactory(sender);
+
+            try {
+                await InvitationController.createInvitation(
+                    household._id,
+                    sender._id,
+                    recieverEmail
+                );
+
+                await InvitationController.createInvitation(
+                    household._id,
+                    sender._id,
+                    recieverEmail
+                );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
         test('Throws an error if the sender does not belong to the household', async () => {
             let error = null;
 
@@ -42,7 +68,7 @@ describe('Invitation Controller', () => {
             const household = await householdFactory();
 
             try {
-                await InvitationController.createInvitiation(
+                await InvitationController.createInvitation(
                     household._id,
                     sender._id,
                     recieverEmail
@@ -309,6 +335,16 @@ describe('Invitation Controller', () => {
             expect(invitations.length).toStrictEqual(0);
         });
 
+        test('Returns the name of the household in the invitation document', async () => {
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
+
+            const returnedInvitations = await InvitationController.getInvitationsByRecieverEmail(invitation.recieverEmail);
+
+            expect(returnedInvitations[0].householdName).toStrictEqual(household.name);
+        });
+
         test('Throws an error if the recieverEmail argument is null', async () => {
             let error = null;
 
@@ -367,9 +403,20 @@ describe('Invitation Controller', () => {
             const household = await householdFactory(sender);
             const invitation = await invitationFactory(household, reciever.email);
 
-            const returnedUser = await InvitationController.acceptInvitation(invitation._id, reciever._id);
+            const { updatedUser } = await InvitationController.acceptInvitation(invitation._id, reciever._id);
 
-            expect(returnedUser._id).toStrictEqual(reciever._id);
+            expect(updatedUser._id).toStrictEqual(reciever._id);
+        });
+
+        test('Returns the joined household', async () => {
+            const sender = await userFactory();
+            const reciever = await userFactory();
+            const newHousehold = await householdFactory(sender);
+            const invitation = await invitationFactory(newHousehold, reciever.email);
+
+            const { household } = await InvitationController.acceptInvitation(invitation._id, reciever._id);
+
+            expect(household._id).toStrictEqual(newHousehold._id);
         });
 
         test('Throws an error if the recieverId does not match the invitation\'s recieverId', async () => {

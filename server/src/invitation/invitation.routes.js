@@ -20,7 +20,7 @@ router.post('/', auth, jsonParser, [
     check('senderId')
         .exists({ checkFalsy: true, checkNull: true })
         .withMessage('senderId must exist')
-        .custom((value, { req }) => value === req.user._id)
+        .custom((value, { req }) => String(value) === String(req.user._id))
         .withMessage('You are not authorized to make an invitation on this sender\'s behalf'),
     check('recieverEmail')
         .exists({ checkFalsy: true, checkNull: true })
@@ -121,13 +121,17 @@ router.get('/email/:email', auth, async (req, res) => {
 });
 
 // Accept invitation
-router.get('/:id/accept', auth, async (req, res) => {
+router.post('/:id/accept', auth, async (req, res) => {
     try {
-        const updatedUser = await InvitationController.acceptInvitation(req.params.id, req.user._id);
+        const { 
+            updatedUser,
+            household
+         } = await InvitationController.acceptInvitation(req.params.id, req.user._id);
 
         res.status(200).json({
             success: true,
-            user: updatedUser
+            user: updatedUser,
+            household: household
         });
     } catch (e) {
         console.error(`Error accepting invitation ${ req.params.id }: ${ e }`);
@@ -139,3 +143,5 @@ router.get('/:id/accept', auth, async (req, res) => {
         });
     }
 });
+
+module.exports = router;

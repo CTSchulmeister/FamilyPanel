@@ -32,6 +32,15 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
             throw new Error(`The senderId argument must be a string represntation of an objectId or an objectId.  Recieved: ${ senderId } (Tyep of ${ typeof senderId }).`);
         }
 
+        const duplicateInvitation = await InvitationModel.findOne({
+            _householdId: householdId,
+            recieverEmail: recieverEmail
+        }).exec();
+
+        if(duplicateInvitation !== null) {
+            throw new Error(`An invitation like this already exists.`);
+        }
+
         const household = await HouseholdModel.findOne({
             _id: householdId,
             _memberIds: senderId
@@ -106,9 +115,27 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
         }
 
         // Invitation querying
-        const invitations = await InvitationModel.find({
+        let invitations = await InvitationModel.find({
             recieverEmail: recieverEmail
-        }).exec();
+        }).lean().exec();
+
+        const householdIds = invitations.map(invitation => invitation._householdId);
+
+        const householdNames = await HouseholdModel.find({
+            _id: householdIds
+        }, '_id name').lean().exec();
+
+        for(let i = 0; i < invitations.length; i++) {
+            for(let household of householdNames) {
+                if(invitations[i]._householdId = household._id) {
+                    invitations[i] = {
+                        ...invitations[i],
+                        householdName: household.name
+                    };
+                    break;
+                }
+            }
+        }
 
         return invitations;
     } catch (e) {
@@ -150,14 +177,17 @@ module.exports.acceptInvitation = async (invitationId, recieverId) => {
         }
 
         await InvitationModel.findByIdAndDelete(invitationId).exec();
-        await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
+        const household = await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
             $push: { _memberIds: user._id }
         }).exec();
         const updatedUser = await UserModel.findByIdAndUpdate(user._id, {
             $push: { _householdIds: invitation._householdId }
         }).exec();
 
-        return updatedUser;
+        return {
+            updatedUser,
+            household
+        };
     } catch (e) {
         throw e;
     }

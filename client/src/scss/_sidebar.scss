@@ -48,24 +48,6 @@
         margin-bottom: 3rem;
     }
 
-    &__household-select-trigger {
-        height: 1rem;
-        margin: 0rem;
-        padding: 0rem;
-        
-        border: none;
-        background: none;
-
-        transition: all ease-out 0.3s;
-
-        &:hover {
-            cursor: pointer;
-            color: $extra-light-gray;
-
-            transition: all ease-in 0.3s;
-        }
-    }
-
     &__household-option {
         display: block;
 
@@ -235,30 +217,6 @@
         width: 1rem;
 
         background: $color-gradient;
-    }
-}
-
-.household-selection {
-    display: grid;
-    grid-template-rows: 3rem 1fr;
-
-    height: auto;
-    max-height: 40vh;
-    width: 100%;
-    padding: 0.5rem;
-    position: absolute;
-    left: 0rem;
-    top: 1.5rem;
-    z-index: 2;
-    
-    background: white;
-    box-shadow: $large-shadow;
-
-    transform-origin: top;
-    animation: appear-vertical 0.3s ease-out;
-
-    &__list {
-        overflow-y: auto;
     }
 }
 

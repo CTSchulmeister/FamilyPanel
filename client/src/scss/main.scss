@@ -10,12 +10,13 @@
 @import './topbar';
 @import './layout';
 @import './sidebar';
-@import './requiresAuth';
+@import './misc';
 @import './spinner';
 @import './profile';
 @import './home';
 @import './notes';
 @import './modal';
+@import './dropdown';
 
 a {
     display: block;

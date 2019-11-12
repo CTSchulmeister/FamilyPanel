@@ -1,6 +1,6 @@
 .home {
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 5.5rem calc(100% - 5.5rem);
     grid-template-columns: 1fr 20rem;
     grid-template-areas:
         "sectionHeader sectionHeader"
@@ -8,19 +8,6 @@
 
     height: 100%;
     width: 100%;
-
-    &__invite-member {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        flex-direction: row-reverse;
-        width: 50%;
-        padding-bottom: 0.5rem;
-
-        & button {
-            margin-left: 0.5rem;
-        }
-    }
 
     & button ~ .typography__subheading--light {
         transition: all ease-in 0.15s;

@@ -7,6 +7,7 @@ const cors = require('cors');
 const config = require('../config');
 const userRoutes = require('./user/user.routes');
 const householdRoutes = require('./household/household.routes');
+const invitationRoutes = require('./invitation/invitation.routes');
 
 // --- Database Setup
 mongoose.connect(config.databaseURL, config.mongooseOptions)
@@ -22,6 +23,7 @@ app.use(cors());
 // --- Routing
 app.use('/api/user', userRoutes);
 app.use('/api/household', householdRoutes);
+app.use('/api/invitation', invitationRoutes);
 app.use((err, req, res, next) => {
     console.log('Error:', err.message);
     res.status(422).json(err.message);

@@ -13,7 +13,7 @@ import {
 
 import { 
     selectCurrentHousehold
-} from '../reducers/selectors';
+} from '../selectors/householdSelectors';
 
 import store from '../store';
 import config from '../config';
@@ -43,6 +43,7 @@ export const createHousehold = (householdData) => async dispatch => {
             },
             body: JSON.stringify(submissionData)
         });
+
         createHouseholdResponse = await createHouseholdResponse.json();
 
         if(createHouseholdResponse.success === false) {
@@ -59,6 +60,7 @@ export const createHousehold = (householdData) => async dispatch => {
             user: createHouseholdResponse.user
         });
     } catch (error) {
+        alert(`Error: ${ JSON.stringify(error) }`);
         dispatch({
             type: SERVER_CONNECTION_ERROR
         });

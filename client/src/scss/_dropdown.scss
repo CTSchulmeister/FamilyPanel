@@ -1,0 +1,31 @@
+.drop-down {
+    position: relative;
+
+    &__panel {
+        padding: 1rem 0rem;
+        border-radius: 1rem;
+        position: absolute;
+        left: calc(50% - 8rem);
+        top: calc(100% + 1rem);
+        width: 16rem;
+        max-height: 500px;
+        z-index: 5;
+
+        background: $white;
+        box-shadow: $large-shadow;
+        transform-origin: top;
+
+        transition: all 0.3s;
+
+        &::before {
+            content: '';
+            height: 1rem;
+            width: 1rem;
+            background: $white;
+            transform: rotate(45deg);
+            position: absolute;
+            left: calc(50% - 0.5rem);
+            top: -0.5rem;
+        }
+    }
+}
