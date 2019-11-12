@@ -21,7 +21,7 @@
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "express-validator": "^6.1.1",
-    "helmet": "^3.20.0",
+    "helmet": "^3.21.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.5",
     "validator": "^11.1.0"
