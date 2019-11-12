@@ -8,7 +8,7 @@ import {
     editNote
 } from '../actions/noteActions';
 
-import NoteDetails from '../components/Notes/NoteDetails';
+import NoteDetails from '../components/NoteDetails';
 
 const NoteDetailsContainer = props => <NoteDetails {...props} />;
 

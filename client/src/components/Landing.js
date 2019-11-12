@@ -4,9 +4,9 @@ import { Redirect } from 'react-router-dom';
 
 import NoServerConnection from './NoServerConnection';
 
-import Heading from './Typography/Heading';
-import Paragraph from './Typography/Paragraph';
-import StandardButton from './Buttons/StandardButton';
+import Heading from './Heading';
+import Paragraph from './Paragraph';
+import StandardButton from './StandardButton';
 
 const Landing = ({
     isAuthenticated,

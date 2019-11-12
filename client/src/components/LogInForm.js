@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import FormErrorBoundary from './Form/FormErrorBoundary';
-import FormHeader from './Form/FormHeader';
-import TextInput from './Form/TextInput';
-import SubmitButton from './Form/SubmitButton';
+import FormErrorBoundary from './FormErrorBoundary';
+import FormHeader from './FormHeader';
+import TextInput from './TextInput';
+import SubmitButton from './SubmitButton';
 
 const formatErrors = errors => {
     let incrementedKey = 0;

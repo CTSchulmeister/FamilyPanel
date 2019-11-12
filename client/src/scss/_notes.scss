@@ -48,7 +48,8 @@
     }
 }
 
-.note-summary {
+.note-summary,
+.note-summary--active {
     grid-area: note-summary;
 
     display: grid;
@@ -76,10 +77,6 @@
         cursor: pointer;
         background-position: left;
         transition: all ease-out 0.3s;
-    }
-
-    &--active {
-        background-position: left;
     }
 
     &__photo-container {
@@ -148,6 +145,10 @@
 
         background: rgba(white, 0.4);
     }
+}
+
+.note-summary--active {
+    background-position: left;
 }
 
 .note-details {

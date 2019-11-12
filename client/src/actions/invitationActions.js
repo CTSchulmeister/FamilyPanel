@@ -22,7 +22,7 @@ import {
 
 import {
     selectUser
-} from '../reducers/selectors';
+} from '../selectors/userSelectors';
 
 import store from '../store';
 import config from '../config';

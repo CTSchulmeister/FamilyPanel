@@ -3,9 +3,11 @@ import { connect } from 'react-redux';
 import { selectAuthenticationState } from '../selectors/userSelectors';
 import { selectServerErrorStatus } from '../selectors/serverSelectors';
 
-import LogIn from './LogIn';
-import Register from './Register';
+import LogInFormContainer from './LogInFormContainer';
+import RegistrationFormContainer from './RegistrationFormContainer';
 import Landing from '../components/Landing';
+
+import history from '../history';
 
 class LandingContainer extends Component {
     constructor(props) {
@@ -13,7 +15,7 @@ class LandingContainer extends Component {
 
         this.state = {
             formToShow: `Log In`,
-            formComponent: <LogIn history={ this.props.history } />,
+            formComponent: <LogInFormContainer />,
             buttonIntro: `Don't have an account yet?`,
             buttonText: `Register!`
         };
@@ -25,14 +27,14 @@ class LandingContainer extends Component {
         if(this.state.formToShow === 'Log In') {
             this.setState({
                 formToShow: `Registration`,
-                formComponent: <Register history={ this.props.history } />,
+                formComponent: <RegistrationFormContainer />,
                 buttonIntro: `Already have an account?`,
                 buttonText: `Log in!`
             });
         } else {
             this.setState({
                 formToShow: `Log In`,
-                formComponent: <LogIn history={ this.props.history } />,
+                formComponent: <LogInFormContainer />,
                 buttonIntro: `Don't have an account yet?`,
                 buttonText: `Register!`
             });
@@ -43,7 +45,7 @@ class LandingContainer extends Component {
         const props = {
             ...this.state,
             ...this.props,
-            history: this.props.history,
+            history: history,
             toggleForm: this.toggleForm
         };
 

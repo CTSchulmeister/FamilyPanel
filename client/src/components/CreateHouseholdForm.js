@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import FormErrorBoundary from './Form/FormErrorBoundary';
-import FormHeader from './Form/FormHeader';
-import TextInputWithRef from './Form/TextInputWithRef';
-import SubmitButton from './Form/SubmitButton';
+import FormErrorBoundary from './FormErrorBoundary';
+import FormHeader from './FormHeader';
+import TextInputWithRef from './TextInputWithRef';
+import SubmitButton from './SubmitButton';
 
 const inputRef = React.createRef();
 

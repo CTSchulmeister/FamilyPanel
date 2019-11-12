@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { changeHouseholdSettings } from '../actions/householdActions';
 import { selectCurrentHousehold } from '../selectors/householdSelectors';
 
-import HomeSettings from '../components/Home/HomeSettings';
+import HomeSettings from '../components/HomeSettings';
 
 class HomeSettingsContainer extends Component {
     constructor(props) {
