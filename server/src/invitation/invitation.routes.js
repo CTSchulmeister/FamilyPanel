@@ -32,7 +32,6 @@ router.post('/', auth, jsonParser, [
         .optional()
         .isString()
         .trim()
-        .escape()
 ], async (req, res) => {
     const errors = validationResult(req);
 
@@ -66,24 +65,45 @@ router.post('/', auth, jsonParser, [
     }
 });
 
-// Delete invitation
-router.delete('/:id', auth, async (req, res) => {
+// Delete invitation (issued by sender)
+router.delete('/sender/:invitationId', auth, async (req, res) => {
     try {
-        const deletedInvitation = await InvitationController.deleteInvitation(
-            req.params.id,
+        await InvitationController.deleteInvitationBySender(
+            req.params.invitationId,
             req.user._id
         );
 
         res.status(200).json({
-            success: true,
-            invitation: deletedInvitation
+            success: true
         });
     } catch (e) {
-        console.error(`Error deleting invitation ${ invitationId }: ${ e }`);
+        console.error(`Error deleting invitation ${ req.params.invitationId }: ${ e }`);
         res.status(500).json({
             success: false,
             errors: [{
-                msg: String(e)
+                msg: e
+            }]
+        });
+    }
+})
+
+// Delete invitation (issued by reciever)
+router.delete('/reciever/:invitationId', auth, async (req, res) => {
+    try {
+        await InvitationController.deleteInvitationByReciever(
+            req.params.invitationId,
+            req.user.email
+        );
+
+        res.status(200).json({
+            success: true
+        });
+    } catch (e) {
+        onsole.error(`Error deleting invitation ${ req.params.invitationId }: ${ e }`);
+        res.status(500).json({
+            success: false,
+            errors: [{
+                msg: e
             }]
         });
     }

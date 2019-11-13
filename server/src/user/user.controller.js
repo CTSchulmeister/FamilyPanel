@@ -50,7 +50,7 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
         }).lean().exec();
 
         if(invitations.length > 0) {
-            const householdIds = invitaitons.map(invitation => invitation._householdId);
+            const householdIds = invitations.map(invitation => invitation._householdId);
 
             const householdNames = await HouseholdModel.find({
                 _id: householdIds

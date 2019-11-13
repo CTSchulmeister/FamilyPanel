@@ -220,121 +220,151 @@ describe('Invitation Controller', () => {
         });
     });
 
-    describe('deleteInvitation()', () => {
-        test('Can delete an invitation', async () => {
-            const user = await userFactory();
-            const household = await householdFactory(user);
-            const invitation = await invitationFactory(household);
-
-            await InvitationController.deleteInvitation(
-                invitation._id, 
-                user._id
-            );
-
-            const queryResult = await InvitationModel.findById(invitation._id).exec();
-
-            expect(queryResult).toBeNull();
-        });
-
-        test('Can handle strings in place of objectIds', async () => {
-            const user = await userFactory();
-            const household = await householdFactory(user);
-            const invitation = await invitationFactory(household);
-
-            await InvitationController.deleteInvitation(
-                String(invitation._id), 
-                String(user._id)
-            );
-
-            const queryResult = await InvitationModel.findById(invitation._id).exec();
-
-            expect(queryResult).toBeNull();
-        });
-
-        test('Returns the deleted invitation', async () => {
-            const user = await userFactory();
-            const household = await householdFactory(user);
-            const invitation = await invitationFactory(household);
-
-            const returnedValue = await InvitationController.deleteInvitation(invitation._id, user._id);
-
-            expect(returnedValue._id).toStrictEqual(invitation._id);
-        });
-
-        test('Throws an error if the invitation doesn\'t exist', async () => {
-            let error = null;
-
-            const user = await userFactory();
-
-            try {
-                await InvitationController.deleteInvitation(new mongoose.Types.ObjectId(), user._id);
-            } catch (e) {
-                error = e;
-            }
-
-            expect(error).not.toBeNull();
-        });
-
-        test('Throws an error if the user doesn\'t belong to the household', async () => {
-            let error = null;
-
-            const nonMemberUser = await userFactory();
-            const memberUser = await userFactory();
-            const household = await householdFactory(memberUser);
-            const invitation = await invitationFactory(household);
-
-            try {
-                await InvitationController.deleteInvitation(invitation._id, nonMemberUser._id);
-            } catch (e) {
-                error = e;
-            }
-
-            expect(error).not.toBeNull();
-        });
-
-        test('Throws an error if the user requesting the deletion didn\'t create the invitation', async () => {
-            let error = null;
-
-            const userOne = await userFactory();
-            const userTwo = await userFactory();
-            const household = await householdFactory(userOne, userTwo);
-            const recieverEmail = generateEmail();
-            const invitation = await new InvitationModel({
-                _householdId: household._id,
-                _senderId: userOne._id,
-                recieverEmail: recieverEmail
-            }).save();
-
-            try {
-                await InvitationController.deleteInvitation(invitation._id, userTwo._id);
-            } catch (e) {
-                error = e;
-            }
-
-            expect(error).not.toBeNull();
-        });
-
-        test('Throws an error if the invitationId argument is null', async () => {
-            let error = null;
-
-            const user = await userFactory();
-
-            try {
-                await InvitationController.deleteInvitation(null, user._id);
-            } catch (e) {
-                error = e;
-            }
-
-            expect(error).not.toBeNull();
-        });
-
-        test('Throws an error if the userId argument is null', async () => {
-            let error = null;
-
+    describe('deleteInvitationBySender()', () => {
+        test('Deletes an invitation', async () => {
             const invitation = await invitationFactory();
 
+            await InvitationController.deleteInvitationBySender(
+                invitation._id,
+                invitation._senderId
+            );
+
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Can handle strings in place of ObjectIds', async () => {
+            const invitation = await invitationFactory();
+
+            await InvitationController.deleteInvitationBySender(
+                String(invitation._id),
+                String(invitation._senderId)
+            );
+
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Throws an error if the invitationId argument is not a valid ObjectId', async () => {
+            const invitation = await invitationFactory();
+            let error = null;
+
             try {
-                await InvitationController.deleteInvitation(invitation._id, null);
+                await InvitationController.deleteInvitationBySender(
+                    'asdkn;da',
+                    invitation._senderId
+                ); 
+            } catch (e) { 
+                error = e;
+            }
+            
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the senderId argument is not a valid ObjectId', async () => {
+            const invitation = await invitationFactory();
+            let error = null;
+
+            try {
+                await InvitationController.deleteInvitationBySender(
+                    invitation._id,
+                    'asdfsac;'
+                );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the senderId does not belong to the invitationId', async () => {
+            const invitation = await invitationFactory();
+            let error = null;
+            
+            try {
+                 await InvitationController.deleteInvitationBySender(
+                     invitation._id,
+                     new mongoose.Types.ObjectId()
+                 );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+    });
+
+    describe('deleteInvitationByReciever()', () => {
+        test('Deletes an invitation', async () => {
+            const invitation = await invitationFactory();
+
+            await InvitationController.deleteInvitationByReciever(
+                invitation._id,
+                invitation.recieverEmail
+            );
+
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Can handle strings in place of ObjectIds', async () => {
+            const invitation = await invitationFactory();
+
+            await InvitationController.deleteInvitationByReciever(
+                String(invitation._id),
+                invitation.recieverEmail
+            );
+
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Throws an error if the invitationId is not a valid ObjectId', async () => {
+            const invitation = await invitationFactory();
+            let error = null;
+
+            try {
+                await InvitationController.deleteInvitationByReciever(
+                    'asdfasdf',
+                    invitation.recieverEmail
+                );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the recieverEmail is not a valid email', async () => {
+            const invitation = await invitationFactory();
+            let error = null;
+
+            try {
+                await InvitationController.deleteInvitationByReciever(
+                    invitation._id,
+                    'asdfadsfa'
+                );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).not.toBeNull();
+        });
+
+        test('Throws an error if the recieverEmail does not belong to the invitationId', async () => {
+            const invitation = await invitationFactory();
+            const email = generateEmail();
+            let error = null;
+
+            try {
+                await InvitationController.deleteInvitationByReciever(
+                    invitation._id,
+                    email
+                );
             } catch (e) {
                 error = e;
             }

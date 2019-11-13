@@ -74,28 +74,52 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
 };
 
 /**
- * @description Deletes an invitation document
+ * @description Deletes an invitation, issued by the sender
  * @param {String | mongoose.Types.ObjectId} invitationId
- * @param {String | mongoose.Types.ObjectId} senderId
- * @return {Promise<mongoose.Document>}
+ * @param {String} senderId
+ * @returns {Promise<mongoose.Document>}
  */
-module.exports.deleteInvitation = async (invitationId, senderId) => {
+module.exports.deleteInvitationBySender = async (invitationId, senderId) => {
     try {
         // Input validation
         if(!ObjectId.isValid(invitationId)) throwInvalidObjectIdError('invitationId', invitationId);
         if(!ObjectId.isValid(senderId)) throwInvalidObjectIdError('senderId', senderId);
 
-        // Invitation deletion
+        // Delete invitation
         const deletedInvitation = await InvitationModel.findOneAndDelete({
             _id: invitationId,
             _senderId: senderId
         }).lean().exec();
 
-        if(deletedInvitation === null) {
-            throw new Error(`No invitation could be found with the id ${ invitationId } from a sender with the id ${ senderId }.`);
-        }
+        if(!deletedInvitation) throw new Error(`No invitation could be found matching the query data.`);
 
-        return deletedInvitation;
+        return;
+    } catch (e) {
+        throw e;
+    }
+};
+
+/**
+ * @description Deletes an invitation, issued by the reciever
+ * @param {String | mongoose.Types.ObjectId} invitationId
+ * @param {String} recieverEmail
+ * @returns {Promise<mongoose.Document>}
+ */
+module.exports.deleteInvitationByReciever = async (invitationId, recieverEmail) => {
+    try {
+        // Input validation
+        if(!ObjectId.isValid(invitationId)) throwInvalidObjectIdError('invitationId', invitationId);
+        if(!validator.isEmail(recieverEmail)) throw new Error(`${ recieverEmail } is not an email.`);
+
+        // Delete invitation
+        const deletedInvitation = await InvitationModel.findOneAndDelete({
+            _id: invitationId,
+            recieverEmail: recieverEmail
+        }).lean().exec()
+
+        if(!deletedInvitation) throw new Error(`No invitation could be found matching the query data.`);
+
+        return;
     } catch (e) {
         throw e;
     }
