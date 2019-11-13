@@ -13,6 +13,7 @@ const getDisplayedNumberOfNotes = notes => {
 };
 
 const NotesList = ({
+    user,
     currentHousehold,
     currentNote,
     toggleShowCreateNote
@@ -32,18 +33,34 @@ const NotesList = ({
         )
     });
 
+    const createNoteButton = (
+        currentHousehold.settings.allMembersCanCreateNotes || currentHousehold._ownerId === user._id
+    )
+        ? (
+            <CircleButton
+                light={ false }
+                onClick={ toggleShowCreateNote }
+                disabled={ currentNote && currentNote.isEditing }
+                tooltipText="Create Note"
+            >
+                <i className="fas fa-edit"></i>
+            </CircleButton>
+        )
+        : (
+            <CircleButton
+                light={ false }
+                tooltipText="You are not allowed to create notes"
+                disabled={ true }
+            >
+                <i className="fas fa-edit"></i>
+            </CircleButton>
+        );
+
     return (
         <div className="notes-list">
             <div className="notes-list__header">
                 { displayedNumberOfNotes }
-                <CircleButton
-                    light={ false }
-                    onClick={ toggleShowCreateNote }
-                    disabled={ currentNote && currentNote.isEditing }
-                    tooltipText="Create Note"
-                >
-                    <i className="fas fa-edit"></i>
-                </CircleButton>
+                { createNoteButton }
             </div>
             <div className="notes-list__list">
                 { notes }

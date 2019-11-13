@@ -188,6 +188,14 @@
         &:hover {
             cursor: pointer;
         }
+
+        &:disabled {
+            background: $light-gray;
+
+            &:hover {
+                cursor: default;
+            }
+        }
     }
 
     &--on {

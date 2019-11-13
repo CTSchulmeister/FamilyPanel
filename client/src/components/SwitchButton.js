@@ -40,10 +40,14 @@ class SwitchButton extends Component {
 
         if(this.state.clicked) className += ` ${ SwitchButton.ANIMATE_CLASS }`;
 
+        const onClick = (this.props.disabled)
+            ? null
+            : this.toggle;
+
         return (
             <button
                 className={ className }
-                onClick={ this.toggle }
+                onClick={ onClick }
                 disabled={ this.props.disabled || false }
                 name={ this.props.name || null }
                 value={ this.props.value || null }

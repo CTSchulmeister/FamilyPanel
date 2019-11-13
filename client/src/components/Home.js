@@ -7,36 +7,41 @@ import HomeSettingsContainer from '../containers/HomeSettingsContainer';
 import InvitationModalContentContainer from '../containers/InvitationModalContentContainer';
 import SectionHeader from './SectionHeader';
 import CircleButton from './CircleButton';
+import DisabledHomeSettingsContainer from '../containers/DisabledHomeSettingsContainer';
 
 const Home = ({
     user,
     currentHousehold
 }) => {
-    let canInvite;
+    const inviteButton = (
+        currentHousehold &&
+        ( currentHousehold.settings.allMembersCanInvite ||
+        currentHousehold._ownerId === user._id )
+    )
+        ? (
+            <Modal>
+                <CircleButton
+                    light={ true }
+                    tooltipText="Invite Member"
+                >
+                    <i className="fas fa-user-plus"></i>
+                </CircleButton>
+                <InvitationModalContentContainer />
+            </Modal>
+        )
+        : null;
 
-    if(currentHousehold) {
-        canInvite = (
-            currentHousehold.settings.allMembersCanInvite || 
-            currentHousehold._ownerId === user._id
-        );
-    }
+    const settings = (currentHousehold && currentHousehold._ownerId === user._id)
+        ? <HomeSettingsContainer />
+        : <DisabledHomeSettingsContainer />;
 
     return (
         <AppContainer activeLink="home">
             <section className="home">
                 <SectionHeader title="Home">
-                    <Modal>
-                        <CircleButton
-                            light={ true }
-                            disabled={ !canInvite }
-                            tooltipText="Invite Member"
-                        >
-                            <i className="fas fa-user-plus"></i>
-                        </CircleButton>
-                        <InvitationModalContentContainer />
-                    </Modal>
+                    { inviteButton }
                 </SectionHeader>
-                <HomeSettingsContainer />
+                { settings }
             </section>
         </AppContainer>
     );
