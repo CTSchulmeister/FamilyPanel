@@ -21,8 +21,6 @@ describe('Household Model', () => {
                 name: 'Our Apartment'
             }).save();
 
-            console.log(household);
-
             const foundHousehold = await HouseholdModel.findById(household._id).exec();
 
             expect(foundHousehold.name).toStrictEqual('Our Apartment');

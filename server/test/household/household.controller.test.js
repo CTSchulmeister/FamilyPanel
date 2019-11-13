@@ -8,7 +8,8 @@ const {
     householdFactory, 
     householdWithEventsFactory,
     householdWithTasksFactory,
-    householdWithNotesFactory
+    householdWithNotesFactory,
+    householdSettingsFactory
 } = require('../testUtilties');
 
 const HouseholdController = require('../../src/household/household.controller');
@@ -157,23 +158,51 @@ describe('Household Controller', () => {
 
         describe('deleteHousehold()', () => {
             test('Can delete a household', async () => {
-                const household = await householdFactory();
-                await HouseholdController.deleteHousehold(household._id);
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                await HouseholdController.deleteHousehold(
+                    household._id, 
+                    user._id
+                );
+
                 const queryResult = await HouseholdModel.findById(household._id).exec();
+
+                expect(queryResult).toBeNull();
+            });
+
+            test('Can handle string values in place of objectIds', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                await HouseholdController.deleteHousehold(
+                    String(household._id), 
+                    String(user._id)
+                );
+
+                const queryResult = await HouseholdModel.findById(household._id).exec();
+
                 expect(queryResult).toBeNull();
             });
 
             test('Returns the deleted household', async () => {
-                const household = await householdFactory();
-                const deletedHousehold = await HouseholdController.deleteHousehold(household._id);
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                const deletedHousehold = await HouseholdController.deleteHousehold(
+                    household._id,
+                    user._id
+                );
+
                 expect(deletedHousehold.name).toStrictEqual(household.name);
             });
 
             test('Throws an error if the household does not exist', async () => {
+                const user = await userFactory();
                 let error = null;
 
                 try {
-                    await HouseholdController.deleteHousehold(new mongoose.Types.ObjectId());
+                    await HouseholdController.deleteHousehold(new mongoose.Types.ObjectId(), user._id);
                 } catch (err) {
                     error = err;
                 }
@@ -181,11 +210,38 @@ describe('Household Controller', () => {
                 expect(error).not.toBeNull();
             });
 
+            test('Throws an error if the user does not exist', async () => {
+                const household = await householdFactory();
+                let error = null;
+
+                try {
+                    await HouseholdController.deleteHousehold(household._id, new mongoose.Types.ObjectId());
+                } catch (err) {
+                    error = err;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an errir if the user is not the owner of the household', async () => {
+                const user = await userFactory();
+                const household = await householdFactory();
+                let error = null;
+
+                try {
+                    await HouseholdController.deleteHousehold(household._id, user._id);
+                } catch (err) {
+                    error = err;
+                }
+                
+                expect(error).not.toBeNull();
+            });
+
             test('Handles invalid data input', async () => {
                 let error = null;
                 
                 try {
-                    await HouseholdController.deleteHousehold('test');
+                    await HouseholdController.deleteHousehold('test', 'test');
                 } catch (err) {
                     error = err;
                 }
@@ -197,7 +253,7 @@ describe('Household Controller', () => {
                 const user = await userFactory();
                 const household = await householdFactory(user);
 
-                await HouseholdController.deleteHousehold(household._id);
+                await HouseholdController.deleteHousehold(household._id, user._id);
 
                 const updatedUser = await UserModel.findById(user._id).exec();
                 
@@ -209,11 +265,326 @@ describe('Household Controller', () => {
                 const owner = await userFactory();
                 const household = await householdFactory(owner, member);
                 
-                await HouseholdController.deleteHousehold(household._id);
+                await HouseholdController.deleteHousehold(household._id, owner._id);
 
                 const updatedMember = await UserModel.findById(member._id).exec();
 
                 expect(updatedMember._householdIds.length).toStrictEqual(0);
+            });
+        });
+
+        describe('getMembersFromHousehold()', () => {
+            test('Returns the members of the household', async () => {
+                const member = await userFactory();
+                const household = await householdFactory(member);
+
+                const members = await HouseholdController.getMembersFromHousehold(
+                    household._id,
+                    member._id
+                );
+
+                expect(members[0]._id).toStrictEqual(member._id);
+            });
+
+            test('Can handle string inputs in place of objectIds', async () => {
+                const member = await userFactory();
+                const household = await householdFactory(member);
+
+                const members = await HouseholdController.getMembersFromHousehold(
+                    String(household._id),
+                    String(member._id)
+                );
+
+                expect(members[0]._id).toStrictEqual(member._id);
+            });
+
+            test('Throws an error if the household is null', async () => {
+                const user = await userFactory();
+                let error = null;
+                
+                try {
+                    await HouseholdController.getMembersFromHousehold(
+                        null,
+                        user._id
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the user is null', async () => {
+                const household = await householdFactory();
+                let error = null;
+                
+                try {
+                    await HouseholdController.getMembersFromHousehold(
+                        household._id,
+                        null
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the household does not exist', async () => {
+                const user = await userFactory();
+                let error = null;
+
+                try {
+                    await HouseholdController.getMembersFromHousehold(
+                        new mongoose.Types.ObjectId(),
+                        user._id
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the user does not exist', async () => {
+                const household = await householdFactory();
+                let error = null;
+
+                try {
+                    await HouseholdController.getMembersFromHousehold(
+                        household._id,
+                        new mongoose.Types.ObjectId()
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the user does not belong to the household', async () => {
+                const user = await userFactory();
+                const household = await householdFactory();
+                let error = null;
+
+                try {
+                    await HouseholdController.getMembersFromHousehold(household._id, user._id);
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+        });
+
+        describe('changeSettings()', () => {
+            test('Updates the household\'s settings', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                await HouseholdController.changeSettings(
+                    household._id,
+                    user._id,
+                    !household.settings.allMembersCanInvite,
+                    !household.settings.allMembersCanCreateEvents,
+                    !household.settings.allMembersCanCreateTasks,
+                    !household.settings.allMembersCanCreateNotes,
+                    household.name,
+                    user._id
+                );
+
+                const updatedHousehold = await HouseholdModel.findById(household._id).exec();
+
+                expect(updatedHousehold.settings.allMembersCanInvite).toStrictEqual(!household.settings.allMembersCanInvite);
+            });
+
+            test('Can change the household\'s name', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                await HouseholdController.changeSettings(
+                    household._id,
+                    user._id,
+                    !household.settings.allMembersCanInvite,
+                    !household.settings.allMembersCanCreateEvents,
+                    !household.settings.allMembersCanCreateTasks,
+                    !household.settings.allMembersCanCreateNotes,
+                    'My House',
+                    user._id
+                );
+
+                const updatedHousehold = await HouseholdModel.findById(household._id).exec();
+
+                expect(updatedHousehold.name).toStrictEqual('My House');
+            });
+
+            test('Can change the household\'s owner', async () => {
+                const owner = await userFactory();
+                const member = await userFactory();
+                const household = await householdFactory(owner, member);
+
+                await HouseholdController.changeSettings(
+                    household._id,
+                    owner._id,
+                    !household.settings.allMembersCanInvite,
+                    !household.settings.allMembersCanCreateEvents,
+                    !household.settings.allMembersCanCreateTasks,
+                    !household.settings.allMembersCanCreateNotes,
+                    household.name,
+                    member._id
+                );
+
+                const updatedHousehold = await HouseholdModel.findById(household._id).exec();
+
+                expect(updatedHousehold._ownerId).toStrictEqual(member._id);
+            });
+
+            test('Returns the updated household', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                const returnedHousehold = await HouseholdController.changeSettings(
+                    household._id,
+                    user._id,
+                    !household.settings.allMembersCanInvite,
+                    !household.settings.allMembersCanCreateEvents,
+                    !household.settings.allMembersCanCreateTasks,
+                    !household.settings.allMembersCanCreateNotes,
+                    household.name,
+                    user._id
+                );
+
+                expect(returnedHousehold._id).toStrictEqual(household._id);
+            });
+
+            test('Returns the updated household with members', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                const returnedHousehold = await HouseholdController.changeSettings(
+                    household._id,
+                    user._id,
+                    !household.settings.allMembersCanInvite,
+                    !household.settings.allMembersCanCreateEvents,
+                    !household.settings.allMembersCanCreateTasks,
+                    !household.settings.allMembersCanCreateNotes,
+                    household.name,
+                    user._id
+                );
+
+                expect(returnedHousehold.members[0]._id).toStrictEqual(user._id);
+            })
+
+            test('Can handle strings in place of ObjectId arguments', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+
+                await HouseholdController.changeSettings(
+                    String(household._id),
+                    String(user._id),
+                    !household.settings.allMembersCanInvite,
+                    !household.settings.allMembersCanCreateEvents,
+                    !household.settings.allMembersCanCreateTasks,
+                    !household.settings.allMembersCanCreateNotes,
+                    household.name,
+                    String(user._id)
+                );
+
+                const updatedHousehold = await HouseholdModel.findById(household._id).exec();
+
+                expect(updatedHousehold.settings.allMembersCanInvite).toStrictEqual(!household.allMembersCanInvite);
+            });
+
+            test('Throws an error if the allMembersCanInvite argument is not a boolean', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+                let error = null;
+
+                try {
+                    await HouseholdController.changeSettings(
+                        household._id,
+                        user._id,
+                        2,
+                        !household.settings.allMembersCanCreateEvents,
+                        !household.settings.allMembersCanCreateTasks,
+                        !household.settings.allMembersCanCreateNotes,
+                        household.name,
+                        user._id
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the allMembersCanCreateEvents argument is not a boolean', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+                let error = null;
+
+                try {
+                    await HouseholdController.changeSettings(
+                        household._id,
+                        user._id,
+                        !household.settings.allMembersCanInvite,
+                        2,
+                        !household.settings.allMembersCanCreateTasks,
+                        !household.settings.allMembersCanCreateNotes,
+                        household.name,
+                        user._id
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the allMembersCanCreateTasks argument is not a boolean', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+                let error = null;
+
+                try {
+                    await HouseholdController.changeSettings(
+                        household._id,
+                        user._id,
+                        !household.settings.allMembersCanInvite,
+                        !household.settings.allMembersCanCreateEvents,
+                        2,
+                        !household.settings.allMembersCanCreateNotes,
+                        household.name,
+                        user._id
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
+            });
+
+            test('Throws an error if the allMembersCanCreateNotes argument is not a boolean', async () => {
+                const user = await userFactory();
+                const household = await householdFactory(user);
+                let error = null;
+
+                try {
+                    await HouseholdController.changeSettings(
+                        household._id,
+                        user._id,
+                        !household.settings.allMembersCanInvite,
+                        !household.settings.allMembersCanCreateEvents,
+                        !household.settings.allMembersCanCreateTasks,
+                        2,
+                        household.name,
+                        user._id
+                    );
+                } catch (e) {
+                    error = e;
+                }
+
+                expect(error).not.toBeNull();
             });
         });
     });

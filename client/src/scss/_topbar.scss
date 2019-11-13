@@ -111,36 +111,6 @@
     }
 }
 
-.invitation-notification {
-    display: flex;
-    justify-content: space-between;
-
-    padding: 0.25rem 0.5rem;
-
-    &:hover {
-        background: $extra-light-gray;
-    }
-
-    &__text {
-        display: flex;
-        flex-direction: column;
-    }
-
-    &__subheading {
-        text-transform: uppercase;
-        color: $gray;
-        font-weight: $bold;
-        letter-spacing: 0.1rem;
-        font-size: 0.5rem;
-    }
-
-    &__buttons {
-        display: grid;
-        grid-gap: 0.5rem;
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
 .notifications {
     &--none {
         text-align: center;

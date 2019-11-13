@@ -6,6 +6,11 @@ const validator = require('validator');
 const InvitationModel = require('./invitation.model');
 const HouseholdModel = require('../household/household.model');
 const UserModel = require('../user/user.model');
+const {
+    throwInvalidObjectIdError
+} = require('../util');
+
+const ObjectId = mongoose.Types.ObjectId;
 
 // --- Invitation Controller Logic
 
@@ -24,13 +29,12 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
             throw new Error(`${ recieverEmail } is not an email.`);
         }
 
-        if(householdId == null) {
-            throw new Error(`The householdId argument must be a string representation of an objectId or an objectId.  Recieved: ${ householdId } (Type of ${ typeof householdId }).`);
-        }
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        if(!ObjectId.isValid(senderId)) throwInvalidObjectIdError('senderId', senderId);
 
-        if(senderId == null) {
-            throw new Error(`The senderId argument must be a string represntation of an objectId or an objectId.  Recieved: ${ senderId } (Tyep of ${ typeof senderId }).`);
-        }
+        // Cast to ObjectId
+        householdId = ObjectId(householdId);
+        senderId = ObjectId(senderId);
 
         const duplicateInvitation = await InvitationModel.findOne({
             _householdId: householdId,
@@ -78,19 +82,14 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
 module.exports.deleteInvitation = async (invitationId, senderId) => {
     try {
         // Input validation
-        if(invitationId === null) {
-            throw new Error(`The invitationId argument must be a string representation of an objectId or an objectId.  Recieved ${ invitationId } (Type of ${ typeof invitationId }).`)
-        }
-
-        if(senderId === null) {
-            throw new Error(`The senderId argument must be a string representation of an objectId or an objectId.  Recieved ${ senderId } (Type of ${ typeof senderId }).`);
-        }
+        if(!ObjectId.isValid(invitationId)) throwInvalidObjectIdError('invitationId', invitationId);
+        if(!ObjectId.isValid(senderId)) throwInvalidObjectIdError('senderId', senderId);
 
         // Invitation deletion
         const deletedInvitation = await InvitationModel.findOneAndDelete({
             _id: invitationId,
             _senderId: senderId
-        }).exec();
+        }).lean().exec();
 
         if(deletedInvitation === null) {
             throw new Error(`No invitation could be found with the id ${ invitationId } from a sender with the id ${ senderId }.`);
@@ -151,13 +150,8 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
 module.exports.acceptInvitation = async (invitationId, recieverId) => {
     try {
         // Input validation
-        if(invitationId == null) {
-            throw new Error(`The invitationId argument must be a string representation of an objectId or an objectId.  Recieved: ${ invitationId } (Type of ${ typeof invitationId }).`);
-        }
-
-        if(recieverId == null) {
-            throw new Error(`The recieverId argument must be a string representation of an objectId or an objectId.  Recieved: ${ recieverId } (Type of ${ typeof recieverId }).`);
-        }
+        if(!ObjectId.isValid(invitationId)) throwInvalidObjectIdError('invitationId', invitationId);
+        if(!ObjectId.isValid(recieverId)) throwInvalidObjectIdError('recieverId', recieverId);
 
         // Invitation acceptance
         const user = await UserModel.findById(recieverId).exec();
@@ -181,7 +175,8 @@ module.exports.acceptInvitation = async (invitationId, recieverId) => {
             $push: { _memberIds: user._id }
         }).exec();
         const updatedUser = await UserModel.findByIdAndUpdate(user._id, {
-            $push: { _householdIds: invitation._householdId }
+            $push: { _householdIds: invitation._householdId },
+            currentHousehold: invitation._householdId
         }).exec();
 
         return {

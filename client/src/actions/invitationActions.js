@@ -108,7 +108,7 @@ export const getInvitationsByEmail = () => async dispatch => {
 
         const user = selectUser(store.getState());
 
-        let invitationsResponse = await fetch(`${ ROOT_URL }/api/invitations/email/${ user.email }`, {
+        let invitationsResponse = await fetch(`${ ROOT_URL }/api/invitation/email/${ user.email }`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -139,11 +139,13 @@ export const getInvitationsByEmail = () => async dispatch => {
 
 export const acceptInvitation = invitationId => async dispatch => {
     try {
+        alert('Accepting Invitation for ' + invitationId);
+
         dispatch({
             type: PENDING_ACCEPT_INVITATION
         });
 
-        let acceptInvitationResponse = await fetch(`${ ROOT_URL }/api/invitations/${ invitationId }/accept`, {
+        let acceptInvitationResponse = await fetch(`${ ROOT_URL }/api/invitation/${ invitationId }/accept`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

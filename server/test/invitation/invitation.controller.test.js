@@ -34,6 +34,22 @@ describe('Invitation Controller', () => {
             expect(foundInvitation).not.toBeNull();
         });
 
+        test('Can handle string inputs in place of ObjectIds', async () => {
+            const sender = await userFactory();
+            const recieverEmail = generateEmail();
+            const household = await householdFactory(sender);
+
+            const invitation = await InvitationController.createInvitation(
+                String(household._id),
+                String(sender._id),
+                recieverEmail
+            );
+
+            const foundInvitation = await InvitationModel.findById(invitation._id).exec();
+
+            expect(foundInvitation).not.toBeNull();
+        });
+
         test('Throws an error if an invitation to this household already exists for the reciever', async () => {
             let error = null;
 
@@ -210,7 +226,25 @@ describe('Invitation Controller', () => {
             const household = await householdFactory(user);
             const invitation = await invitationFactory(household);
 
-            await InvitationController.deleteInvitation(invitation._id, user._id);
+            await InvitationController.deleteInvitation(
+                invitation._id, 
+                user._id
+            );
+
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Can handle strings in place of objectIds', async () => {
+            const user = await userFactory();
+            const household = await householdFactory(user);
+            const invitation = await invitationFactory(household);
+
+            await InvitationController.deleteInvitation(
+                String(invitation._id), 
+                String(user._id)
+            );
 
             const queryResult = await InvitationModel.findById(invitation._id).exec();
 
@@ -371,13 +405,32 @@ describe('Invitation Controller', () => {
     });
 
     describe('acceptInvitation()', () => {
-        test('Deletes the invitation', async () => {
+        test('Accepts the invitation', async () => {
             const sender = await userFactory();
             const reciever = await userFactory();
             const household = await householdFactory(sender);
             const invitation = await invitationFactory(household, reciever.email);
 
-            await InvitationController.acceptInvitation(invitation._id, reciever._id);
+            await InvitationController.acceptInvitation(
+                invitation._id, 
+                reciever._id
+            );
+
+            const queryResult = await InvitationModel.findById(invitation._id).exec();
+
+            expect(queryResult).toBeNull();
+        });
+
+        test('Can handle strings in place of objectIds', async () => {
+            const sender = await userFactory();
+            const reciever = await userFactory();
+            const household = await householdFactory(sender);
+            const invitation = await invitationFactory(household, reciever.email);
+
+            await InvitationController.acceptInvitation(
+                String(invitation._id), 
+                String(reciever._id)
+            );
 
             const queryResult = await InvitationModel.findById(invitation._id).exec();
 

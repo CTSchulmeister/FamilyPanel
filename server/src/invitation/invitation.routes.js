@@ -44,8 +44,8 @@ router.post('/', auth, jsonParser, [
     } else {
         try {
             const updatedUser = await InvitationController.createInvitation(
-                String(req.body.householdId),
-                String(req.body.senderId),
+                req.body.householdId,
+                req.body.senderId,
                 req.body.recieverEmail,
                 req.body.message || null
             );
@@ -70,8 +70,8 @@ router.post('/', auth, jsonParser, [
 router.delete('/:id', auth, async (req, res) => {
     try {
         const deletedInvitation = await InvitationController.deleteInvitation(
-            String(req.params.id),
-            String(req.user._id)
+            req.params.id,
+            req.user._id
         );
 
         res.status(200).json({

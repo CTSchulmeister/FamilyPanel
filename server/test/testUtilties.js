@@ -145,3 +145,16 @@ module.exports.invitationFactory = async (household = null, recieverEmail = null
         message: this.randomStringGenerator(30)
     }).save();
 };
+
+module.exports.householdSettingsFactory = () => {
+    const getRandomBoolean = () => {
+        return (Math.floor(Math.random() + 1) === 1) ? true : false;
+    };
+
+    return {
+        allMembersCanInvite: getRandomBoolean(),
+        allMembersCanCreateEvents: getRandomBoolean(),
+        allMembersCanCreateTasks: getRandomBoolean(),
+        allMembersCanCreateNotes: getRandomBoolean()
+    };
+};

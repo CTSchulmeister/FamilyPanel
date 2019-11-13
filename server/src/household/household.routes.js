@@ -45,7 +45,7 @@ router.post('/', auth, jsonParser, [
             let memberIds = req.body.memberIds.map(memberId => String(memberId));
 
             const { newHousehold, updatedUser } = await HouseholdController.createHousehold(
-                String(req.body.ownerId),
+                req.body.ownerId,
                 memberIds,
                 req.body.name
             );
@@ -69,7 +69,7 @@ router.post('/', auth, jsonParser, [
 router.get('/:household', auth, async (req, res) => {
     try {
         const household = await HouseholdController.readHousehold(
-            String(req.params.household)
+            req.params.household
         );
 
         if(!household._memberIds.includes(req.user._id)) {
@@ -94,8 +94,8 @@ router.get('/:household', auth, async (req, res) => {
 router.get('/:household/members', auth, async (req, res) => {
     try {
         const members  = await HouseholdController.getMembersFromHousehold(
-            String(req.params.household), 
-            String(req.user._id)
+            req.params.household, 
+            req.user._id
         );
 
         res.status(200).json({
@@ -133,7 +133,7 @@ router.patch('/:household', auth, jsonParser, [
     } else {
         try {
             let household = await HouseholdController.readHousehold(
-                String(req.params.household)
+                req.params.household
             );
 
             if(household._ownerId != req.user._id) {
@@ -205,14 +205,14 @@ router.patch('/:household/settings', auth, jsonParser, [
     } else {
         try {
             const household = await HouseholdController.changeSettings(
-                String(req.body.householdId),
-                String(req.user._id),
+                req.body.householdId,
+                req.user._id,
                 req.body.allMembersCanInvite,
                 req.body.allMembersCanCreateEvents,
                 req.body.allMembersCanCreateTasks,
                 req.body.allMembersCanCreateNotes,
                 req.body.name,
-                String(req.body.ownerId)
+                req.body.ownerId
             );
     
             res.status(200).json({
@@ -229,10 +229,11 @@ router.patch('/:household/settings', auth, jsonParser, [
 });
 
 // DELETE
-router.delete('/:household', async (req, res) => {
+router.delete('/:household', auth, async (req, res) => {
     try {
         const household = await HouseholdController.deleteHousehold(
-            String(req.params.household)
+            req.params.household,
+            req.user._id
         );
 
         res.status(200).json({
