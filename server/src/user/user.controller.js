@@ -5,7 +5,10 @@ const UserModel = require('./user.model');
 const HouseholdModel = require('../household/household.model');
 const InvitationModel = require('../invitation/invitation.model');
 const { generateSalt, generateHash, nonPersonalUserData } = require('../util');
+const validator = require('validator');
 const mongoose = require('mongoose');
+
+const ObjectId = mongoose.Types.ObjectId;
 
 // --- Controller Logic
 
@@ -17,57 +20,59 @@ const mongoose = require('mongoose');
  * @param {String} password - The user's unhashed password.
  */
 module.exports.createUser = async (firstName, lastName, email, password) => {
-    const salt = generateSalt();
-    const hashedPassword = generateHash(password, salt);
+    try {
+        const salt = generateSalt();
+        const hashedPassword = generateHash(password, salt);
 
-    if(await UserModel.findOne({ email: email }).exec() != null) {
-        throw `A user with the email ${ email } already exists`;
-    }
+        if(await UserModel.findOne({ email: email }).lean().exec() !== null) {
+            throw new Error(`A user with the email ${ email } already exists.`);
+        }
 
-    let user = new UserModel({
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: hashedPassword,
-        salt: salt
-    });
+        let user = new UserModel({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: hashedPassword,
+            salt: salt
+        });
+    
+        user.validate((err) => { if(err) throw err; });
 
-    user.validate((err) => {
-        if(err) throw err;
-    });
+        user = await user.save();
 
-    user = await user.save();
+        const token = await user.generateAuthToken();
 
-    const token = await user.generateAuthToken();
+        user.password = undefined;
+        user.salt = undefined;
 
-    user.password = undefined;
-    user.salt = undefined;
+        const invitations = await InvitationModel.find({ 
+            recieverEmail: email 
+        }).lean().exec();
 
-    const invitations = await InvitationModel.find({ 
-        recieverEmail: email 
-    }).lean().exec();
+        if(invitations.length > 0) {
+            const householdIds = invitaitons.map(invitation => invitation._householdId);
 
-    if(invitations.length > 0) {
-        const householdIds = invitations.map(invitation => invitation._householdId);
+            const householdNames = await HouseholdModel.find({
+                _id: householdIds
+            }, '_id name').lean().exec();
 
-        const householdNames = await HouseholdModel.find({
-            _id: householdIds
-        }, '_id name').lean().exec();
-
-        for(let i = 0; i < invitations.length; i++) {
-            for(let household of householdNames) {
-                if(invitations[i]._householdId = household._id) {
-                    invitations[i] = {
-                        ...invitations[i],
-                        householdName: household.name
-                    };
-                    break;
+            for(let i = 0; i < invitations.length; i++) {
+                for(let household of householdNames) {
+                    if(invitations[i]._householdId = household._id) {
+                        invitations[i] = {
+                            ...invitations[i],
+                            householdName: household.name
+                        };
+                        break;
+                    }
                 }
             }
         }
-    }
 
-    return { user, token, invitations };
+        return { user, token, invitations };
+    } catch (e) {
+        throw e;
+    }
 };
 
 /**

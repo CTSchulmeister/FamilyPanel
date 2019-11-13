@@ -18,8 +18,9 @@ const InvitationContent = ({
         history.push('/profile');
     };
 
-    const handleDecline = () => {
-
+    const handleDecline = async () => {
+        await deleteInvitation(invitation._id);
+        history.push('/profile');
     };
 
     return (
@@ -57,6 +58,7 @@ const InvitationContent = ({
                     </StandardButton>
                     <StandardButton
                         size="medium"
+                        onClick={ async () => await handleDecline() }
                     >
                         Decline
                     </StandardButton>
