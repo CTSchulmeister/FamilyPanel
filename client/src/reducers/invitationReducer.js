@@ -1,5 +1,6 @@
 import {
     SERVER_CONNECTION_ERROR,
+    USER_LOGGED_OUT,
 
     PENDING_CREATE_INVITATION,
     INVITATION_CREATED,
@@ -92,7 +93,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                invitations: removeInvitation(state, action.invitation._id)
+                invitations: removeInvitation(state, action.invitationId)
             };
         case INVITATION_DELETION_ERROR:
             return {
@@ -112,6 +113,7 @@ export default function(state = initialState, action) {
             };
 
         case SERVER_CONNECTION_ERROR: 
+        case USER_LOGGED_OUT:
             return initialState;
 
         default:

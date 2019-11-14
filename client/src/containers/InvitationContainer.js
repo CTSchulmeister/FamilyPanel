@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
     acceptInvitation,
-    deleteInvitation
+    deleteInvitationByReciever
 } from '../actions/invitationActions';
 import {
     selectInvitations
@@ -24,7 +24,7 @@ const InvitationContainer = props => {
 
     const passedProps = {
         acceptInvitation: props.acceptInvitation,
-        deleteInvitation: props.deleteInvitation,
+        deleteInvitation: props.deleteInvitationByReciever,
         invitation: invitation,
         history: history
     };
@@ -40,5 +40,5 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
     acceptInvitation,
-    deleteInvitation
+    deleteInvitationByReciever
 })(InvitationContainer)

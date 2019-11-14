@@ -7,7 +7,8 @@ const InvitationModel = require('./invitation.model');
 const HouseholdModel = require('../household/household.model');
 const UserModel = require('../user/user.model');
 const {
-    throwInvalidObjectIdError
+    throwInvalidObjectIdError,
+    nonPersonalUserData
 } = require('../util');
 
 const ObjectId = mongoose.Types.ObjectId;
@@ -194,14 +195,20 @@ module.exports.acceptInvitation = async (invitationId, recieverId) => {
             throw new Error(`The invitation with the id ${ invitationId } does not match the user with the id ${ recieverId }.`);
         }
 
-        await InvitationModel.findByIdAndDelete(invitationId).exec();
-        const household = await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
+        await InvitationModel.findByIdAndDelete(invitationId).lean().exec();
+
+        let household = await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
             $push: { _memberIds: user._id }
-        }).exec();
+        }, { new: true }).lean().exec();
+        household = {
+            ...household,
+            members: await getHouseholdMembers(household._id)
+        };
+
         const updatedUser = await UserModel.findByIdAndUpdate(user._id, {
             $push: { _householdIds: invitation._householdId },
             currentHousehold: invitation._householdId
-        }).exec();
+        }, { new: true }).lean().exec();
 
         return {
             updatedUser,
@@ -210,4 +217,11 @@ module.exports.acceptInvitation = async (invitationId, recieverId) => {
     } catch (e) {
         throw e;
     }
+};
+
+// Util
+const getHouseholdMembers = async householdId => {
+    const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+
+    return members;
 };

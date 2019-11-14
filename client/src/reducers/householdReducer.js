@@ -47,11 +47,7 @@ export default function(state = initialState, action) {
                 currentHousehold: action.currentHousehold
             };
         case USER_LOGGED_OUT: 
-            return {
-                ...state,
-                households: null,
-                currentHousehold: null
-            };
+            return initialState;
 
         // Household Actions
         case PENDING_HOUSEHOLD_CREATION:
@@ -147,7 +143,8 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                households: state.households.push(action.household)
+                households: state.households.concat(action.household),
+                currentHousehold: action.household
             };
         case ACCEPT_INVITATION_ERROR:
             return {

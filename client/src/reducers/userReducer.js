@@ -79,13 +79,7 @@ export default function(state = initialState, action) {
                 loading: true
             };
         case USER_LOGGED_OUT:
-            return {
-                ...state,
-                loading: false,
-                user: null,
-                token: null,
-                authenticated: false,
-            }
+            return initialState;
         case LOG_OUT_ERROR:
             return {
                 ...state,

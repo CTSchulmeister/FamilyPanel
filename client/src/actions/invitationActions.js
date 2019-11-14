@@ -65,13 +65,13 @@ export const createInvitation = invitationData => async dispatch => {
     }
 };
 
-export const deleteInvitation = invitationId => async dispatch => {
+export const deleteInvitationByReciever = invitationId => async dispatch => {
     try {
         dispatch({
             type: PENDING_DELETE_INVITATION
         });
 
-        let deleteInvitationResponse = await fetch(`${ ROOT_URL }/api/invitation/${ invitationId }`, {
+        let deleteInvitationResponse = await fetch(`${ ROOT_URL }/api/invitation/reciever/${ invitationId }`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -91,7 +91,42 @@ export const deleteInvitation = invitationId => async dispatch => {
 
         dispatch({
             type: INVITATION_DELETED,
-            invitation: deleteInvitationResponse.invitation
+            invitationId: invitationId
+        });
+    } catch (e) {
+        dispatch({
+            type: SERVER_CONNECTION_ERROR
+        });
+    }
+};
+
+export const deleteInvitationBySender = invitationId => async dispatch => {
+    try {
+        dispatch({
+            type: PENDING_DELETE_INVITATION
+        });
+
+        let deleteInvitationResponse = await fetch(`${ ROOT_URL }/api/invitation/sender/${ invitationId }`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
+            }
+        });
+        deleteInvitationResponse = await deleteInvitationResponse.json();
+
+        if(deleteInvitationResponse.success === false) {
+            dispatch({
+                type: INVITATION_DELETION_ERROR,
+                errors: deleteInvitationResponse.errors
+            });
+            return;
+        }
+
+        dispatch({
+            type: INVITATION_DELETED,
+            invitationId: invitationId
         });
     } catch (e) {
         dispatch({
@@ -139,8 +174,6 @@ export const getInvitationsByEmail = () => async dispatch => {
 
 export const acceptInvitation = invitationId => async dispatch => {
     try {
-        alert('Accepting Invitation for ' + invitationId);
-
         dispatch({
             type: PENDING_ACCEPT_INVITATION
         });
@@ -164,7 +197,7 @@ export const acceptInvitation = invitationId => async dispatch => {
 
         dispatch({
             type: INVITATION_ACCEPTED,
-            user: acceptInvitationResponse.updatedUser,
+            user: acceptInvitationResponse.user,
             invitationId: invitationId,
             household: acceptInvitationResponse.household
         });
