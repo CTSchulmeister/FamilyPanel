@@ -37,6 +37,8 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
         householdId = ObjectId(householdId);
         senderId = ObjectId(senderId);
 
+        recieverEmail = recieverEmail.toLowerCase();
+
         const duplicateInvitation = await InvitationModel.findOne({
             _householdId: householdId,
             recieverEmail: recieverEmail
@@ -113,6 +115,8 @@ module.exports.deleteInvitationByReciever = async (invitationId, recieverEmail) 
         if(!validator.isEmail(recieverEmail)) throw new Error(`${ recieverEmail } is not an email.`);
 
         // Delete invitation
+        recieverEmail = recieverEmail.toLowerCase();
+
         const deletedInvitation = await InvitationModel.findOneAndDelete({
             _id: invitationId,
             recieverEmail: recieverEmail
@@ -131,7 +135,7 @@ module.exports.deleteInvitationByReciever = async (invitationId, recieverEmail) 
  * @param {String} recieverEmail
  * @returns {Promise<Array<mongoose.Document>>}
  */
-module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
+module.exports.getInvitationsByRecieverEmail = async recieverEmail => {
     try {
         // Input validation
         if(!validator.isEmail(recieverEmail)) {
@@ -139,6 +143,8 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
         }
 
         // Invitation querying
+        recieverEmail = recieverEmail.toLowerCase();
+
         let invitations = await InvitationModel.find({
             recieverEmail: recieverEmail
         }).lean().exec();

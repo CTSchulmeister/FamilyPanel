@@ -4,14 +4,10 @@ import PropTypes from 'prop-types';
 import StandardButton from './StandardButton';
 import HouseholdOption from './HouseholdOption';
 
-import CreateHouseholdFormContainer from '../containers/CreateHouseholdFormContainer';
-
 const HouseholdSelection = ({
     households,
-    toggleHouseholdCreationForm,
     changeCurrentHousehold,
-    showHouseholdCreation,
-    handleHouseholdCreation
+    history
 }) => {
     const householdOptions = households.map(household => {
         return (
@@ -24,25 +20,14 @@ const HouseholdSelection = ({
         );
     });
 
-    const householdCreation = (showHouseholdCreation)
-        ? (
-            <CreateHouseholdFormContainer
-                toggleHouseholdCreationForm={ toggleHouseholdCreationForm }
-                handleHouseholdCreation={ handleHouseholdCreation }
-                className="fromSelection"
-            />
-        ) 
-        : null;
-
     return (
         <div className="household-selection">
-            <StandardButton size="wide" onClick={ toggleHouseholdCreationForm }>
+            <StandardButton size="wide" onClick={ () => history.push('/create-household') }>
                 Create Household
             </StandardButton>
             <div className="household-selection__list">
                 { householdOptions }
             </div>
-            { householdCreation }
         </div>
     );
 };

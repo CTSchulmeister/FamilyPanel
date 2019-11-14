@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createHousehold } from '../actions/householdActions';
+import history from '../history';
 
 import CreateHouseholdForm from '../components/CreateHouseholdForm';
 
@@ -31,8 +32,8 @@ class CreateHouseholdFormContainer extends Component {
         event.preventDefault();
 
         try {
-            this.props.toggleHouseholdCreationForm();
             await this.props.createHousehold(this.state);
+            history.push('/home');
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered creating household: ${ error }`);

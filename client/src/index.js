@@ -13,6 +13,7 @@ import InvitationContainer from './containers/InvitationContainer';
 import NotFound from './components/NotFound';
 
 import './index.scss';
+import CreateHouseholdFormContainer from './containers/CreateHouseholdFormContainer';
 
 require('dotenv').config();
 
@@ -27,6 +28,7 @@ ReactDOM.render(
                 <Route path="/home" exact component={ HomeContainer } />
                 <Route path="/notes" exact component={ NotesContainer } />
                 <Route path="/invitation/:id" component={ InvitationContainer } />
+                <Route path="/create-household" exact component={ CreateHouseholdFormContainer } />
                 <Route>
                     <NotFound history={ history } />
                 </Route>

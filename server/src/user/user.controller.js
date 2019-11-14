@@ -28,6 +28,8 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
             throw new Error(`A user with the email ${ email } already exists.`);
         }
 
+        email = email.toLowerCase();
+
         let user = new UserModel({
             firstName: firstName,
             lastName: lastName,
@@ -81,6 +83,8 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
  * @param {String} password - The user's unhashed password.
  */
 module.exports.loginUser = async (email, password) => {
+    email = email.toLowerCase();
+
     const user = await UserModel.findOne({ email: email }).exec();
 
     if(!user) {

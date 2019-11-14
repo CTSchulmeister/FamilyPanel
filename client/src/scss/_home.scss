@@ -1,10 +1,10 @@
 .home {
     display: grid;
     grid-template-rows: 5.5rem calc(100% - 5.5rem);
-    grid-template-columns: 1fr 20rem;
+    grid-template-columns: 1fr 20rem 20rem;
     grid-template-areas:
-        "sectionHeader sectionHeader"
-        "mainSection   sideBar      ";
+        "sectionHeader sectionHeader sectionHeader"
+        "mainSection     members        sideBar   ";
 
     height: 100%;
     width: 100%;
@@ -16,6 +16,20 @@
     & button:hover ~ .typography__subheading--light {
         transition: all ease-out 0.15s;
         color: $white;
+    }
+}
+
+.home-members {
+    grid-area: members;
+    background: rgba($white, 0.4);
+    padding: 1rem;
+
+    & .typography__heading--dark {
+        margin-bottom: 1rem;
+    }
+
+    & .user-panel--rounded {
+        margin-bottom: 1rem;
     }
 }
 
@@ -68,5 +82,28 @@
         display: flex;
         align-items: center;
         color: $extra-light-gray;
+    }
+}
+
+.create-household {
+    display: grid;
+    grid-template-rows: 5.5rem calc(100% - 5.5rem);
+    grid-template-areas:
+        "sectionHeader"
+        "mainSection";
+
+    height: 100%;
+    width: 100%;
+
+    &__form-wrapper {
+        grid-area: mainSection;
+        padding: 2rem;
+        background: rgba($white, 0.4);
+        border-bottom-left-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+
+        & .form {
+            shadow: $large-shadow;
+        }
     }
 }
