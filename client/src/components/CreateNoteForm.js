@@ -34,6 +34,7 @@ const CreateNoteForm = ({
                         value={ title }
                         onChange={ handleChange }
                         label="Title"
+                        maxLength={ 50 }
                     />
                     <TextArea
                         name="body"

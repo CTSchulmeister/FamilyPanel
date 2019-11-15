@@ -51,21 +51,25 @@ const HomeSettings = ({
                                 label={ 'Allow all members to invite: '}
                                 onClick={ () => handleToggleChange('allMembersCanInvite') }
                                 isOn={ allMembersCanInvite }
+                                light={ true }
                             />
                             <ToggleableHomeSetting
                                 label={ 'Allow all members to create events: '}
                                 onClick={ () => handleToggleChange('allMembersCanCreateEvents') }
                                 isOn={ allMembersCanCreateEvents }
+                                light={ true }
                             />
                             <ToggleableHomeSetting
                                 label={ 'Allow all members to create tasks: '}
                                 onClick={ () => handleToggleChange('allMembersCanCreateTasks') }
                                 isOn={ allMembersCanCreateTasks }
+                                light={ true }
                             />
                             <ToggleableHomeSetting
                                 label={ 'Allow all members to create notes: '}
                                 onClick={ () => handleToggleChange('allMembersCanCreateNotes') }
                                 isOn={ allMembersCanCreateNotes }
+                                light={ true }
                             />
                         </HomeSettingsGroup>
                         <HomeSettingsGroup label="Household Name">

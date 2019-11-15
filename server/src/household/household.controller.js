@@ -20,7 +20,15 @@ const ObjectId = mongoose.Types.ObjectId;
  * @param {Array<String | mongoose.Types.ObjectId>} memberIds - An array of the ids of the household's members.
  * @param {String} name - The household's name.
  */
-module.exports.createHousehold = async (ownerId, memberIds, name) => {
+module.exports.createHousehold = async (
+    ownerId, 
+    memberIds, 
+    name, 
+    allMembersCanInvite,
+    allMembersCanCreateEvents,
+    allMembersCanCreateTasks,
+    allMembersCanCreateNotes
+) => {
     try {
         // Input Validation and ObjectId casting
         if(!ObjectId.isValid(ownerId)) throwInvalidObjectIdError('ownerId', ownerId);
@@ -47,7 +55,13 @@ module.exports.createHousehold = async (ownerId, memberIds, name) => {
         let newHousehold = await new HouseholdModel({
             _ownerId: ownerId,
             _memberIds: memberIds,
-            name: name
+            name: name,
+            settings: {
+                allMembersCanInvite: allMembersCanInvite,
+                allMembersCanCreateEvents: allMembersCanCreateEvents,
+                allMembersCanCreateTasks: allMembersCanCreateTasks,
+                allMembersCanCreateNotes: allMembersCanCreateNotes
+            }
         }).save();
         newHousehold = newHousehold._doc;
 

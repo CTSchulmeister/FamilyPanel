@@ -39,21 +39,25 @@ const DisabledHomeSettings = ({
                         label="Allow all members to invite: "
                         isOn={ allMembersCanInvite }
                         disabled={ true }
+                        light={ true }
                     />
                     <ToggleableHomeSetting
                         label="Allow all members to create events: "
                         isOn={ allMembersCanCreateEvents }
                         disabled={ true }
+                        light={ true }
                     />
                     <ToggleableHomeSetting
                         label="Allow all members to create tasks: "
                         isOn={ allMembersCanCreateTasks }
                         disabled={ true }
+                        light={ true }
                     />
                     <ToggleableHomeSetting
                         label="Allow all members to create notes: "
                         isOn={ allMembersCanCreateNotes }
                         disabled={ true }
+                        light={ true }
                     />
                 </HomeSettingsGroup>
                 <HomeSettingsGroup label="Household Owner">

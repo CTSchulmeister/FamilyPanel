@@ -20,16 +20,8 @@ import config from '../config';
 
 const ROOT_URL = process.env.REACT_APP_API_URL || `http://localhost:${ config.PORT }`;
 
-export const createHousehold = (householdData) => async dispatch => {
+export const createHousehold = householdData => async dispatch => {
     try {
-        let user = store.getState().user.user;
-
-        let submissionData = {
-            ownerId: user._id,
-            memberIds: [user._id],
-            name: householdData.name
-        };
-
         dispatch({
             type: PENDING_HOUSEHOLD_CREATION
         });
@@ -41,7 +33,7 @@ export const createHousehold = (householdData) => async dispatch => {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem('auth_jwt_token')
             },
-            body: JSON.stringify(submissionData)
+            body: JSON.stringify(householdData)
         });
 
         createHouseholdResponse = await createHouseholdResponse.json();

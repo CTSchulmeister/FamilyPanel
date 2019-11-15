@@ -173,7 +173,6 @@
         margin: 0.5rem 0.125rem;
 
         border: none;
-        box-shadow: 0rem 0rem 0rem 0.125rem $white;
 
         &::after {
             content: '';
@@ -182,7 +181,6 @@
             width: 0.8rem;
             border-radius: 50%;
             position: absolute;
-            background: $dark-gray;
         }
 
         &:hover {
@@ -208,6 +206,22 @@
 
         &.switch-button--animate::after {
             animation: turnOn 0.15s;
+        }
+    }
+
+    &--light {
+        box-shadow: 0rem 0rem 0rem 0.125rem $white;
+
+        &::after {
+            background: $dark-gray;
+        }
+    }
+
+    &--dark {
+        box-shadow: 0rem 0rem 0rem 0.125rem $gray;
+
+        &::after {
+            background: $white;
         }
     }
 

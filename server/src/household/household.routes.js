@@ -26,7 +26,19 @@ router.post('/', auth, jsonParser, [
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The name field cannot be left empty')
         .isString()
-        .trim()
+        .trim(),
+    check('allMembersCanInvite')
+        .isBoolean()
+            .withMessage(`allMembersCanInvite must be a boolean value.`),
+    check(`allMembersCanCreateEvents`)
+        .isBoolean()
+            .withMessage(`allMembersCanCreateEvents must be a boolean value.`),
+    check(`allMembersCanCreateTasks`)
+        .isBoolean()
+            .withMessage(`allMembersCanCreateTasks must be a boolean value`),
+    check(`allMembersCanCreateNotes`)
+        .isBoolean()
+            .withMessage(`allMembersCanCreateNotes must be a boolean value`)
 ], async (req, res) => {
     const errors = validationResult(req);
 
@@ -42,12 +54,24 @@ router.post('/', auth, jsonParser, [
         });
     } else {
         try {
-            let memberIds = req.body.memberIds.map(memberId => String(memberId));
+            const {
+                ownerId,
+                memberIds,
+                name,
+                allMembersCanInvite,
+                allMembersCanCreateEvents,
+                allMembersCanCreateTasks,
+                allMembersCanCreateNotes
+            } = req.body;
 
             const { newHousehold, updatedUser } = await HouseholdController.createHousehold(
-                req.body.ownerId,
+                ownerId,
                 memberIds,
-                req.body.name
+                name,
+                allMembersCanInvite,
+                allMembersCanCreateEvents,
+                allMembersCanCreateTasks,
+                allMembersCanCreateNotes
             );
 
             res.status(200).json({

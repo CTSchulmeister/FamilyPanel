@@ -6,15 +6,19 @@ const ToggleableHomeSetting = ({
     label,
     isOn,
     onClick,
-    disabled
+    disabled,
+    light
 }) => {
+    const className = (light) ? "home-setting--light" : "home-setting--dark";
+
     return (
-        <div className="home-setting">
+        <div className={ className }>
             <label className="home-setting__label">{ label }</label>
             <SwitchButton
                 isOn={ isOn }
                 onClick={ onClick || null }
                 disabled={ disabled || false }
+                light={ light }
             />
         </div>
     );

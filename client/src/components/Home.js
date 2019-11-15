@@ -38,7 +38,7 @@ const Home = ({
     return (
         <AppContainer activeLink="home">
             <section className="home">
-                <SectionHeader title="Home">
+                <SectionHeader title={ currentHousehold.name }>
                     { inviteButton }
                 </SectionHeader>
                 { settings }
