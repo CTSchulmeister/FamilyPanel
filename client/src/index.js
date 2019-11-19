@@ -8,6 +8,7 @@ import history from './history';
 import LandingContainer from './containers/LandingContainer';
 import ProfileContainer from './containers/ProfileContainer';
 import HomeContainer from './containers/HomeContainer';
+import TasksContainer from './containers/TasksContainer';
 import NotesContainer from './containers/NotesContainer';
 import InvitationContainer from './containers/InvitationContainer';
 import NotFound from './components/NotFound';
@@ -26,6 +27,7 @@ ReactDOM.render(
                 <Route path="/" exact component={ LandingContainer } />
                 <Route path="/profile" exact component={ ProfileContainer } />
                 <Route path="/home" exact component={ HomeContainer } />
+                <Route path="/tasks" exact component={ TasksContainer } />
                 <Route path="/notes" exact component={ NotesContainer } />
                 <Route path="/invitation/:id" component={ InvitationContainer } />
                 <Route path="/create-household" exact component={ CreateHouseholdFormContainer } />

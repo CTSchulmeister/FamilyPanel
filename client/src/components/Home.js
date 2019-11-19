@@ -14,7 +14,7 @@ const Home = ({
     currentHousehold,
     isAuthenticated
 }) => {
-    let content;
+    let content = null;
 
     if(isAuthenticated) {
         const inviteButton = (
@@ -47,8 +47,6 @@ const Home = ({
                 { settings }
             </section>
         );
-    } else {
-        content = null;
     }
 
     return (

@@ -19,6 +19,11 @@ const SideBarGroup = ({
             icon = <i className="fas fa-home"></i>;
             route = '/home';
             break;
+        case 'tasks':
+            title = 'Tasks';
+            icon = <i className="fas fa-tasks"></i>;
+            route = '/tasks';
+            break;
         case 'notes':
             title = 'Notes';
             icon = <i className="fas fa-sticky-note"></i>;
