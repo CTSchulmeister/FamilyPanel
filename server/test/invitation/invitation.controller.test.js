@@ -375,7 +375,7 @@ describe('Invitation Controller', () => {
 
     describe('getInvitationsByRecieverEmail()', () => {
         test('Returns an array of invitation documents', async () => {
-            const recieverEmail = generateEmail();
+            const recieverEmail = generateEmail().toLowerCase();
             const invitationOne = await invitationFactory(null, recieverEmail);
             const invitationTwo = await invitationFactory(null, recieverEmail);
 

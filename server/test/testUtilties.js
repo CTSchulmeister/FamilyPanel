@@ -140,7 +140,7 @@ module.exports.invitationFactory = async (household = null, recieverEmail = null
     return await new InvitationModel({
         _householdId: workingHousehold._id,
         _senderId: user._id,
-        recieverEmail: recieverEmail || this.generateEmail(),
+        recieverEmail: recieverEmail || this.generateEmail().toLowerCase(),
         sent: Date.now(),
         message: this.randomStringGenerator(30)
     }).save();

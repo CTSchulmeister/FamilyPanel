@@ -19,6 +19,7 @@ import {
     INVITATION_ACCEPTED,
     ACCEPT_INVITATION_ERROR
 } from '../actions/types';
+import _ from 'lodash';
 
 const initialState = {
     loading: false,
@@ -37,6 +38,11 @@ const updateHouseholdInHouseholdsArray = (state, household) => {
     });
 };
 
+const changeCurrentHousehold = household => {
+    household.notes = _.sortBy(household.notes, 'createdAt').reverse();
+    return household;
+};
+
 export default function(state = initialState, action) {
     switch(action.type) {
         // Logging In / Out
@@ -44,7 +50,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 households: action.households,
-                currentHousehold: action.currentHousehold
+                currentHousehold: changeCurrentHousehold(action.currentHousehold)
             };
         case USER_LOGGED_OUT: 
             return initialState;
@@ -60,7 +66,7 @@ export default function(state = initialState, action) {
                 ...state,
                 loading: false,
                 households: state.households.concat(action.currentHousehold),
-                currentHousehold: action.currentHousehold,
+                currentHousehold: changeCurrentHousehold(action.currentHousehold),
                 currentNote: null
             };
         case HOUSEHOLD_CREATION_ERROR:
@@ -78,7 +84,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                currentHousehold: action.currentHousehold,
+                currentHousehold: changeCurrentHousehold(action.currentHousehold),
                 currentNote: null
             };
         case CURRENT_HOUSEHOLD_CHANGE_ERROR:
@@ -96,7 +102,7 @@ export default function(state = initialState, action) {
                 ...state,
                 loading: false,
                 households: updateHouseholdInHouseholdsArray(state, action.household),
-                currentHousehold: action.household,
+                currentHousehold: changeCurrentHousehold(action.household),
                 currentNote: (action.currentNote || action.currentNote === null)
                     ? action.currentNote
                     : state.currentNote
@@ -144,7 +150,7 @@ export default function(state = initialState, action) {
                 ...state,
                 loading: false,
                 households: state.households.concat(action.household),
-                currentHousehold: action.household
+                currentHousehold: changeCurrentHousehold(action.household)
             };
         case ACCEPT_INVITATION_ERROR:
             return {

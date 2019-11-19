@@ -38,7 +38,10 @@ const NoteSchema = new mongoose.Schema({
         required: true,
         default: 'Untitled Note'
     },
-    body: String,
+    body: {
+        type: String,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now()

@@ -1087,14 +1087,9 @@ describe('Household Controller', () => {
 
             test('Throws an error if the note does not exist', async () => {
                 const mockNoteId = new mongoose.Types.ObjectId();
-                const mockUserId = new mongoose.Types.ObjectId();
+                const user = await userFactory();
+                const household = await householdFactory(user);
                 let error = null;
-
-                const household = await new HouseholdModel({
-                    _ownerId: mockUserId,
-                    _memberIds: [mockUserId, ],
-                    name: 'Our Apartment'
-                }).save();
 
                 try {
                     await HouseholdController.readNote(household._id, mockNoteId);

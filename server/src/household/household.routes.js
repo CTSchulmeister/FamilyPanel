@@ -612,7 +612,8 @@ router.post('/:household/note', auth, jsonParser, [
         .isString()
         .trim(),
     check('body')
-        .optional()
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The body field cannot be left empty')
         .isString()
         .trim()
 ], async (req, res) => {
@@ -625,13 +626,11 @@ router.post('/:household/note', auth, jsonParser, [
         });
     } else {
         try {
-            const body = (req.body.body) ? req.body.body : null;
-
             const household = await HouseholdController.createNote(
-                String(req.params.household),
-                String(req.user._id),
+                req.params.household,
+                req.user._id,
                 req.body.title,
-                body
+                req.body.body
             );
 
             res.status(200).json({
@@ -652,8 +651,8 @@ router.post('/:household/note', auth, jsonParser, [
 router.get('/:household/note/:note', async (req, res) => {
     try {
         const note = await HouseholdController.readNote(
-            String(req.params.household), 
-            String(req.params.note)
+            req.params.household, 
+            req.params.note
         );
 
         res.status(200).json({
@@ -698,8 +697,8 @@ router.patch('/:household/note/:note', auth, jsonParser, [
             const body = (req.body.body) ? req.body.body : null;
 
             const household = await HouseholdController.updateNote(
-                String(req.params.household),
-                String(req.params.note),
+                req.params.household,
+                req.params.note,
                 title,
                 body
             );
@@ -722,9 +721,9 @@ router.patch('/:household/note/:note', auth, jsonParser, [
 router.delete('/:household/note/:note', auth, async (req, res) => {
     try {
         const household = await HouseholdController.deleteNote(
-            String(req.params.household), 
-            String(req.user._id), 
-            String(req.params.note)
+            req.params.household, 
+            req.user._id, 
+            req.params.note
         );
 
         res.status(200).json({
