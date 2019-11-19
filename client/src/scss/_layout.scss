@@ -24,6 +24,15 @@
         padding: 2rem;
         background: $color-gradient;
     }
+
+    &__spinner-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        grid-area: main;
+        background: $color-gradient;
+    }
 }
 
 .section-header {

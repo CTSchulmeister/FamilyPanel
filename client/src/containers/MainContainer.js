@@ -13,7 +13,11 @@ const MainContainer = ({
     children,
     isLoading
 }) => {
-    if(isLoading) return <Spinner />;
+    if(isLoading) return (
+        <div className="main__spinner-wrapper">
+            <Spinner />
+        </div>
+    );
 
     return (
         <div className="main__wrapper">
