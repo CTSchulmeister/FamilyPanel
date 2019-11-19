@@ -55,9 +55,10 @@ export const readNote = noteId => dispatch => {
     let currentHouseholdNotes = store.getState().households.currentHousehold.notes;
     let noteToRead = null;
 
-    for(let note of currentHouseholdNotes) {
-        if(note._id === noteId) {
-            noteToRead = note;
+    const notesLength = currentHouseholdNotes.length;
+    for(let i = 0; i < notesLength; i++) {
+        if(String(currentHouseholdNotes[i]._id) === String(noteId)) {
+            noteToRead = currentHouseholdNotes[i];
             break;
         }
     }

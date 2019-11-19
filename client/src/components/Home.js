@@ -11,45 +11,57 @@ import DisabledHomeSettingsContainer from '../containers/DisabledHomeSettingsCon
 
 const Home = ({
     user,
-    currentHousehold
+    currentHousehold,
+    isAuthenticated
 }) => {
-    const inviteButton = (
-        currentHousehold &&
-        ( currentHousehold.settings.allMembersCanInvite ||
-        currentHousehold._ownerId === user._id )
-    )
-        ? (
-            <Modal>
-                <CircleButton
-                    light={ true }
-                    tooltipText="Invite Member"
-                >
-                    <i className="fas fa-user-plus"></i>
-                </CircleButton>
-                <InvitationModalContentContainer />
-            </Modal>
+    let content;
+
+    if(isAuthenticated) {
+        const inviteButton = (
+            currentHousehold &&
+            ( currentHousehold.settings.allMembersCanInvite ||
+            currentHousehold._ownerId === user._id )
         )
-        : null;
+            ? (
+                <Modal>
+                    <CircleButton
+                        light={ true }
+                        tooltipText="Invite Member"
+                    >
+                        <i className="fas fa-user-plus"></i>
+                    </CircleButton>
+                    <InvitationModalContentContainer />
+                </Modal>
+            )
+            : null;
 
-    const settings = (currentHousehold && currentHousehold._ownerId === user._id)
-        ? <HomeSettingsContainer />
-        : <DisabledHomeSettingsContainer />;
+        const settings = (currentHousehold && currentHousehold._ownerId === user._id)
+            ? <HomeSettingsContainer />
+            : <DisabledHomeSettingsContainer />;
 
-    return (
-        <AppContainer activeLink="home">
+        content = (
             <section className="home">
                 <SectionHeader title={ currentHousehold.name }>
                     { inviteButton }
                 </SectionHeader>
                 { settings }
             </section>
+        );
+    } else {
+        content = null;
+    }
+
+    return (
+        <AppContainer activeLink="home">
+            { content }
         </AppContainer>
     );
 };
 
 Home.propTypes = {
     user: PropTypes.object.isRequired,
-    currentHousehold: PropTypes.object.isRequired
+    currentHousehold: PropTypes.object.isRequired,
+    isAuthenticated: PropTypes.bool.isRequired
 };
 
 export default Home;

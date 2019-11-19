@@ -33,25 +33,23 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
         if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
         if(!ObjectId.isValid(senderId)) throwInvalidObjectIdError('senderId', senderId);
 
-        // Cast to ObjectId
+        // Variable formatting
         householdId = ObjectId(householdId);
         senderId = ObjectId(senderId);
-
         recieverEmail = recieverEmail.toLowerCase();
 
-        const duplicateInvitation = await InvitationModel.findOne({
-            _householdId: householdId,
-            recieverEmail: recieverEmail
-        }).exec();
-
-        if(duplicateInvitation !== null) {
+        if(await checkIfDuplicateInvitationExists(householdId, recieverEmail)) {
             throw new Error(`An invitation like this already exists.`);
+        }
+
+        if(await checkIfRecieverBelongsToHousehold(householdId, recieverEmail)) {
+            throw new Error(`The reciever already belongs to this household.`);
         }
 
         const household = await HouseholdModel.findOne({
             _id: householdId,
             _memberIds: senderId
-        }).exec();
+        }).lean().exec();
 
         if(household === null) {
             throw new Error(`No household with the id ${ householdId } could be found.`);
@@ -230,4 +228,28 @@ const getHouseholdMembers = async householdId => {
     const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
 
     return members;
+};
+
+const checkIfDuplicateInvitationExists = async (householdId, recieverEmail) => {
+    const duplicateInvitation = await InvitationModel.findOne({
+        _householdId: householdId,
+        recieverEmail: recieverEmail
+    }).lean().exec();
+
+    return (duplicateInvitation !== null) ? true : false;
+};
+
+const checkIfRecieverBelongsToHousehold = async (householdId, recieverEmail) => {
+    const user = await UserModel.findOne({
+        email: recieverEmail
+    }).lean().exec();
+
+    if(!user) return false;
+
+    const householdsLength = user._householdIds.length;
+    for(let i = 0; i < householdsLength; i++) {
+        if(user._householdIds[i].equals(householdId)) return true;
+    }
+
+    return false;
 };

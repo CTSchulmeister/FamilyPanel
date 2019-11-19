@@ -28,8 +28,6 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
             throw new Error(`A user with the email ${ email } already exists.`);
         }
 
-        email = email.toLowerCase();
-
         let user = new UserModel({
             firstName: firstName,
             lastName: lastName,
@@ -48,7 +46,7 @@ module.exports.createUser = async (firstName, lastName, email, password) => {
         user.salt = undefined;
 
         const invitations = await InvitationModel.find({ 
-            recieverEmail: email 
+            recieverEmail: email.toLowerCase()
         }).lean().exec();
 
         if(invitations.length > 0) {

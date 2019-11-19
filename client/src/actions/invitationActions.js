@@ -51,13 +51,12 @@ export const createInvitation = invitationData => async dispatch => {
                 type: INVITATION_CREATION_ERROR,
                 errors: createInvitationResponse.errors
             });
-            return;
+        } else {
+            dispatch({
+                type: INVITATION_CREATED,
+                invitation: createInvitationResponse.invitation
+            });
         }
-
-        dispatch({
-            type: INVITATION_CREATED,
-            invitation: createInvitationResponse.invitation
-        });
     } catch (e) {
         dispatch({
             type: SERVER_CONNECTION_ERROR
