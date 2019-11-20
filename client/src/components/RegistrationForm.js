@@ -37,9 +37,11 @@ const formatErrors = errors => {
 
         incrementedKey++;
 
+        const message = (error instanceof Error) ? error.message : error.msg;
+
         return (
             <li className="form__error" key={ incrementedKey }>
-                <span className="form__error-param">{ param }</span> { error.msg }
+                <span className="form__error-param">{ param }</span> { message }
             </li>
         );
     });

@@ -4,6 +4,7 @@
   "description": "",
   "private": true,
   "dependencies": {
+    "crypto": "^1.0.1",
     "history": "^4.10.1",
     "lodash": "^4.17.15",
     "node-sass": "^4.12.0",

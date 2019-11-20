@@ -29,30 +29,16 @@ router.post('/', jsonParser, [
     check('email')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The email field cannot be left empty')
-        .custom((value, { req }) => value == req.body.retypeEmail)
-            .withMessage('The input for email and retype email did not match')
         .isEmail()
             .withMessage('An invalid email was submitted')
         .normalizeEmail()
         .trim()
         .escape(),
-    check('retypeEmail')
-        .exists({ checkFalsy: true, checkNull: true })
-            .withMessage('The retype email field cannot be left empty'),
     check('password')
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The password field cannot be left empty')
-        .custom((value, { req }) => value == req.body.retypePassword)
-            .withMessage('The input for password and retype password did not match')
-        .isLength({ min: 8 })
-            .withMessage('Password must be at least 8 characters long')
-        .custom(value => checkPasswordFormat(value))
-            .withMessage('Password must contain at least one letter, one number, and one special character')
         .isString()
-        .trim(),
-    check('retypePassword')
-        .exists({ checkFalsy: true, checkNull: true })
-            .withMessage('The retype password field cannot be left empty')
+        .trim()
 ], async (req, res) => {
     const errors = validationResult(req);
 

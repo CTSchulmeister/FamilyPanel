@@ -39,7 +39,10 @@ const updateHouseholdInHouseholdsArray = (state, household) => {
 };
 
 const changeCurrentHousehold = household => {
-    household.notes = _.sortBy(household.notes, 'createdAt').reverse();
+    if(household !== null) {
+        household.notes = _.sortBy(household.notes, 'createdAt').reverse();
+    }
+    
     return household;
 };
 
