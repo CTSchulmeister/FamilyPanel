@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import {
+    handledLinks
+} from '../constants';
 
 const SideBarGroup = ({
     type,
@@ -18,6 +21,11 @@ const SideBarGroup = ({
             title = 'Home';
             icon = <i className="fas fa-home"></i>;
             route = '/home';
+            break;
+        case 'tasks':
+            title = 'Tasks';
+            icon = <i className="fas fa-tasks"></i>;
+            route = '/tasks';
             break;
         case 'notes':
             title = 'Notes';
@@ -44,11 +52,7 @@ const SideBarGroup = ({
 
 SideBarGroup.propTypes = {
     active: PropTypes.bool.isRequired,
-    type: PropTypes.oneOf([
-        'profile',
-        'home',
-        'notes'
-    ]).isRequired
+    type: PropTypes.oneOf(handledLinks).isRequired
 };
 
 export default SideBarGroup;

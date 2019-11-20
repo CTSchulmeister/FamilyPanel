@@ -26,7 +26,19 @@ router.post('/', auth, jsonParser, [
         .exists({ checkFalsy: true, checkNull: true })
             .withMessage('The name field cannot be left empty')
         .isString()
-        .trim()
+        .trim(),
+    check('allMembersCanInvite')
+        .isBoolean()
+            .withMessage(`allMembersCanInvite must be a boolean value.`),
+    check(`allMembersCanCreateEvents`)
+        .isBoolean()
+            .withMessage(`allMembersCanCreateEvents must be a boolean value.`),
+    check(`allMembersCanCreateTasks`)
+        .isBoolean()
+            .withMessage(`allMembersCanCreateTasks must be a boolean value`),
+    check(`allMembersCanCreateNotes`)
+        .isBoolean()
+            .withMessage(`allMembersCanCreateNotes must be a boolean value`)
 ], async (req, res) => {
     const errors = validationResult(req);
 
@@ -42,12 +54,24 @@ router.post('/', auth, jsonParser, [
         });
     } else {
         try {
-            let memberIds = req.body.memberIds.map(memberId => String(memberId));
+            const {
+                ownerId,
+                memberIds,
+                name,
+                allMembersCanInvite,
+                allMembersCanCreateEvents,
+                allMembersCanCreateTasks,
+                allMembersCanCreateNotes
+            } = req.body;
 
             const { newHousehold, updatedUser } = await HouseholdController.createHousehold(
-                String(req.body.ownerId),
+                ownerId,
                 memberIds,
-                req.body.name
+                name,
+                allMembersCanInvite,
+                allMembersCanCreateEvents,
+                allMembersCanCreateTasks,
+                allMembersCanCreateNotes
             );
 
             res.status(200).json({
@@ -69,7 +93,7 @@ router.post('/', auth, jsonParser, [
 router.get('/:household', auth, async (req, res) => {
     try {
         const household = await HouseholdController.readHousehold(
-            String(req.params.household)
+            req.params.household
         );
 
         if(!household._memberIds.includes(req.user._id)) {
@@ -94,8 +118,8 @@ router.get('/:household', auth, async (req, res) => {
 router.get('/:household/members', auth, async (req, res) => {
     try {
         const members  = await HouseholdController.getMembersFromHousehold(
-            String(req.params.household), 
-            String(req.user._id)
+            req.params.household, 
+            req.user._id
         );
 
         res.status(200).json({
@@ -133,7 +157,7 @@ router.patch('/:household', auth, jsonParser, [
     } else {
         try {
             let household = await HouseholdController.readHousehold(
-                String(req.params.household)
+                req.params.household
             );
 
             if(household._ownerId != req.user._id) {
@@ -205,14 +229,14 @@ router.patch('/:household/settings', auth, jsonParser, [
     } else {
         try {
             const household = await HouseholdController.changeSettings(
-                String(req.body.householdId),
-                String(req.user._id),
+                req.body.householdId,
+                req.user._id,
                 req.body.allMembersCanInvite,
                 req.body.allMembersCanCreateEvents,
                 req.body.allMembersCanCreateTasks,
                 req.body.allMembersCanCreateNotes,
                 req.body.name,
-                String(req.body.ownerId)
+                req.body.ownerId
             );
     
             res.status(200).json({
@@ -229,10 +253,11 @@ router.patch('/:household/settings', auth, jsonParser, [
 });
 
 // DELETE
-router.delete('/:household', async (req, res) => {
+router.delete('/:household', auth, async (req, res) => {
     try {
         const household = await HouseholdController.deleteHousehold(
-            String(req.params.household)
+            req.params.household,
+            req.user._id
         );
 
         res.status(200).json({
@@ -587,7 +612,8 @@ router.post('/:household/note', auth, jsonParser, [
         .isString()
         .trim(),
     check('body')
-        .optional()
+        .exists({ checkFalsy: true, checkNull: true })
+            .withMessage('The body field cannot be left empty')
         .isString()
         .trim()
 ], async (req, res) => {
@@ -600,13 +626,11 @@ router.post('/:household/note', auth, jsonParser, [
         });
     } else {
         try {
-            const body = (req.body.body) ? req.body.body : null;
-
             const household = await HouseholdController.createNote(
-                String(req.params.household),
-                String(req.user._id),
+                req.params.household,
+                req.user._id,
                 req.body.title,
-                body
+                req.body.body
             );
 
             res.status(200).json({
@@ -627,8 +651,8 @@ router.post('/:household/note', auth, jsonParser, [
 router.get('/:household/note/:note', async (req, res) => {
     try {
         const note = await HouseholdController.readNote(
-            String(req.params.household), 
-            String(req.params.note)
+            req.params.household, 
+            req.params.note
         );
 
         res.status(200).json({
@@ -673,8 +697,8 @@ router.patch('/:household/note/:note', auth, jsonParser, [
             const body = (req.body.body) ? req.body.body : null;
 
             const household = await HouseholdController.updateNote(
-                String(req.params.household),
-                String(req.params.note),
+                req.params.household,
+                req.params.note,
                 title,
                 body
             );
@@ -697,9 +721,9 @@ router.patch('/:household/note/:note', auth, jsonParser, [
 router.delete('/:household/note/:note', auth, async (req, res) => {
     try {
         const household = await HouseholdController.deleteNote(
-            String(req.params.household), 
-            String(req.user._id), 
-            String(req.params.note)
+            req.params.household, 
+            req.user._id, 
+            req.params.note
         );
 
         res.status(200).json({

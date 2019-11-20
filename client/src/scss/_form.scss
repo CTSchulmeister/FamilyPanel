@@ -61,6 +61,10 @@
             }
         }
 
+        &--max-length {
+            margin-bottom: 0.5rem;
+        }
+
         &--light::after {
             background-color: $extra-dark-gray;
         }
@@ -193,6 +197,14 @@
                 color: $gray;
             }
         }
+    }
+
+    &__input-length {
+        position: absolute;
+        right: 0rem;
+        bottom: -0.5rem;
+        font-size: 0.5rem;
+        color: $extra-dark-gray;
     }
 
     &__hint {
@@ -433,77 +445,5 @@
         transform: scaleY(0);
     } to {
         transform: scaleY(1);
-    }
-}
-
-.user-option,
-.user-option--active {
-    display: grid;
-    grid-template-columns: 3rem 1fr;
-    grid-template-areas:
-        "picture name";
-
-    height: 3rem;
-    width: 100%;
-    padding: 0rem 0rem 0rem 1rem;
-    position: relative;
-
-    border-bottom: 0.125rem solid $primary;
-
-    transition: all ease-out 0.15s;
-
-    &:hover {
-        cursor: pointer;
-
-        background: $extra-light-gray;
-
-        transition: all ease-in 0.15s;
-    }
-
-    &__picture-wrapper {
-        grid-area: picture;
-
-        padding: 0.25rem;
-    }
-
-    &__picture {
-        height: 2.5rem;
-        width: 2.5rem;
-
-        border-radius: 50%;
-        border: 0.125rem solid $primary;
-    }
-
-    &__name {
-        grid-area: name;
-
-        padding: 1rem 0rem 0rem 0.5rem;
-
-        color: $dark-gray;
-        text-transform: uppercase;
-        letter-spacing: 0.1rem;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-    }
-}
-
-.user-option {
-    background: $white;
-}
-
-.user-option--active {
-    background: $extra-light-gray;
-
-    &::after {
-        content: '';
-
-        height: 100%;
-        width: 1rem;
-        position: absolute;
-        top: 0rem;
-        left: 0rem;
-
-        background: $primary;
     }
 }

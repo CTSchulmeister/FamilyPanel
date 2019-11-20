@@ -5,6 +5,8 @@ class SwitchButton extends Component {
     static BASE_CLASS = `switch-button`;
     static ON_CLASS = `${ SwitchButton.BASE_CLASS }--on`;
     static OFF_CLASS = `${ SwitchButton.BASE_CLASS }--off`;
+    static LIGHT_CLASS = `${ SwitchButton.BASE_CLASS }--light`;
+    static DARK_CLASS = `${ SwitchButton.BASE_CLASS }--dark`;
     static ANIMATE_CLASS = `${ SwitchButton.BASE_CLASS }--animate`;
 
     constructor(props) {
@@ -38,12 +40,20 @@ class SwitchButton extends Component {
             ? SwitchButton.ON_CLASS
             : SwitchButton.OFF_CLASS;
 
+        className += (this.props.light) 
+            ? ' ' + SwitchButton.LIGHT_CLASS
+            : ' ' + SwitchButton.DARK_CLASS;
+
         if(this.state.clicked) className += ` ${ SwitchButton.ANIMATE_CLASS }`;
+
+        const onClick = (this.props.disabled)
+            ? null
+            : this.toggle;
 
         return (
             <button
                 className={ className }
-                onClick={ this.toggle }
+                onClick={ onClick }
                 disabled={ this.props.disabled || false }
                 name={ this.props.name || null }
                 value={ this.props.value || null }

@@ -2,119 +2,213 @@
 
 // --- Modules
 const mongoose = require('mongoose');
+const validator = require('validator');
 const HouseholdModel = require('./household.model');
 const UserModel = require('../user/user.model');
-const { nonPersonalUserData } = require('../util');
+const { 
+    nonPersonalUserData,
+    throwInvalidObjectIdError
+} = require('../util');
+
+const ObjectId = mongoose.Types.ObjectId;
 
 // --- Household Controller Logic
 
 /**
- * Creates a household.
- * @param {String} ownerId - The id of the household's owner.
- * @param {Array<String} memberIds - An array of the ids of the household's members.
+ * @description Creates a household.
+ * @param {String | mongoose.Types.ObjectId} ownerId - The id of the household's owner.
+ * @param {Array<String | mongoose.Types.ObjectId>} memberIds - An array of the ids of the household's members.
  * @param {String} name - The household's name.
  */
-module.exports.createHousehold = async (ownerId, memberIds, name) => {
-    memberIds = [...memberIds];
-    memberIds = (memberIds.length > 0) ? memberIds : [ownerId];
-    if(!memberIds.includes(ownerId)) memberIds.push(ownerId);
+module.exports.createHousehold = async (
+    ownerId, 
+    memberIds, 
+    name, 
+    allMembersCanInvite,
+    allMembersCanCreateEvents,
+    allMembersCanCreateTasks,
+    allMembersCanCreateNotes
+) => {
+    try {
+        // Input Validation and ObjectId casting
+        if(!ObjectId.isValid(ownerId)) throwInvalidObjectIdError('ownerId', ownerId);
+        ownerId = ObjectId(ownerId);
 
-    if(await UserModel.countDocuments({ _id: { $in: memberIds } }) != memberIds.length) {
-        throw new Error(`At least one user in memberIds does not exist`);
+        if(!Array.isArray(memberIds)) throw new Error(`The memberIds argument is not an array.`);
+
+        const memberIdsLength = memberIds.length;
+        let ownerInMemberIds = false;
+
+        for(let i = 0; i < memberIdsLength; i++) {
+            if(!ObjectId.isValid(memberIds[i])) throwInvalidObjectIdError(`memberIds[${ i }]`, memberIds[i]);
+            memberIds[i] = ObjectId(memberIds[i]);
+            if(ownerId.equals(memberIds[i])) ownerInMemberIds = true;
+        }
+
+        if(!ownerInMemberIds) memberIds.push(ownerId);
+
+        if(await UserModel.countDocuments({ _id: { $in: memberIds } }).exec() != memberIds.length) {
+            throw new Error(`At least one user in memberIds does not exist`);
+        }
+
+        // Create household document
+        let newHousehold = await new HouseholdModel({
+            _ownerId: ownerId,
+            _memberIds: memberIds,
+            name: name,
+            settings: {
+                allMembersCanInvite: allMembersCanInvite,
+                allMembersCanCreateEvents: allMembersCanCreateEvents,
+                allMembersCanCreateTasks: allMembersCanCreateTasks,
+                allMembersCanCreateNotes: allMembersCanCreateNotes
+            }
+        }).save();
+        newHousehold = newHousehold._doc;
+
+        await UserModel.updateMany({ _id: { $in: memberIds }}, { $push: { _householdIds: newHousehold._id } }).exec();
+
+        newHousehold = {
+            ...newHousehold,
+            members: await getHouseholdMembers(newHousehold._id)
+        };
+
+        const updatedUser = await UserModel.findByIdAndUpdate(ownerId, {
+            currentHousehold: newHousehold._id
+        }, { new: true })
+            .lean()
+            .exec();
+
+        return { newHousehold, updatedUser };
+    } catch (e) {
+        throw e;
     }
-
-    let newHousehold = await new HouseholdModel({
-        _ownerId: ownerId,
-        _memberIds: memberIds,
-        name: name
-    })
-    
-    newHousehold.validate((err) => {
-        if(err) throw err;
-    });
-
-    newHousehold = await newHousehold.save();
-    newHousehold = newHousehold._doc;
-
-    await UserModel.updateMany({ _id: { $in: memberIds }}, { $push: { _householdIds: newHousehold._id } }).exec();
-
-    newHousehold = {
-        ...newHousehold,
-        members: await getHouseholdMembers(newHousehold._id)
-    };
-
-    let updatedUser = await UserModel.findByIdAndUpdate(ownerId, {
-        currentHousehold: newHousehold._id
-    }, { new: true }).exec();
-
-    return { newHousehold, updatedUser };
 };
 
 /**
- * Retrieves a household document by id.
- * @param {String} id - The household's _id value.
+ * @description Retrieves a household document by id.
+ * @param {String | mongoose.Types.ObjectId} id
+ * @returns { Promise<mongoose.Document> }
  */
-module.exports.readHousehold = async (id) => {
-    let household = await HouseholdModel.findById(id).exec();
+module.exports.readHousehold = async id => {
+    try {
+        // Input validation and ObjectId casting.
+        if(!ObjectId.isValid(id)) throwInvalidObjectIdError('id', id);
+        id = ObjectId(id);
 
-    if(!household) throw new Error(`Household with id ${ id } does not exist`);
+        // Retrieve household
+        let household = await HouseholdModel.findById(id)
+            .lean()
+            .exec();
 
-    household = {
-        ...household._doc,
-        members: await getHouseholdMembers(household._id)
-    };
+        if(!household) throw new Error(`Household with id ${ id } does not exist`);
 
-    return household;
+        household = {
+            ...household,
+            members: await getHouseholdMembers(household._id)
+        };
+
+        return household;
+    } catch (e) {
+        throw e;
+    }
 };
 
 /**
  * Retrieves the members belonging to a household.
- * @param {String} householdId - The household's _id value.
- * @param {String} userId - The id of the user making the request.
+ * @param {String | mongoose.Types.ObjectId } householdId - The household's _id value.
+ * @param {String | mongoose.Types.ObjectId } userId - The id of the user making the request.
+ * @returns {Promise<mongoose.Document[]>}
  */
 module.exports.getMembersFromHousehold = async (householdId, userId) => {
-    const household = await HouseholdModel.findOne({ _id: householdId, _memberIds: userId }).exec();
+    try {
+        // Input validation and ObjectId casting
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        householdId = ObjectId(householdId);
 
-    if(!household) {
-        throw new Error(`No household has the id ${ householdId } with a member with the id ${ userId }`);
+        if(!ObjectId.isValid(userId)) throwInvalidObjectIdError('userId', userId);
+        userId = ObjectId(userId);
+
+        const household = await HouseholdModel.findOne({ 
+            _id: householdId, 
+            _memberIds: userId 
+        }).lean().exec();
+
+        if(!household) throw new Error(`No household has the id ${ householdId } with a member with the id ${ userId }`);
+
+        return await getHouseholdMembers(household._id);
+    } catch (e) {
+        throw e;
     }
-
-    let members = await getHouseholdMembers(household._id);
-
-    return members;
 };
 
 /**
  * Updates a household document by id given update parameters.
  * Pass null to fields not being update.
- * @param {String} id - The household's id.
- * @param {String} [ownerId] - The household's new ownerId.
- * @param {Array<String>} [memberIds] - The household's new array of memberIds.
+ * @param {String | mongoose.Types.ObjectId} id - The household's id.
+ * @param {String | mongoose.Types.ObjectId} [ownerId] - The household's new ownerId.
+ * @param {Array<String | mongoose.Types.ObjectId>} [memberIds] - The household's new array of memberIds.
  * @param {String} [name] - The household's new name.
  */
 module.exports.updateHousehold = async (id, ownerId = null, memberIds = null, name = null) => {
-    let update = {};
+    try {
+        // Input validation and ObjectId casting
+        if(!ObjectId.isValid(id)) throwInvalidObjectIdError('id', id);
+        id = ObjectId(id);
 
-    if(!ownerId && !memberIds && !name) {
-        throw new Error(`No values were passed to update the household with id ${ id }`);
+        if(ownerId) {
+            if(!ObjectId.isValid(ownerId)) throwInvalidObjectIdError('ownerId', ownerId);
+            ownerId = ObjectId(ownerId);
+        }
+
+        if(memberIds) {
+            if(!Array.isArray(memberIds)) throw new Error(`The memberIds argument is not an array.`);
+
+            const memberIdsLength = memberIds.length;
+
+            for(let i = 0; i < memberIdsLength; i++) {
+                if(!ObjectId.isValid(memberIds[i])) throwInvalidObjectIdError(`memberIds[${ i }]`, memberIds[i]);
+            }
+        }
+
+        if(!ownerId && !memberIds && !name) {
+            throw new Error(`No values were passed to update the household with id ${ id }`);
+        }
+
+        let update = {};
+
+        if(ownerId) update._ownerId = ownerId;
+        if(memberIds) update._memberIds = memberIds;
+        if(name) update.name = name;
+
+        let updatedHousehold = await HouseholdModel.findByIdAndUpdate(id, update, { new: true })
+            .lean()
+            .exec();
+
+        if(!updatedHousehold) throw new Error(`Household with id ${ id } does not exist`);
+
+        updatedHousehold = {
+            ...updatedHousehold,
+            members: await getHouseholdMembers(updatedHousehold._id)
+        };
+
+        return updatedHousehold;
+    } catch (e) {
+        throw e;
     }
-
-    if(ownerId) update._ownerId = ownerId;
-    if(memberIds) update._memberIds = memberIds;
-    if(name) update.name = name;
-
-    let updatedHousehold = await HouseholdModel.findByIdAndUpdate(id, update, { new: true }).exec();
-
-    if(!updatedHousehold) throw new Error(`Household with id ${ id } does not exist`);
-
-    updatedHousehold = {
-        ...updatedHousehold._doc,
-        members: await getHouseholdMembers(updatedHousehold._id)
-    };
-
-    return updatedHousehold;
 };
 
+/**
+ * @description Updates a households settings
+ * @param {String | mongoose.Types.ObjectId} householdId
+ * @param {String | mongoose.Types.ObjectId} userId
+ * @param {Boolean} allMembersCanInvite
+ * @param {Boolean} allMembersCanCreateEvents
+ * @param {Boolean} allMembersCanCreateTasks
+ * @param {Boolean} allMembersCanCreateNotes
+ * @param {String} name
+ * @param {String | mongoose.Types.ObjectId} ownerId
+ * @returns {Promise<mongoose.Document>}
+ */
 module.exports.changeSettings = async (
     householdId,
     userId,
@@ -125,43 +219,90 @@ module.exports.changeSettings = async (
     name,
     ownerId
 ) => {
-    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId, _ownerId: userId },
-        { 
-            name: name,
-            _ownerId: ownerId,
-            settings: {
-                allMembersCanInvite: allMembersCanInvite,
-                allMembersCanCreateEvents: allMembersCanCreateEvents,
-                allMembersCanCreateTasks: allMembersCanCreateTasks,
-                allMembersCanCreateNotes: allMembersCanCreateNotes
-            }
-        },
-        { new: true }
-    );
+    try {
+        // Input validation and ObjectId casting
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        householdId = ObjectId(householdId);
 
-    if(!updatedHousehold) throw new Error(`...`);
+        if(!ObjectId.isValid(userId)) throwInvalidObjectIdError('userId', userId);
+        userId = ObjectId(userId);
 
-    updatedHousehold = {
-        ...updatedHousehold._doc,
-        members: await getHouseholdMembers(updatedHousehold._id)
-    };
+        if(!ObjectId.isValid(ownerId)) throwInvalidObjectIdError('ownerId', ownerId);
+        ownerId = ObjectId(ownerId);
 
-    return updatedHousehold;
+        if(allMembersCanInvite !== true && allMembersCanInvite !== false) {
+            throw new Error('The allMembersCanInvite argument is not a boolean value.');
+        }
+
+        if(allMembersCanCreateEvents !== true && allMembersCanCreateEvents !== false) {
+            throw new Error('The allMembersCanCreateEvents argument is not a boolean value.');
+        }
+
+        if(allMembersCanCreateTasks !== true && allMembersCanCreateTasks !== false) {
+            throw new Error('The allMembersCanCreateTasks argument is not a boolean value.');
+        }
+
+        if(allMembersCanCreateNotes !== true && allMembersCanCreateNotes !== false) {
+            throw new Error('The allMembersCanCreateNotes argument is not a boolean value.');
+        }
+
+        // Update settings
+        let updatedHousehold = await HouseholdModel.findOneAndUpdate(
+            { _id: householdId, _ownerId: userId },
+            { 
+                name: name,
+                _ownerId: ownerId,
+                settings: {
+                    allMembersCanInvite: allMembersCanInvite,
+                    allMembersCanCreateEvents: allMembersCanCreateEvents,
+                    allMembersCanCreateTasks: allMembersCanCreateTasks,
+                    allMembersCanCreateNotes: allMembersCanCreateNotes
+                }
+            },
+            { new: true }
+        ).lean().exec();
+
+        if(!updatedHousehold) throw new Error(`No household was found matching the query criteria.`);
+
+        updatedHousehold = {
+            ...updatedHousehold,
+            members: await getHouseholdMembers(updatedHousehold._id)
+        };
+
+        return updatedHousehold;
+    } catch (e) {
+        throw e;
+    }
 };
 
 /**
  * Deletes a household document by id.
- * @param {String} id - The household's id.
+ * @param {String | mongoose.Types.ObjectId} householdId
+ * @param {String | mongoose.Types.ObjectId} userId
+ * @returns {Promise<mongoose.Document>}
  */
-module.exports.deleteHousehold = async (id) => {
-    await UserModel.updateMany({ _householdIds: id }, { $pull: { _householdIds: id } }).exec();
+module.exports.deleteHousehold = async (householdId, userId) => {
+    try {
+        // Input validation.
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        if(!ObjectId.isValid(userId)) throwInvalidObjectIdError('userId', userId);
 
-    const household = await HouseholdModel.findByIdAndDelete(id).exec();
+        // Delete household
+        const household = await HouseholdModel.findOneAndDelete({
+            _id: householdId,
+            _ownerId: userId
+        }).lean().exec()
 
-    if(!household) throw new Error(`Household with id ${ id } does not exist`);
+        if(!household) throw new Error(`No household was found matching the query criteria.`);
 
-    return household;
+        await UserModel.updateMany({ _householdIds: householdId }, {
+            $pull: { _householdIds: householdId }
+        }).exec();
+
+        return household;
+    } catch (e) {
+        throw e;
+    }
 };
 
 // --- Event Controller Logic
@@ -458,30 +599,40 @@ module.exports.deleteTask = async (householdId, taskId) => {
  * @param {String} title - The note's title.
  * @param {String} [body] - The note's body.
  */
-module.exports.createNote = async (householdId, creatorId, title, body = null) => {
-    let note = {
-        _creatorId: creatorId,
-        title: title,
-        createdAt: Date.now()
-    };
+module.exports.createNote = async (householdId, creatorId, title, body) => {
+    try {
+        // Input validation
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        if(!ObjectId.isValid(creatorId)) throwInvalidObjectIdError('creatorId', creatorId);
 
-    if(body) note.body = body;
+        // Cast to ObjectId
+        householdId = ObjectId(householdId);
+        creatorId = ObjectId(creatorId);
 
-    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId },
-        { $push: { notes: note } },
-        { new: true }
-    ).exec();
+        const note = {
+            _creatorId: creatorId,
+            title: title,
+            body: body,
+            createdAt: Date.now()
+        };
 
-    if(!updatedHousehold) throw new Error(`No household was found that matched the query criteria.`);
- 
+        let updatedHousehold = await HouseholdModel.findOneAndUpdate(
+            { _id: householdId },
+            { $push: { notes: note } },
+            { new: true }
+        ).lean().exec();
 
-    updatedHousehold = {
-        ...updatedHousehold._doc,
-        members: await getHouseholdMembers(updatedHousehold._id)
-    };
+        if(!updatedHousehold) throw new Error(`No household was found that matched the query criteria.`);
 
-    return updatedHousehold;
+        updatedHousehold = {
+            ...updatedHousehold,
+            members: await getHouseholdMembers(updatedHousehold._id)
+        };
+
+        return updatedHousehold;
+    } catch (e) {
+        throw e;
+    }
 };
 
 /**
@@ -490,19 +641,37 @@ module.exports.createNote = async (householdId, creatorId, title, body = null) =
  * @param {String} noteId - The note's id.
  */
 module.exports.readNote = async (householdId, noteId) => {
-    const household = await HouseholdModel.findOne({ _id: householdId, 'notes._id': noteId }).exec();
+    try {
+        // Input validation
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        if(!ObjectId.isValid(noteId)) throwInvalidObjectIdError('noteId', noteId);
 
-    if(!household) { 
-        throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+        const household = await HouseholdModel.findOne({ 
+            _id: householdId, 'notes._id': noteId 
+        }).lean().exec();
+
+        if(!household) {
+            throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+        }
+
+        let note;
+
+        const notesLength = household.notes.length;
+        for(let i = 0; i < notesLength; i++) {
+            if(household.notes[i]._id.equals(noteId)) {
+                note = household.notes[i];
+                break;
+            }
+        }
+
+        if(!note) {
+            throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
+        }
+
+        return note;
+    } catch (e) {
+        throw e;
     }
-
-    const note = household.notes.id(noteId);
-
-    if(!note) {
-        throw new Error(`Error retrieving note ${ noteId } from household ${ householdId }`);
-    }
-
-    return note;
 };
 
 /**
@@ -513,32 +682,44 @@ module.exports.readNote = async (householdId, noteId) => {
  * @param {String} [body] - The note's new body.
  */
 module.exports.updateNote = async (householdId, noteId, title = null, body = null) => {
-    if(!title && !body) {
-        throw new Error(`No values were passed to update the note with id ${ noteId }`);
-    }
+    try {
+        // Input validation
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        if(!ObjectId.isValid(noteId)) throwInvalidObjectIdError('noteId', noteId);
+
+        if(!title && !body) {
+            throw new Error(`No values were passed to update the note with id ${ noteId }`);
+        }
+
+        // Cast to ObjectId
+        householdId = ObjectId(householdId);
+        noteId = ObjectId(noteId);
+
+        let update = {};
+
+        if(title) update['notes.$.title'] = title;
+        if(body) update['notes.$.body'] = body;
+        update['notes.$.updatedAt'] = Date.now();
+
+        let updatedHousehold = await HouseholdModel.findOneAndUpdate(
+            { _id: householdId, 'notes._id': noteId },
+            update,
+            { new: true }
+        ).lean().exec();
+
+        if(!updatedHousehold) {
+            throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+        }
+
+        updatedHousehold = {
+            ...updatedHousehold,
+            members: await getHouseholdMembers(updatedHousehold._id)
+        };
     
-    let update = {};    
-
-    if(title) update['notes.$.title'] = title;
-    if(body) update['notes.$.body'] = body;
-    update['notes.$.updatedAt'] = Date.now();
-
-    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId, 'notes._id': noteId },
-        update,
-        { new: true }
-    ).exec();
-
-    if(!updatedHousehold) {
-        throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+        return updatedHousehold;
+    } catch (e) {
+        throw e;
     }
-
-    updatedHousehold = {
-        ...updatedHousehold._doc,
-        members: await getHouseholdMembers(updatedHousehold._id)
-    };
-
-    return updatedHousehold;
 };
 
 /**
@@ -548,22 +729,37 @@ module.exports.updateNote = async (householdId, noteId, title = null, body = nul
  * @param {String} noteId - The note's id.
  */
 module.exports.deleteNote = async (householdId, userId, noteId) => {
-    let updatedHousehold = await HouseholdModel.findOneAndUpdate(
-        { _id: householdId, _memberIds: userId, 'notes._id': noteId },
-        { $pull: { notes: { _id: noteId, _creatorId: userId } } },
-        { new: true }
-    ).exec();
+    try {
+        // Input validation
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        if(!ObjectId.isValid(userId)) throwInvalidObjectIdError('userId', userId);
+        if(!ObjectId.isValid(noteId)) throwInvalidObjectIdError('noteId', noteId);
 
-    if(!updatedHousehold) {
-        throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+        // Cast to ObjectId
+        householdId = ObjectId(householdId);
+        userId = ObjectId(userId);
+        noteId = ObjectId(noteId);
+
+        // Delete Note
+        let updatedHousehold = await HouseholdModel.findOneAndUpdate(
+            { _id: householdId, _memberIds: userId, 'notes._id': noteId },
+            { $pull: { notes: { _id: noteId, _creatorId: userId } } },
+            { new: true }
+        ).lean().exec();
+
+        if(!updatedHousehold) {
+            throw new Error(`The household ${ householdId } does not have a note with the id ${ noteId }`);
+        }
+
+        updatedHousehold = {
+            ...updatedHousehold,
+            members: await getHouseholdMembers(updatedHousehold._id)
+        };
+
+        return updatedHousehold;
+    } catch (e) {
+        throw e;
     }
-
-    updatedHousehold = {
-        ...updatedHousehold._doc,
-        members: await getHouseholdMembers(updatedHousehold._id)
-    };
-
-    return updatedHousehold;
 };
 
 // HELPER METHODS
@@ -573,11 +769,7 @@ module.exports.deleteNote = async (householdId, userId, noteId) => {
  * @param {String} householdId
  */
 const getHouseholdMembers = async householdId => {
-    const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+    const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).lean().exec();
 
     return members;
-};
-
-const getHouseholdMembersLean = async householdId => {
-    return await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).lean().exec();
 };

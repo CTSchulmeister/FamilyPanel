@@ -4,7 +4,13 @@
 const mongoose = require('mongoose');
 
 const UserController = require('../../src/user/user.controller');
+const UserModel = require('../../src/user/user.model');
 const HouseholdModel = require('../../src/household/household.model');
+
+const {
+    userFactory,
+    householdFactory
+} = require('../testUtilties');
 
 process.env.TEST_SUITE = 'familypanel-user-controller-test';
 process.env.JWT_KEY = 'testkey';
@@ -38,11 +44,15 @@ describe('User Controller', () => {
 
     describe('readUser()', () => {
         test('Can retrieve a user', async () => {
-            let { user } = await UserController.createUser('B', 'Test', 'btest@email.com', 'mypassword');
+            const user = await userFactory();
+            const result = await UserController.readUser(user._id);
+            expect(result._id).toStrictEqual(user._id);
+        });
 
-            user = await UserController.readUser(user._id);
-
-            expect(user.firstName).toBe('B');
+        test('Can handle string arguments in place of objectIds', async () => {
+            const user = await userFactory();
+            const result = await UserController.readUser(String(user._id));
+            expect(result._id).toStrictEqual(user._id);
         });
 
         test('Throws an error if retrieving a non-existant user', async () => {
@@ -50,8 +60,8 @@ describe('User Controller', () => {
 
             try {
                 await UserController.readUser(new mongoose.Types.ObjectId());
-            } catch (err) {
-                error = err;
+            } catch (e) {
+                error = e;
             }
 
             expect(error).not.toBeNull();
@@ -60,11 +70,12 @@ describe('User Controller', () => {
 
     describe('updateUser()', () => {
         test('Can update a user', async () => {
-            let { user } = await UserController.createUser('C', 'Test', 'ctest@email.com', 'mypassword');
-
-            user = await UserController.updateUser(user._id, 'Bob', null, null, null);
-
-            expect(user.firstName).toBe('Bob');
+            const user = await userFactory();
+            const result = await UserController.updateUser(
+                user._id,
+                'Bob',
+            );
+            expect(result.firstName).toStrictEqual('Bob');
         });
 
         test('Throws an error if the user does not exist', async () => {
@@ -86,66 +97,57 @@ describe('User Controller', () => {
 
     describe('deleteUser()', () => {
         test('Can delete a user', async () => {
-            let { user } = await UserController.createUser('D', 'Test', 'dtest@email.com', 'mypassword');
-
-            user = await UserController.deleteUser(user._id);
-
-            expect(user.firstName).toBe('D');
+            const user = await userFactory();
+            await UserController.deleteUser(user._id);
+            const queryResult = await UserModel.findById(user).lean().exec();
+            expect(queryResult).toBeNull();
         });
     })
 
     test('Can delete a user and their owned household', async () => {
-        let { user } = await UserController.createUser('E', 'Test', 'etest@email.com', 'mypassword');
+        const user = await userFactory();
+        const household = await householdFactory(user);
 
-        let household = await new HouseholdModel({
-            _ownerId: user._id,
-            _memberIds: [user._id],
-            name: 'Test Household Two'
-        });
+        await UserController.deleteUser(user._id);
+        const queryResult = await HouseholdModel.findById(household._id);
 
-        user = await UserController.deleteUser(user._id);
-        household = await HouseholdModel.findById(household._id);
-
-        expect(user.firstName).toBe('E');
-        expect(household).toBeNull(); 
+        expect(queryResult).toBeNull();
     });
 
-    test('Can delete a user and their relevant documents from a not owner household', async () => {
-        let { user } = await UserController.createUser('F', 'Test', 'ftest@email.com', 'mypassword');
-        const mockUserId = new mongoose.Types.ObjectId();
+    test('Can delete a user and their relevant documents from a household they do not own', async () => {
+        const user = await userFactory();
+        const householdOwner = await userFactory();
+        const household = await householdFactory(householdOwner, user);
 
-        let household = await new HouseholdModel({
-            _ownerId: mockUserId._id,
-            _memberIds: [user._id, mockUserId],
-            name: 'Test Household One',
-            events: [{
-                _creatorId: user._id,
-                title: 'Concert',
-            }],
-            notes: [{
-                _creatorId: user._id,
-                title: 'My Note'
-            }],
-            tasks: [{
-                _creatorId: user._id,
-                _assignedUserIds: [user._id, mockUserId],
-                title: 'First Task'
-            }, {
-                _creatorId: mockUserId,
-                _assignedUserIds: [user._id, mockUserId],
-                title: 'Second Task'
-            }]
-        }).save();
+        const note = {
+            _creatorId: user._id,
+            title: 'My Note',
+            body: 'Blah blah blah'
+        };
 
-        user = await UserController.deleteUser(user._id);
+        const userTask = {
+            _creatorId: user._id,
+            _assignedUserId: [user._id, householdOwner._id],
+            title: 'My Task'
+        };
 
-        household = await HouseholdModel.findById(household._id);
+        const ownerTask = {
+            _creatorId: householdOwner._id,
+            _assignedUserId: [user._id, householdOwner._id],
+            title: 'Owner Task'
+        };
 
-        expect(user.firstName).toBe('F');
-        expect(Object.values(household._memberIds).indexOf(user._id)).toBe(-1);
-        expect(household.events.length).toBe(0);
-        expect(household.notes.length).toBe(0);
-        expect(household.tasks.length).toBe(1);
-        expect(Object.values(household.tasks[0]._assignedUserIds).indexOf(user._id)).toBe(-1);
+        await HouseholdModel.findByIdAndUpdate(household._id, {
+            $push: { notes: note, tasks: [userTask, ownerTask] }
+        }).lean().exec();
+
+        await UserController.deleteUser(user._id);
+
+        const queryResult = await HouseholdModel.findById(household._id);
+
+        expect(Object.values(queryResult._memberIds).indexOf(user._id)).toStrictEqual(-1);
+        expect(queryResult.notes.length).toStrictEqual(0);
+        expect(queryResult.tasks.length).toStrictEqual(1);
+        expect(Object.values(queryResult.tasks[0]._assignedUserIds).indexOf(user._id)).toStrictEqual(-1);
     });
 })

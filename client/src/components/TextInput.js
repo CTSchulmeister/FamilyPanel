@@ -1,18 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const TextInput = props => {
-    const inputClassName = (props.light)
+const TextInput = ({
+    type,
+    name,
+    value,
+    label,
+    onChange,
+    hint,
+    light,
+    maxLength,
+    minLength
+}) => {
+    const inputClassName = (light)
         ? 'form__text-input--light'
         : 'form__text-input--dark';
 
-    const labelClassName = (props.light)
+    const labelClassName = (light)
         ? 'form__label--light'
         : 'form__label--dark';
 
-    const inputGroupClassName = (props.light)
+    let inputGroupClassName = (light)
         ? 'form__input-group--light'
         : 'form__input-group--dark';
+
+    inputGroupClassName += (maxLength)
+        ? ' form__input-group--max-length'
+        : '';
 
     const focusInput = event => {
         if(event.target.classList.contains(`.${ inputGroupClassName }`)) {
@@ -24,31 +38,40 @@ const TextInput = props => {
         }
     }
 
-    const hint = (props.hint)
+    const inputHint = (hint)
         ? (
             <div className="form__hint">
                 <i className="fas fa-info-circle"></i>
                 &nbsp;
-                { props.hint }
+                { hint }
+            </div>
+        )
+        : null;
+
+    const inputLength = (maxLength)
+        ? (
+            <div className="form__input-length">
+                { value.length } / { maxLength }
             </div>
         )
         : null;
 
     return (
         <div className={ inputGroupClassName } onClick={ focusInput }>
-            { hint }
+            { inputHint }
             <input
                 className={ inputClassName }
-                type={ props.type }
-                name={ props.name }
-                value={ props.value }
-                onChange={ props.onChange }
-                maxLength={ props.maxLength || null }
-                minLength={ props.minLength || null }
+                type={ type }
+                name={ name }
+                value={ value }
+                onChange={ onChange }
+                maxLength={ maxLength || null }
+                minLength={ minLength || null }
             />
-            <label className={ labelClassName } htmlFor={ props.name }>
-                { props.label }
+            <label className={ labelClassName } htmlFor={ name }>
+                { label }
             </label>
+            { inputLength }
         </div>
     );
 };

@@ -7,8 +7,9 @@ import HomeSettingsGroup from './HomeSettingsGroup';
 import ToggleableHomeSetting from './ToggleableHomeSetting';
 import SubmitButton from './SubmitButton';
 import TextInput from './TextInput';
-import UserSelect from './UserSelect';
 import FormErrorBoundary from './FormErrorBoundary';
+import DropDown from './DropDown';
+import UserPanel from './UserPanel';
 
 const HomeSettings = ({
     handleSubmit,
@@ -23,6 +24,18 @@ const HomeSettings = ({
     name,
     ownerId
 }) => {
+    const owner = currentHousehold.members.filter(member => member._id === ownerId)[0];
+
+    const userOptions = currentHousehold.members.map(member => {
+        return <UserPanel 
+            user={ member } 
+            key={ member._id } 
+            isButton={ true } 
+            isRounded={ false } 
+            onClick={ () => handleUserSelect(member._id) }
+        />;
+    });
+
     return (
         <div className="home-settings">
             <div className="home-settings__header">
@@ -38,24 +51,28 @@ const HomeSettings = ({
                                 label={ 'Allow all members to invite: '}
                                 onClick={ () => handleToggleChange('allMembersCanInvite') }
                                 isOn={ allMembersCanInvite }
+                                light={ true }
                             />
                             <ToggleableHomeSetting
                                 label={ 'Allow all members to create events: '}
                                 onClick={ () => handleToggleChange('allMembersCanCreateEvents') }
                                 isOn={ allMembersCanCreateEvents }
+                                light={ true }
                             />
                             <ToggleableHomeSetting
                                 label={ 'Allow all members to create tasks: '}
                                 onClick={ () => handleToggleChange('allMembersCanCreateTasks') }
                                 isOn={ allMembersCanCreateTasks }
+                                light={ true }
                             />
                             <ToggleableHomeSetting
                                 label={ 'Allow all members to create notes: '}
                                 onClick={ () => handleToggleChange('allMembersCanCreateNotes') }
                                 isOn={ allMembersCanCreateNotes }
+                                light={ true }
                             />
                         </HomeSettingsGroup>
-                        <HomeSettingsGroup label="Change...">
+                        <HomeSettingsGroup label="Household Name">
                             <TextInput
                                 type="text"
                                 name="name"
@@ -64,12 +81,12 @@ const HomeSettings = ({
                                 label="Household Name"
                                 light={ true }
                             />
-                            <UserSelect
-                                users={ currentHousehold.members }
-                                activeUserId={ ownerId }
-                                title="Change Owner"
-                                onClick={ handleUserSelect }
-                            />
+                        </HomeSettingsGroup>
+                        <HomeSettingsGroup label="Owner">
+                            <DropDown>
+                                <UserPanel user={ owner } isDropDownTrigger={ true } isRounded={ true } />
+                                { userOptions }
+                            </DropDown>
                         </HomeSettingsGroup>
                         <SubmitButton text="Save" />
                     </form>

@@ -28,12 +28,16 @@ class CreateNoteFormContainer extends Component {
             value
         } = event.target;
 
+        const newNoteData = {
+            ...this.state.noteData,
+            [key]: value
+        };
+
+        const newCanSubmit = (newNoteData.title !== '' && newNoteData.body !== '') ? true : false;
+
         this.setState({
-            noteData: {
-                ...this.state.noteData,
-                [key]: value
-            },
-            canSubmit: true
+            noteData: newNoteData,
+            canSubmit: newCanSubmit
         });
     };
 

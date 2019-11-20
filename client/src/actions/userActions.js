@@ -10,6 +10,9 @@ import {
     LOG_OUT_ERROR,
     INVITATIONS_RECIEVED
 } from './types';
+import {
+    hashPassword
+} from '../util';
 
 import config from '../config';
 
@@ -20,6 +23,30 @@ export const registerUser = userData => async dispatch => {
         dispatch({
             type: PENDING_AUTHORIZATION
         });
+
+        let errors = [];
+
+        if(userData.email !== userData.retypeEmail) {
+            errors.push(new Error('The values for email and retype email do not match.'));
+        }
+
+        if(userData.password !== userData.retypePassword) {
+            errors.push(new Error('The values for password and retype password do not match.'));
+        }
+
+        if(errors.length > 0) {
+            dispatch({
+                type: REGISTRATION_ERROR,
+                errors: errors
+            });
+            return;
+        }
+
+        userData = {
+            ...userData,
+            password: hashPassword(userData.password),
+            retypePassword: undefined
+        };
 
         let registrationResponse = await fetch(`${ ROOT_URL }/api/user`, {
             method: 'POST',
@@ -64,13 +91,18 @@ export const logUserIn = userData => async dispatch => {
             type: PENDING_AUTHORIZATION
         });
 
+        const submissionData = {
+            ...userData,
+            password: hashPassword(userData.password)
+        };
+
         let userResponse = await fetch(`${ ROOT_URL }/api/user/login`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json' 
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify(submissionData)
         });
 
         userResponse = await userResponse.json();

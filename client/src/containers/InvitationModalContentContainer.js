@@ -48,9 +48,12 @@ class InvitationModalContentContainer extends Component {
         try {
             await this.props.clearInvitationErrors;
             await this.props.createInvitation(this.state.invitationData);
-            this.setState({
-                invitationCreatedSuccesfully: true
-            });
+
+            if(!this.props.invitationCreationError) {
+                this.setState({
+                    invitationCreatedSuccesfully: true
+                });
+            }
         } catch (error) {
             // TODO: Handle error with logging
             alert(`Error encountered creating invitation: ${ error }`);

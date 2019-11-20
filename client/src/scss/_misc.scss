@@ -26,3 +26,57 @@
         letter-spacing: 0.2rem;
     }
 }
+
+.user-panel,
+.user-panel--rounded {
+    display: grid;
+    grid-template-columns: 3rem calc(100% - 3rem);
+    grid-template-areas:
+        "picture name";
+
+    height: 3rem;
+    width: 100%;
+
+    background: $white;
+
+    &__picture-wrapper {
+        grid-area: picture;
+        padding: 0.25rem;
+    }
+
+    &__picture {
+        height: 2.5rem;
+        width: 2.5rem;
+
+        border-radius: 50%;
+        border: 0.125rem solid $primary;
+    }
+
+    &__name-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+        overflow: hidden;
+
+        color: $gray;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+
+        & i {
+            font-size: 1.5rem;
+        }
+    }
+
+    &[role="button"] {
+        &:hover {
+            background: $extra-light-gray;
+            cursor: pointer;
+        }
+    }
+}
+
+.user-panel--rounded {
+    border-radius: 1.5rem;
+}

@@ -19,6 +19,10 @@ const SideBarGroups = ({
                     active={ activeLink === 'home' }
                 />
                 <SideBarGroup
+                    type='tasks'
+                    active={ activeLink === 'tasks' }
+                />
+                <SideBarGroup
                     type='notes'
                     active={ activeLink === 'notes' }
                 />

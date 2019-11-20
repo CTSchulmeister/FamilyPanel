@@ -19,6 +19,7 @@ import {
     INVITATION_ACCEPTED,
     ACCEPT_INVITATION_ERROR
 } from '../actions/types';
+import _ from 'lodash';
 
 const initialState = {
     loading: false,
@@ -37,21 +38,37 @@ const updateHouseholdInHouseholdsArray = (state, household) => {
     });
 };
 
+const setHouseholds = households => {
+    if(households == null || !Array.isArray(households)) {
+        return [];
+    } else {
+        return households;
+    }
+};
+
+const addHousehold = (state, household) => {
+    return state.households.concat(household);
+};
+
+const changeCurrentHousehold = household => {
+    if(household !== null) {
+        household.notes = _.sortBy(household.notes, 'createdAt').reverse();
+    }
+    
+    return household;
+};
+
 export default function(state = initialState, action) {
     switch(action.type) {
         // Logging In / Out
         case USER_LOGGED_IN:
             return {
                 ...state,
-                households: action.households,
-                currentHousehold: action.currentHousehold
+                households: setHouseholds(action.households),
+                currentHousehold: changeCurrentHousehold(action.currentHousehold)
             };
         case USER_LOGGED_OUT: 
-            return {
-                ...state,
-                households: null,
-                currentHousehold: null
-            };
+            return initialState;
 
         // Household Actions
         case PENDING_HOUSEHOLD_CREATION:
@@ -63,8 +80,8 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                households: state.households.concat(action.currentHousehold),
-                currentHousehold: action.currentHousehold,
+                households: addHousehold(state, action.currentHousehold),
+                currentHousehold: changeCurrentHousehold(action.currentHousehold),
                 currentNote: null
             };
         case HOUSEHOLD_CREATION_ERROR:
@@ -82,7 +99,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                currentHousehold: action.currentHousehold,
+                currentHousehold: changeCurrentHousehold(action.currentHousehold),
                 currentNote: null
             };
         case CURRENT_HOUSEHOLD_CHANGE_ERROR:
@@ -100,7 +117,7 @@ export default function(state = initialState, action) {
                 ...state,
                 loading: false,
                 households: updateHouseholdInHouseholdsArray(state, action.household),
-                currentHousehold: action.household,
+                currentHousehold: changeCurrentHousehold(action.household),
                 currentNote: (action.currentNote || action.currentNote === null)
                     ? action.currentNote
                     : state.currentNote
@@ -147,7 +164,8 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                households: state.households.push(action.household)
+                households: addHousehold(state, action.household),
+                currentHousehold: changeCurrentHousehold(action.household)
             };
         case ACCEPT_INVITATION_ERROR:
             return {

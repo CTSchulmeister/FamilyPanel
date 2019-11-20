@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import isRequiredIf from 'react-proptype-conditional-require';
 
 import Modal from './Modal';
 import AppContainer from '../containers/AppContainer';
@@ -7,44 +8,59 @@ import HomeSettingsContainer from '../containers/HomeSettingsContainer';
 import InvitationModalContentContainer from '../containers/InvitationModalContentContainer';
 import SectionHeader from './SectionHeader';
 import CircleButton from './CircleButton';
+import DisabledHomeSettingsContainer from '../containers/DisabledHomeSettingsContainer';
 
 const Home = ({
     user,
-    currentHousehold
+    currentHousehold,
+    isAuthenticated
 }) => {
-    let canInvite;
+    let content = null;
 
-    if(currentHousehold) {
-        canInvite = (
-            currentHousehold.settings.allMembersCanInvite || 
-            currentHousehold._ownerId === user._id
+    if(isAuthenticated) {
+        const inviteButton = (
+            currentHousehold &&
+            ( currentHousehold.settings.allMembersCanInvite ||
+            currentHousehold._ownerId === user._id )
+        )
+            ? (
+                <Modal>
+                    <CircleButton
+                        light={ true }
+                        tooltipText="Invite Member"
+                    >
+                        <i className="fas fa-user-plus"></i>
+                    </CircleButton>
+                    <InvitationModalContentContainer />
+                </Modal>
+            )
+            : null;
+
+        const settings = (currentHousehold && currentHousehold._ownerId === user._id)
+            ? <HomeSettingsContainer />
+            : <DisabledHomeSettingsContainer />;
+
+        content = (
+            <section className="home">
+                <SectionHeader title={ currentHousehold.name }>
+                    { inviteButton }
+                </SectionHeader>
+                { settings }
+            </section>
         );
     }
 
     return (
         <AppContainer activeLink="home">
-            <section className="home">
-                <SectionHeader title="Home">
-                    <Modal>
-                        <CircleButton
-                            light={ true }
-                            disabled={ !canInvite }
-                            tooltipText="Invite Member"
-                        >
-                            <i className="fas fa-user-plus"></i>
-                        </CircleButton>
-                        <InvitationModalContentContainer />
-                    </Modal>
-                </SectionHeader>
-                <HomeSettingsContainer />
-            </section>
+            { content }
         </AppContainer>
     );
 };
 
 Home.propTypes = {
-    user: PropTypes.object.isRequired,
-    currentHousehold: PropTypes.object.isRequired
+    isAuthenticated: PropTypes.bool.isRequired,
+    currentHousehold: isRequiredIf(PropTypes.object, props => props.isAuthenticated === true),
+    user: isRequiredIf(PropTypes.object, props => props.isAuthenticated === true)   
 };
 
 export default Home;

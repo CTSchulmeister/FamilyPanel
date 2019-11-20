@@ -1,0 +1,10 @@
+.tasks {
+    display: grid;
+    grid-template-rows: 5.5rem calc(100% - 5.5rem);
+    grid-template-areas:
+        "sectionHeader"
+        "mainSection";
+
+    height: 100%;
+    width: 100%;
+}

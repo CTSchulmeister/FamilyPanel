@@ -8,9 +8,9 @@ import {
     selectCurrentHousehold
 } from '../selectors/householdSelectors';
 
-import Home from '../components/Home';
+import Tasks from '../components/Tasks';
 
-const HomeContainer = props => <Home { ...props } />;
+const TasksContainer = props => <Tasks { ...props } />;
 
 const mapStateToProps = state => ({
     user: selectUser(state),
@@ -18,4 +18,4 @@ const mapStateToProps = state => ({
     isAuthenticated: selectAuthenticationState(state)
 });
 
-export default connect(mapStateToProps)(HomeContainer);
+export default connect(mapStateToProps)(TasksContainer);

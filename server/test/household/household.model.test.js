@@ -15,15 +15,15 @@ describe('Household Model', () => {
 
     describe('CREATE', () => {
         test('Can create a household', async () => {
-            let household = await new HouseholdModel({
+            const household = await new HouseholdModel({
                 _ownerId: idOne,
                 _memberIds: [idOne, idTwo, idThree],
                 name: 'Our Apartment'
             }).save();
 
-            household = await HouseholdModel.findOne(household._id).exec();
+            const foundHousehold = await HouseholdModel.findById(household._id).exec();
 
-            expect(household.name).toEqual('Our Apartment');
+            expect(foundHousehold.name).toStrictEqual('Our Apartment');
         });
 
         test('Does not create a household if missing data', async () => {

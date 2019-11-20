@@ -51,3 +51,12 @@ module.exports.removePersonalData = (user) => {
 };
 
 module.exports.nonPersonalUserData = '_id firstName lastName email';
+
+/**
+ * @param {String} variableName
+ * @param {Any} value
+ * @returns {Error}
+ */
+module.exports.throwInvalidObjectIdError = (variableName, value) => {
+    throw new Error(`The ${ variableName } argument must be an objectId or a string representation of an objectId.  Recieved: ${ value } (Type of ${ typeof value }).`);
+};

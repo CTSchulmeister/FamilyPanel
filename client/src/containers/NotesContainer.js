@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { 
-    selectCurrentNote 
+import {
+    selectCurrentNote
 } from '../selectors/notesSelectors';
 
 import Notes from '../components/Notes';

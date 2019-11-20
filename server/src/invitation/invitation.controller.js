@@ -6,6 +6,12 @@ const validator = require('validator');
 const InvitationModel = require('./invitation.model');
 const HouseholdModel = require('../household/household.model');
 const UserModel = require('../user/user.model');
+const {
+    throwInvalidObjectIdError,
+    nonPersonalUserData
+} = require('../util');
+
+const ObjectId = mongoose.Types.ObjectId;
 
 // --- Invitation Controller Logic
 
@@ -24,27 +30,26 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
             throw new Error(`${ recieverEmail } is not an email.`);
         }
 
-        if(householdId == null) {
-            throw new Error(`The householdId argument must be a string representation of an objectId or an objectId.  Recieved: ${ householdId } (Type of ${ typeof householdId }).`);
-        }
+        if(!ObjectId.isValid(householdId)) throwInvalidObjectIdError('householdId', householdId);
+        if(!ObjectId.isValid(senderId)) throwInvalidObjectIdError('senderId', senderId);
 
-        if(senderId == null) {
-            throw new Error(`The senderId argument must be a string represntation of an objectId or an objectId.  Recieved: ${ senderId } (Tyep of ${ typeof senderId }).`);
-        }
+        // Variable formatting
+        householdId = ObjectId(householdId);
+        senderId = ObjectId(senderId);
+        recieverEmail = recieverEmail.toLowerCase();
 
-        const duplicateInvitation = await InvitationModel.findOne({
-            _householdId: householdId,
-            recieverEmail: recieverEmail
-        }).exec();
-
-        if(duplicateInvitation !== null) {
+        if(await checkIfDuplicateInvitationExists(householdId, recieverEmail)) {
             throw new Error(`An invitation like this already exists.`);
+        }
+
+        if(await checkIfRecieverBelongsToHousehold(householdId, recieverEmail)) {
+            throw new Error(`The reciever already belongs to this household.`);
         }
 
         const household = await HouseholdModel.findOne({
             _id: householdId,
             _memberIds: senderId
-        }).exec();
+        }).lean().exec();
 
         if(household === null) {
             throw new Error(`No household with the id ${ householdId } could be found.`);
@@ -70,33 +75,54 @@ module.exports.createInvitation = async (householdId, senderId, recieverEmail, m
 };
 
 /**
- * @description Deletes an invitation document
+ * @description Deletes an invitation, issued by the sender
  * @param {String | mongoose.Types.ObjectId} invitationId
- * @param {String | mongoose.Types.ObjectId} senderId
- * @return {Promise<mongoose.Document>}
+ * @param {String} senderId
+ * @returns {Promise<mongoose.Document>}
  */
-module.exports.deleteInvitation = async (invitationId, senderId) => {
+module.exports.deleteInvitationBySender = async (invitationId, senderId) => {
     try {
         // Input validation
-        if(invitationId === null) {
-            throw new Error(`The invitationId argument must be a string representation of an objectId or an objectId.  Recieved ${ invitationId } (Type of ${ typeof invitationId }).`)
-        }
+        if(!ObjectId.isValid(invitationId)) throwInvalidObjectIdError('invitationId', invitationId);
+        if(!ObjectId.isValid(senderId)) throwInvalidObjectIdError('senderId', senderId);
 
-        if(senderId === null) {
-            throw new Error(`The senderId argument must be a string representation of an objectId or an objectId.  Recieved ${ senderId } (Type of ${ typeof senderId }).`);
-        }
-
-        // Invitation deletion
+        // Delete invitation
         const deletedInvitation = await InvitationModel.findOneAndDelete({
             _id: invitationId,
             _senderId: senderId
-        }).exec();
+        }).lean().exec();
 
-        if(deletedInvitation === null) {
-            throw new Error(`No invitation could be found with the id ${ invitationId } from a sender with the id ${ senderId }.`);
-        }
+        if(!deletedInvitation) throw new Error(`No invitation could be found matching the query data.`);
 
-        return deletedInvitation;
+        return;
+    } catch (e) {
+        throw e;
+    }
+};
+
+/**
+ * @description Deletes an invitation, issued by the reciever
+ * @param {String | mongoose.Types.ObjectId} invitationId
+ * @param {String} recieverEmail
+ * @returns {Promise<mongoose.Document>}
+ */
+module.exports.deleteInvitationByReciever = async (invitationId, recieverEmail) => {
+    try {
+        // Input validation
+        if(!ObjectId.isValid(invitationId)) throwInvalidObjectIdError('invitationId', invitationId);
+        if(!validator.isEmail(recieverEmail)) throw new Error(`${ recieverEmail } is not an email.`);
+
+        // Delete invitation
+        recieverEmail = recieverEmail.toLowerCase();
+
+        const deletedInvitation = await InvitationModel.findOneAndDelete({
+            _id: invitationId,
+            recieverEmail: recieverEmail
+        }).lean().exec()
+
+        if(!deletedInvitation) throw new Error(`No invitation could be found matching the query data.`);
+
+        return;
     } catch (e) {
         throw e;
     }
@@ -107,7 +133,7 @@ module.exports.deleteInvitation = async (invitationId, senderId) => {
  * @param {String} recieverEmail
  * @returns {Promise<Array<mongoose.Document>>}
  */
-module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
+module.exports.getInvitationsByRecieverEmail = async recieverEmail => {
     try {
         // Input validation
         if(!validator.isEmail(recieverEmail)) {
@@ -115,6 +141,8 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
         }
 
         // Invitation querying
+        recieverEmail = recieverEmail.toLowerCase();
+
         let invitations = await InvitationModel.find({
             recieverEmail: recieverEmail
         }).lean().exec();
@@ -151,13 +179,8 @@ module.exports.getInvitationsByRecieverEmail = async (recieverEmail) => {
 module.exports.acceptInvitation = async (invitationId, recieverId) => {
     try {
         // Input validation
-        if(invitationId == null) {
-            throw new Error(`The invitationId argument must be a string representation of an objectId or an objectId.  Recieved: ${ invitationId } (Type of ${ typeof invitationId }).`);
-        }
-
-        if(recieverId == null) {
-            throw new Error(`The recieverId argument must be a string representation of an objectId or an objectId.  Recieved: ${ recieverId } (Type of ${ typeof recieverId }).`);
-        }
+        if(!ObjectId.isValid(invitationId)) throwInvalidObjectIdError('invitationId', invitationId);
+        if(!ObjectId.isValid(recieverId)) throwInvalidObjectIdError('recieverId', recieverId);
 
         // Invitation acceptance
         const user = await UserModel.findById(recieverId).exec();
@@ -176,13 +199,20 @@ module.exports.acceptInvitation = async (invitationId, recieverId) => {
             throw new Error(`The invitation with the id ${ invitationId } does not match the user with the id ${ recieverId }.`);
         }
 
-        await InvitationModel.findByIdAndDelete(invitationId).exec();
-        const household = await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
+        await InvitationModel.findByIdAndDelete(invitationId).lean().exec();
+
+        let household = await HouseholdModel.findByIdAndUpdate(invitation._householdId, {
             $push: { _memberIds: user._id }
-        }).exec();
+        }, { new: true }).lean().exec();
+        household = {
+            ...household,
+            members: await getHouseholdMembers(household._id)
+        };
+
         const updatedUser = await UserModel.findByIdAndUpdate(user._id, {
-            $push: { _householdIds: invitation._householdId }
-        }).exec();
+            $push: { _householdIds: invitation._householdId },
+            currentHousehold: invitation._householdId
+        }, { new: true }).lean().exec();
 
         return {
             updatedUser,
@@ -191,4 +221,35 @@ module.exports.acceptInvitation = async (invitationId, recieverId) => {
     } catch (e) {
         throw e;
     }
+};
+
+// Util
+const getHouseholdMembers = async householdId => {
+    const members = await UserModel.find({ _householdIds: householdId }, nonPersonalUserData).exec();
+
+    return members;
+};
+
+const checkIfDuplicateInvitationExists = async (householdId, recieverEmail) => {
+    const duplicateInvitation = await InvitationModel.findOne({
+        _householdId: householdId,
+        recieverEmail: recieverEmail
+    }).lean().exec();
+
+    return (duplicateInvitation !== null) ? true : false;
+};
+
+const checkIfRecieverBelongsToHousehold = async (householdId, recieverEmail) => {
+    const user = await UserModel.findOne({
+        email: recieverEmail
+    }).lean().exec();
+
+    if(!user) return false;
+
+    const householdsLength = user._householdIds.length;
+    for(let i = 0; i < householdsLength; i++) {
+        if(user._householdIds[i].equals(householdId)) return true;
+    }
+
+    return false;
 };

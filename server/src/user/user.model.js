@@ -65,6 +65,10 @@ UserSchema.methods.generateAuthToken = async function() {
     return token;
 }
 
+UserSchema.pre('save', function() {
+    this.email = this.email.toLowerCase();
+});
+
 const User = mongoose.connection.model('User', UserSchema);
 
 module.exports = User;

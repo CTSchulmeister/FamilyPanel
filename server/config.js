@@ -4,7 +4,8 @@ module.exports = {
         useNewUrlParser: true, 
         useFindAndModify: false,
         useCreateIndex: true,
-        autoIndex: false
+        autoIndex: false,
+        useUnifiedTopology: true
     },
     PORT: 8080,
     JWT_KEY: 'insecureJWTKey'
