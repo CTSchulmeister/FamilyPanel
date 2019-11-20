@@ -52,7 +52,6 @@ export const createHousehold = householdData => async dispatch => {
             user: createHouseholdResponse.user
         });
     } catch (error) {
-        alert(`Error: ${ JSON.stringify(error) }`);
         dispatch({
             type: SERVER_CONNECTION_ERROR
         });

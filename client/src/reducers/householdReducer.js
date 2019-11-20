@@ -38,6 +38,14 @@ const updateHouseholdInHouseholdsArray = (state, household) => {
     });
 };
 
+const setHouseholds = households => {
+    if(households == null || !Array.isArray(households)) {
+        return [];
+    } else {
+        return households;
+    }
+};
+
 const changeCurrentHousehold = household => {
     if(household !== null) {
         household.notes = _.sortBy(household.notes, 'createdAt').reverse();
@@ -52,7 +60,7 @@ export default function(state = initialState, action) {
         case USER_LOGGED_IN:
             return {
                 ...state,
-                households: action.households,
+                households: setHouseholds(action.households),
                 currentHousehold: changeCurrentHousehold(action.currentHousehold)
             };
         case USER_LOGGED_OUT: 
