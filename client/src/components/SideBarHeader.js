@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import isRequiredIf from 'react-proptype-conditional-require';
 
 import DropDown from './DropDown';
 
@@ -52,11 +53,9 @@ const SideBarHeader = ({
 };
 
 SideBarHeader.propTypes = {
-    toggleHouseholdCreationForm: PropTypes.func.isRequired,
-    handleHouseholdCreation: PropTypes.func.isRequired,
-    showHouseholdCreation: PropTypes.bool.isRequired,
     changeCurrentHousehold: PropTypes.func.isRequired,
-    currentHousehold: PropTypes.object.isRequired
+    households: PropTypes.array.isRequired,
+    currentHousehold: isRequiredIf(PropTypes.object, props => props.households.length > 0)
 };
 
 export default SideBarHeader;

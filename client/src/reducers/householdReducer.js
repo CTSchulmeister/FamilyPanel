@@ -46,6 +46,10 @@ const setHouseholds = households => {
     }
 };
 
+const addHousehold = (state, household) => {
+    return state.households.concat(household);
+};
+
 const changeCurrentHousehold = household => {
     if(household !== null) {
         household.notes = _.sortBy(household.notes, 'createdAt').reverse();
@@ -76,7 +80,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                households: state.households.concat(action.currentHousehold),
+                households: addHousehold(state, action.currentHousehold),
                 currentHousehold: changeCurrentHousehold(action.currentHousehold),
                 currentNote: null
             };
@@ -160,7 +164,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 loading: false,
-                households: state.households.concat(action.household),
+                households: addHousehold(state, action.household),
                 currentHousehold: changeCurrentHousehold(action.household)
             };
         case ACCEPT_INVITATION_ERROR:

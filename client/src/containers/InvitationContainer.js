@@ -8,6 +8,9 @@ import {
 import {
     selectInvitations
 } from '../selectors/invitationSelectors';
+import {
+    selectAuthenticationState
+} from '../selectors/userSelectors';
 import history from '../history';
 
 import Invitation from '../components/Invitation';
@@ -26,6 +29,7 @@ const InvitationContainer = props => {
         acceptInvitation: props.acceptInvitation,
         deleteInvitation: props.deleteInvitationByReciever,
         invitation: invitation,
+        isAuthenticated: props.isAuthenticated,
         history: history
     };
 
@@ -35,6 +39,7 @@ const InvitationContainer = props => {
 }
 
 const mapStateToProps = state => ({
+    isAuthenticated: selectAuthenticationState(state),
     invitations: selectInvitations(state)
 });
 

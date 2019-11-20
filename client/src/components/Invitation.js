@@ -17,22 +17,22 @@ const Invitation = props => {
         );
 
     return (
-        <AppContainer activeLink={ null }>
+        <AppContainer activeLink={ '' }>
+            { props.isAuthenticated &&
             <section className="invitation">
                 <SectionHeader title="Invitation" />
                 { mainSection }
             </section>
+            }
         </AppContainer>
     );
 };
 
 Invitation.propTypes = {
-    acceptInvitaiton: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool.isRequired,
+    acceptInvitation: PropTypes.func.isRequired,
     deleteInvitation: PropTypes.func.isRequired,
-    invitation: PropTypes.oneOf([
-        PropTypes.object,
-        null
-    ]).isRequired
+    invitation: PropTypes.object
 };
 
 export default Invitation;

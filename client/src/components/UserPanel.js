@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 const UserPanel = props => {
     const {
         firstName,
-        lastName,
-        _id
+        lastName
     } = props.user;
 
     const className = (props.isRounded)

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import isRequiredIf from 'react-proptype-conditional-require';
 
 import AppContainer from '../containers/AppContainer';
 import SectionHeader from './SectionHeader';
@@ -27,9 +28,9 @@ const Tasks = ({
 };
 
 Tasks.propTypes = {
-    user: PropTypes.object.isRequired,
-    currentHousehold: PropTypes.object.isRequired,
-    isAuthenticated: PropTypes.bool.isRequired
+    isAuthenticated: PropTypes.bool.isRequired,
+    user: isRequiredIf(PropTypes.object, props => props.isAuthenticated === true),
+    currentHousehold: isRequiredIf(PropTypes.object, props => props.isAuthenticated === true)  
 };
 
 export default Tasks;

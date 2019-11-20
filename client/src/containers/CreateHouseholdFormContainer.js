@@ -4,7 +4,8 @@ import {
     createHousehold 
 } from '../actions/householdActions';
 import {
-    selectUser
+    selectUser,
+    selectAuthenticationState
 } from '../selectors/userSelectors';
 import history from '../history';
 
@@ -98,6 +99,7 @@ class CreateHouseholdFormContainer extends Component {
             handleToggleChange: this.handleToggleChange,
             handleSubmit: this.handleSubmit,
             className: this.props.className,
+            isAuthenticated: this.props.isAuthenticated,
             allowSubmit: this.state.allowSubmit,
             ...this.state.submissionData
         };
@@ -107,7 +109,8 @@ class CreateHouseholdFormContainer extends Component {
 }
 
 const mapStateToProps = state => ({
-    user: selectUser(state)
+    user: selectUser(state),
+    isAuthenticated: selectAuthenticationState(state)
 });
 
 export default connect(mapStateToProps, { 

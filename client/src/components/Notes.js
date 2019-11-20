@@ -42,7 +42,7 @@ const Notes = ({
 Notes.propTypes = {
     showCreateNote: PropTypes.bool.isRequired,
     toggleShowCreateNote: PropTypes.func.isRequired,
-    currentNote: PropTypes.object.isRequired
+    currentNote: PropTypes.object
 };
 
 export default Notes;

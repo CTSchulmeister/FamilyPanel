@@ -116,8 +116,8 @@ const InvitationModalContent = ({
 };
 
 InvitationModalContent.propTypes = {
-    invitationCreationError: PropTypes.object.isRequired,
-    invitationCreatedSuccesfully: PropTypes.bool.isRequired,
+    invitationCreationError: PropTypes.array,
+    invitationCreatedSuccesfully: PropTypes.bool,
     handleSubmit: PropTypes.func.isRequired,
     handleChange: PropTypes.func.isRequired,
     toggleIsShown: PropTypes.func.isRequired,

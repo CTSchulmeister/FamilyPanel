@@ -73,8 +73,8 @@ const NotesList = ({
 NotesList.propTypes = {
     user: PropTypes.object.isRequired,
     currentHousehold: PropTypes.object.isRequired,
-    currentNote: PropTypes.object.isRequired,
-    toggleShowCreateNotes: PropTypes.func.isRequired
+    currentNote: PropTypes.object,
+    toggleShowCreateNote: PropTypes.func.isRequired
 };
 
 export default NotesList;

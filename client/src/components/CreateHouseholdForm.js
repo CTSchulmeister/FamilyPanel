@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import isRequiredIf from 'react-proptype-conditional-require';
 
 import AppContainer from '../containers/AppContainer';
 import FormErrorBoundary from './FormErrorBoundary';
@@ -13,6 +14,7 @@ import Paragraph from './Paragraph';
 import Heading from './Heading';
 
 const CreateHouseholdForm = ({
+    isAuthenticated,
     handleChange,
     handleToggleChange,
     handleSubmit,
@@ -25,7 +27,8 @@ const CreateHouseholdForm = ({
     allMembersCanCreateNotes
 }) => {
     return (
-        <AppContainer activeLink={ null }>
+        <AppContainer activeLink={ '' }>
+            { isAuthenticated &&
             <section className="create-household">
                 <SectionHeader title="Create Household" />
                 <div className="create-household__form-wrapper">
@@ -101,14 +104,16 @@ const CreateHouseholdForm = ({
                     </div>
                 </div>
             </section>
+            }
         </AppContainer>
     );
 };
 
 CreateHouseholdForm.propTypes = {
+    isAuthenticated: PropTypes.bool.isRequired,
     handleChange: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
-    name: PropTypes.string.isRequired,
+    name: isRequiredIf(PropTypes.string, props => props.isAuthenticated === true),
     className: PropTypes.string
 };
 

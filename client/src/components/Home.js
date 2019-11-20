@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import isRequiredIf from 'react-proptype-conditional-require';
 
 import Modal from './Modal';
 import AppContainer from '../containers/AppContainer';
@@ -57,9 +58,9 @@ const Home = ({
 };
 
 Home.propTypes = {
-    user: PropTypes.object.isRequired,
-    currentHousehold: PropTypes.object.isRequired,
-    isAuthenticated: PropTypes.bool.isRequired
+    isAuthenticated: PropTypes.bool.isRequired,
+    currentHousehold: isRequiredIf(PropTypes.object, props => props.isAuthenticated === true),
+    user: isRequiredIf(PropTypes.object, props => props.isAuthenticated === true)   
 };
 
 export default Home;

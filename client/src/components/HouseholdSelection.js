@@ -33,7 +33,6 @@ const HouseholdSelection = ({
 };
 
 HouseholdSelection.propTypes = {
-    toggleHouseholdCreationForm: PropTypes.func.isRequired,
     changeCurrentHousehold: PropTypes.func.isRequired,
     households: PropTypes.array.isRequired
 };

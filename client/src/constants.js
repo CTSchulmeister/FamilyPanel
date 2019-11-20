@@ -3,5 +3,5 @@ export const handledLinks = [
     'home',
     'notes',
     'tasks',
-    null
+    ''
 ];

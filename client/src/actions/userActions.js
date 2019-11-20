@@ -130,7 +130,6 @@ export const logUserIn = userData => async dispatch => {
             invitations: userResponse.invitations
         });
     } catch (error) {
-        alert(error);
         dispatch({
             type: SERVER_CONNECTION_ERROR
         });
